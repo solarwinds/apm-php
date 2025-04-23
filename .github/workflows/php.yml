@@ -1,0 +1,104 @@
+name: PHP Composer
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ '8.1', '8.2', '8.3' ]
+        composer_args: [""]
+        include:
+          - php-version: 8.4
+            experimental: false
+            composer_args: "--ignore-platform-reqs"
+    env:
+      extensions: ast, grpc, opentelemetry, protobuf
+
+    steps:
+    - name: Set cache key
+      id: key
+      run: |
+        echo "key=$(date +'%Y-%U')" >> $GITHUB_ENV
+
+    - uses: actions/checkout@v4
+
+    - name: Setup cache environment
+      id: extcache
+      uses: shivammathur/cache-extensions@v1
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: ${{ env.extensions }}
+        key: ${{ env.key }}
+
+    - name: Cache extensions
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.extcache.outputs.dir }}
+        key: ${{ steps.extcache.outputs.key }}
+        restore-keys: ${{ steps.extcache.outputs.key }}
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        coverage: xdebug
+        tools: php-cs-fixer
+        extensions: ${{ env.extensions }}
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.php-version }}-php-
+
+    - name: Cache test tools
+      id: test-tools-cache
+      uses: actions/cache@v4
+      with:
+        path: vendor-bin
+        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.php-version }}-php-
+
+    - name: Install dependencies
+      id: composer
+      if: steps.composer-cache.outputs.cache-hit != 'true'
+      run: composer install --prefer-dist --no-progress ${{ matrix.composer_args }}
+
+    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
+    # Docs: https://getcomposer.org/doc/articles/scripts.md
+
+    # - name: Run test suite
+    #   run: composer run-script test
+    - name: Run Phpstan
+      id: phpstan
+      continue-on-error: true
+      run: vendor/bin/phpstan analyse --error-format=github
+
+    - name: Run PHPUnit (unit tests)
+      id: unit
+      continue-on-error: true
+      env:
+        OTEL_LOG_LEVEL: none
+      run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+
+    - name: Code Coverage
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.clover
+        flags: ${{ matrix.php-version }}

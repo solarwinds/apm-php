@@ -1,6 +1,10 @@
 {
   "name": "solarwinds/apm-php",
+  "description": "OpenTelemetry custom distro to connect to Solarwinds",
+  "keywords": ["solarwinds_apm", "swo", "instrumentation", "performance", "opentelemetry", "observability"],
   "type": "library",
+  "readme": "./README.md",
+  "license": "Apache-2.0",
   "autoload": {
     "psr-4": {
       "Solarwinds\\ApmPhp\\": "src/"
@@ -18,17 +22,18 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require-dev": {
-    "phpunit/phpunit": "^10.0",
+    "phpunit/phpunit": "^10 || ^11",
     "rector/rector": "^1.0",
-    "phpstan/phpstan": "^1.12",
+    "phpstan/phpstan": "^1.10.13",
     "phpstan/phpstan-mockery": "^1.1",
-    "phpstan/phpstan-phpunit": "^1.3"
+    "phpstan/phpstan-phpunit": "^1.3",
+    "symfony/http-client": "^5.2"
   },
   "require": {
     "php": "^8.1",
     "open-telemetry/sdk": "^1.1",
-    "symfony/http-client": "7.2.x-dev",
-    "nyholm/psr7": "^1.8@dev",
+    "psr/http-client": "^1.0",
+    "nyholm/psr7": "^1.4",
     "open-telemetry/exporter-otlp": "^1.1"
   },
   "config": {
