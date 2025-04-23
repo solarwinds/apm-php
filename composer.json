@@ -1,6 +1,10 @@
 {
   "name": "solarwinds/apm-php",
+  "description": "OpenTelemetry custom distro to connect to Solarwinds",
+  "keywords": ["solarwinds_apm", "swo", "instrumentation", "performance", "opentelemetry", "observability"],
   "type": "library",
+  "readme": "./README.md",
+  "license": "Apache-2.0",
   "autoload": {
     "psr-4": {
       "Solarwinds\\ApmPhp\\": "src/"
