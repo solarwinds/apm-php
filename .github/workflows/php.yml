@@ -95,3 +95,10 @@ jobs:
       env:
         OTEL_LOG_LEVEL: none
       run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+
+    - name: Code Coverage
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.clover
+        flags: ${{ matrix.php-version }}
