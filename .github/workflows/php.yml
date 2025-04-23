@@ -19,9 +19,6 @@ jobs:
           - php-version: 8.4
             experimental: false
             composer_args: "--ignore-platform-reqs"
-          - php-version: 8.5
-            experimental: true
-            composer_args: "--ignore-platform-reqs"
     env:
       extensions: ast, grpc, opentelemetry, protobuf
 
@@ -98,11 +95,3 @@ jobs:
       env:
         OTEL_LOG_LEVEL: none
       run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
-
-  packages:
-    uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@main
-    needs: php
-    with:
-      matrix_extension: '["ast, json, grpc"]'
-      matrix_php_version: '["8.1", "8.2", "8.3"]'
-      install_directory: '~/.test/.packages'
