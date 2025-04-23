@@ -13,8 +13,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ '8.0', '8.1', '8.2', '8.3' ]
+        php-version: [ '8.1', '8.2', '8.3' ]
         composer_args: [""]
+        include:
+          - php-version: 8.4
+            experimental: false
+            composer_args: "--ignore-platform-reqs"
+          - php-version: 8.5
+            experimental: true
+            composer_args: "--ignore-platform-reqs"
     env:
       extensions: ast, grpc, opentelemetry, protobuf
 
@@ -88,6 +95,8 @@ jobs:
     - name: Run PHPUnit (unit tests)
       id: unit
       continue-on-error: true
+      env:
+        OTEL_LOG_LEVEL: none
       run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
   packages:
