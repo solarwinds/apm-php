@@ -56,5 +56,12 @@
       "php-http/discovery": true,
       "symfony/runtime": true
     }
+  },
+  "extra": {
+    "bamarni-bin": {
+      "bin-links": false,
+      "target-directory": "vendor-bin",
+      "forward-command": true
+    }
   }
 }
