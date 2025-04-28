@@ -47,7 +47,7 @@ class XTraceOptionsPropagatorTest extends TestCase
         $context = $this->propagator->extract($carrier);
         $bag = XTraceOptionsBaggage::fromContext($context);
         $this->assertTrue(!$bag->isEmpty());
-        $this->assertEquals('foo', $bag->getEntry('x-trace-options')->getValue());
+        $this->assertEquals('foo', $bag->getEntry('x-trace-options')?->getValue());
         $this->assertNull($bag->getEntry('x-trace-options-signature'));
     }
 
@@ -60,8 +60,8 @@ class XTraceOptionsPropagatorTest extends TestCase
         $context = $this->propagator->extract($carrier);
         $bag = XTraceOptionsBaggage::fromContext($context);
         $this->assertTrue(!$bag->isEmpty());
-        $this->assertEquals('foo', $bag->getEntry('x-trace-options')->getValue());
-        $this->assertEquals('bar', $bag->getEntry('x-trace-options-signature')->getValue());
+        $this->assertEquals('foo', $bag->getEntry('x-trace-options')?->getValue());
+        $this->assertEquals('bar', $bag->getEntry('x-trace-options-signature')?->getValue());
     }
 
     public function test_extract_x_trace_options_baggage_signature_only(): void

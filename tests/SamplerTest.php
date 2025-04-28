@@ -161,7 +161,6 @@ class SamplerTest extends TestCase
         $this->assertTrue($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1], $spans[0]->getAttributes()->toArray());
@@ -218,7 +217,6 @@ class SamplerTest extends TestCase
         $this->assertFalse($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
     }
@@ -241,7 +239,6 @@ class SamplerTest extends TestCase
         $this->assertTrue($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1], $spans[0]->getAttributes()->toArray());
@@ -265,7 +262,6 @@ class SamplerTest extends TestCase
         $this->assertFalse($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
     }
@@ -288,7 +284,6 @@ class SamplerTest extends TestCase
         $this->assertTrue($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1], $spans[0]->getAttributes()->toArray());
@@ -312,7 +307,6 @@ class SamplerTest extends TestCase
         $this->assertFalse($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
     }
@@ -335,7 +329,6 @@ class SamplerTest extends TestCase
         $this->assertTrue($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1], $spans[0]->getAttributes()->toArray());
@@ -365,7 +358,6 @@ class SamplerTest extends TestCase
         $this->assertTrue($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1], $spans[0]->getAttributes()->toArray());
@@ -403,7 +395,6 @@ class SamplerTest extends TestCase
         $this->assertTrue($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1, 'http.request.method' => 'GET', 'url.scheme' => 'http', 'server.address' => 'localhost', 'url.path' => '/test'], $spans[0]->getAttributes()->toArray());
@@ -441,7 +432,6 @@ class SamplerTest extends TestCase
         $this->assertTrue($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1, 'http.method' => 'GET', 'http.scheme' => 'http', 'net.host.name' => 'localhost', 'http.target' => '/test'], $spans[0]->getAttributes()->toArray());
@@ -469,7 +459,6 @@ class SamplerTest extends TestCase
         $this->assertTrue($main->isRecording());
         $mainScope->detach();
         $main->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['BucketCapacity' => 1, 'BucketRate' => 0.1, 'TriggeredTrace' => true], $spans[0]->getAttributes()->toArray());
