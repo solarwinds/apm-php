@@ -1176,6 +1176,7 @@ class OboeSamplerTest extends TestCase
             $attributes[$key] = $value;
         }
         $this->assertEquals('value', $attributes['custom-key']);
+        $this->assertTrue(is_string($sampler->getResponseHeaders()->XTraceOptionsResponse));
         $this->assertStringContainsString('trigger-trace=tracing-disabled', $sampler->getResponseHeaders()->XTraceOptionsResponse);
         $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
     }
