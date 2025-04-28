@@ -102,7 +102,7 @@ abstract class OboeSampler implements SamplerInterface
         }
         if (!$s->settings) {
             $this->logDebug('settings unavailable; sampling disabled');
-            if ($s->traceOptions?->triggerTrace) {
+            if ($s->traceOptions && $s->traceOptions->triggerTrace) {
                 $this->logDebug('trigger trace requested but unavailable');
                 $s->traceOptions->response->triggerTrace = TriggerTrace::SETTINGS_NOT_AVAILABLE;
             }

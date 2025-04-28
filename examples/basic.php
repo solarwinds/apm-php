@@ -29,7 +29,7 @@ $child1->setAttribute('http.status_code', 200);
 try {
     throw new Exception('Some error message');
 } catch (Exception $exc) {
-    $child1->setStatus('error', $exc->getMessage());
+    $child1->setStatus('Error', $exc->getMessage());
     $child1->recordException($exc);
 }
 $child1Scope->detach();
