@@ -26,6 +26,9 @@ use RuntimeException;
 
 class SdkBuilder
 {
+    /**
+     * @return void
+     */
     public function buildAndRegisterGlobal()
     {
         if (InstalledVersions::isInstalled('solarwinds/apm-php')) {

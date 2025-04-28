@@ -10,7 +10,7 @@ use Solarwinds\ApmPhp\TriggerTraceUtil;
 #[CoversClass(TriggerTraceUtil::class)]
 class TriggerTraceUtilTest extends TestCase
 {
-    public function test_valid_signature()
+    public function test_valid_signature(): void
     {
         $result = TriggerTraceUtil::validateSignature(
             'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
@@ -22,7 +22,7 @@ class TriggerTraceUtilTest extends TestCase
         $this->assertEquals(Auth::OK, $result);
     }
 
-    public function test_invalid_signature()
+    public function test_invalid_signature(): void
     {
         $result = TriggerTraceUtil::validateSignature(
             'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
@@ -34,7 +34,7 @@ class TriggerTraceUtilTest extends TestCase
         $this->assertEquals(Auth::BAD_SIGNATURE, $result);
     }
 
-    public function test_missing_signature_key()
+    public function test_missing_signature_key(): void
     {
         $result = TriggerTraceUtil::validateSignature(
             'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
@@ -46,7 +46,7 @@ class TriggerTraceUtilTest extends TestCase
         $this->assertEquals(Auth::NO_SIGNATURE_KEY, $result);
     }
 
-    public function test_timestamp_past()
+    public function test_timestamp_past(): void
     {
         $result = TriggerTraceUtil::validateSignature(
             'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
@@ -58,7 +58,7 @@ class TriggerTraceUtilTest extends TestCase
         $this->assertEquals(Auth::BAD_TIMESTAMP, $result);
     }
 
-    public function test_timestamp_future()
+    public function test_timestamp_future(): void
     {
         $result = TriggerTraceUtil::validateSignature(
             'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
@@ -70,7 +70,7 @@ class TriggerTraceUtilTest extends TestCase
         $this->assertEquals(Auth::BAD_TIMESTAMP, $result);
     }
 
-    public function test_missing_timestamp()
+    public function test_missing_timestamp(): void
     {
         $result = TriggerTraceUtil::validateSignature(
             'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',

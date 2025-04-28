@@ -33,7 +33,7 @@ class TestSampler extends Sampler
 #[CoversClass(Sampler::class)]
 class SamplerTest extends TestCase
 {
-    public function test_handles_non_http_spans_properly()
+    public function test_handles_non_http_spans_properly(): void
     {
         $spanKind = SpanKind::KIND_SERVER;
         $attributes = (new AttributesFactory())->builder([

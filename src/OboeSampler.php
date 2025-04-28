@@ -197,7 +197,7 @@ abstract class OboeSampler implements SamplerInterface
         array $links,
     ): ?TraceState;
 
-    private function parentBasedAlgo(SampleState $s, ContextInterface $parentContext)
+    private function parentBasedAlgo(SampleState $s, ContextInterface $parentContext): void
     {
         $parentIdAttributes = Attributes::create([
             PARENT_ID_ATTRIBUTE => substr((string) $s->traceState, 0, 16),
@@ -234,7 +234,7 @@ abstract class OboeSampler implements SamplerInterface
         }
     }
 
-    private function triggerTraceAlgo(SampleState $s, ContextInterface $parentContext)
+    private function triggerTraceAlgo(SampleState $s, ContextInterface $parentContext): void
     {
         if ($s->settings?->flags & Flags::TRIGGERED_TRACE->value) {
             $this->logDebug('TRIGGERED_TRACE set; trigger tracing');
@@ -271,9 +271,9 @@ abstract class OboeSampler implements SamplerInterface
         }
     }
 
-    private function diceRollAlgo(SampleState $s, ContextInterface $parentContext)
+    private function diceRollAlgo(SampleState $s, ContextInterface $parentContext): void
     {
-        $dice = new Dice(1000000, $s->settings->sampleRate);
+        $dice = new Dice(1000000, $s->settings? $s->settings->sampleRate : 0);
         $sampleAttributes = Attributes::create([
             SAMPLE_RATE_ATTRIBUTE => $dice->getRate(),
             SAMPLE_SOURCE_ATTRIBUTE => $s->settings->sampleSource->value,
@@ -303,7 +303,7 @@ abstract class OboeSampler implements SamplerInterface
         }
     }
 
-    private function disabledAlgo(SampleState $s)
+    private function disabledAlgo(SampleState $s): void
     {
         if ($s->traceOptions?->triggerTrace) {
             $this->logDebug('trigger trace requested but tracing disabled');

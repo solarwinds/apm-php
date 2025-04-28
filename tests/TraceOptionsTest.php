@@ -9,7 +9,7 @@ use Solarwinds\ApmPhp\TraceOptions;
 #[CoversClass(TraceOptions::class)]
 class TraceOptionsTest extends TestCase
 {
-    public function test_no_key_no_value()
+    public function test_no_key_no_value(): void
     {
         $header = '=';
         $result = TraceOptions::from($header);
@@ -17,7 +17,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals(new TraceOptions(), $result);
     }
 
-    public function test_orphan_value()
+    public function test_orphan_value(): void
     {
         $header = '=value';
         $result = TraceOptions::from($header);
@@ -25,7 +25,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals(new TraceOptions(), $result);
     }
 
-    public function test_valid_trigger_trace()
+    public function test_valid_trigger_trace(): void
     {
         $header = 'trigger-trace';
         $result = TraceOptions::from($header);
@@ -36,7 +36,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_trigger_trace_no_value()
+    public function test_trigger_trace_no_value(): void
     {
         $header = 'trigger-trace=value';
         $result = TraceOptions::from($header);
@@ -47,7 +47,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_trigger_trace_duplicate()
+    public function test_trigger_trace_duplicate(): void
     {
         $header = 'trigger-trace;trigger-trace';
         $result = TraceOptions::from($header);
@@ -59,7 +59,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_timestamp_no_value()
+    public function test_timestamp_no_value(): void
     {
         $header = 'ts';
         $result = TraceOptions::from($header);
@@ -70,7 +70,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_timestamp_duplicate()
+    public function test_timestamp_duplicate(): void
     {
         $header = 'ts=1234;ts=5678';
         $result = TraceOptions::from($header);
@@ -82,7 +82,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_timestamp_invalid()
+    public function test_timestamp_invalid(): void
     {
         $header = 'ts=value';
         $result = TraceOptions::from($header);
@@ -93,7 +93,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_timestamp_float()
+    public function test_timestamp_float(): void
     {
         $header = 'ts=12.34';
         $result = TraceOptions::from($header);
@@ -104,7 +104,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_timestamp_trim()
+    public function test_timestamp_trim(): void
     {
         $header = 'ts = 1234567890 ';
         $result = TraceOptions::from($header);
@@ -115,7 +115,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_sw_keys_no_value()
+    public function test_sw_keys_no_value(): void
     {
         $header = 'sw-keys';
         $result = TraceOptions::from($header);
@@ -126,7 +126,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_sw_keys_duplicate()
+    public function test_sw_keys_duplicate(): void
     {
         $header = 'sw-keys=keys1;sw-keys=keys2';
         $result = TraceOptions::from($header);
@@ -138,7 +138,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_sw_keys_trim()
+    public function test_sw_keys_trim(): void
     {
         $header = 'sw-keys= name:value ';
         $result = TraceOptions::from($header);
@@ -149,7 +149,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_sw_keys_ignore_after_semi()
+    public function test_sw_keys_ignore_after_semi(): void
     {
         $header = 'sw-keys=check-id:check-1013,website-id;booking-demo';
         $result = TraceOptions::from($header);
@@ -161,7 +161,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_custom_keys_trim()
+    public function test_custom_keys_trim(): void
     {
         $header = 'custom-key= value ';
         $result = TraceOptions::from($header);
@@ -172,7 +172,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_custom_keys_no_value()
+    public function test_custom_keys_no_value(): void
     {
         $header = 'custom-key';
         $result = TraceOptions::from($header);
@@ -183,7 +183,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_custom_keys_duplicate()
+    public function test_custom_keys_duplicate(): void
     {
         $header = 'custom-key=value1;custom-key=value2';
         $result = TraceOptions::from($header);
@@ -195,7 +195,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_custom_keys_equals_in_value()
+    public function test_custom_keys_equals_in_value(): void
     {
         $header = 'custom-key=name=value';
         $result = TraceOptions::from($header);
@@ -206,7 +206,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_custom_keys_spaces_in_key()
+    public function test_custom_keys_spaces_in_key(): void
     {
         $header = 'custom- key=value;custom-ke y=value';
         $result = TraceOptions::from($header);
@@ -220,7 +220,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_other_ignored()
+    public function test_other_ignored(): void
     {
         $header = 'key=value';
         $result = TraceOptions::from($header);
@@ -231,7 +231,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_trim_everything()
+    public function test_trim_everything(): void
     {
         $header = 'trigger-trace ; custom-something=value; custom-OtherThing = other val ; sw-keys = 029734wr70:9wqj21,0d9j1 ; ts = 12345 ; foo = bar';
         $result = TraceOptions::from($header);
@@ -249,7 +249,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_semi_everywhere()
+    public function test_semi_everywhere(): void
     {
         $header = ';foo=bar;;;custom-something=value_thing;;sw-keys=02973r70:1b2a3;;;;custom-key=val;ts=12345;;;;;;;trigger-trace;;;';
         $result = TraceOptions::from($header);
@@ -267,7 +267,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_single_quotes()
+    public function test_single_quotes(): void
     {
         $header = "trigger-trace;custom-foo='bar;bar';custom-bar=foo";
         $result = TraceOptions::from($header);
@@ -283,7 +283,7 @@ class TraceOptionsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_missing_values_and_semi()
+    public function test_missing_values_and_semi(): void
     {
         $header = ';trigger-trace;custom-something=value_thing;sw-keys=02973r70:9wqj21,0d9j1;1;2;3;4;5;=custom-key=val?;=';
         $result = TraceOptions::from($header);

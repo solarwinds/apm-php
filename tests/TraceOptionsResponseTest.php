@@ -11,7 +11,7 @@ use Solarwinds\ApmPhp\TriggerTrace;
 #[CoversClass(TraceOptionsResponse::class)]
 class TraceOptionsResponseTest extends TestCase
 {
-    public function test_basic()
+    public function test_basic(): void
     {
         $response = new TraceOptionsResponse();
         $response->auth = Auth::OK;
@@ -20,7 +20,7 @@ class TraceOptionsResponseTest extends TestCase
         $this->assertEquals($expected, (string) $response);
     }
 
-    public function test_ignored_values()
+    public function test_ignored_values(): void
     {
         $response = new TraceOptionsResponse();
         $response->auth = Auth::OK;

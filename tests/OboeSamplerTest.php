@@ -77,7 +77,7 @@ class TestOboeSampler extends OboeSampler
 #[CoversClass(OboeSampler::class)]
 class OboeSamplerTest extends TestCase
 {
-    public function test_description()
+    public function test_description(): void
     {
         $sampler = new TestOboeSampler(null, null, new LocalSettings(null, true), $this->makeRequestHeaders([]));
         $this->assertEquals('OboeSampler', $sampler->getDescription());
@@ -111,7 +111,7 @@ class OboeSamplerTest extends TestCase
         return $headers;
     }
 
-    public function test_invalid_x_trace_options_signature_rejects_missing_signature_key()
+    public function test_invalid_x_trace_options_signature_rejects_missing_signature_key(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -151,7 +151,12 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    private function createParentContext(?string $traceId, ?string $spanId, bool $sampled, bool $isRemote, mixed $sw): ContextInterface
+    /**
+     * @param null|string|true $sw
+     *
+     * @psalm-param 'inverse'|null|true $sw
+     */
+    private function createParentContext(?string $traceId, ?string $spanId, bool $sampled, bool $isRemote, string|bool|null $sw): ContextInterface
     {
         $generator = new RandomIdGenerator();
         $traceId = $traceId ?? $generator->generateTraceId();
@@ -191,7 +196,7 @@ class OboeSamplerTest extends TestCase
         return $map;
     }
 
-    public function test_invalid_x_trace_options_signature_rejects_bad_timestamp()
+    public function test_invalid_x_trace_options_signature_rejects_bad_timestamp(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -232,7 +237,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_invalid_x_trace_options_signature_rejects_bad_signature()
+    public function test_invalid_x_trace_options_signature_rejects_bad_signature(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -273,7 +278,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_missing_settings_does_not_sample()
+    public function test_missing_settings_does_not_sample(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -299,7 +304,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_missing_settings_expires_after_ttl()
+    public function test_missing_settings_expires_after_ttl(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -334,7 +339,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_missing_settings_respects_x_trace_options_keys_and_values()
+    public function test_missing_settings_respects_x_trace_options_keys_and_values(): void
     {
         $sampler = new TestOboeSampler(
             null,
@@ -362,7 +367,7 @@ class OboeSamplerTest extends TestCase
         $this->assertStringContainsString('trigger-trace=not-requested', $sampler->getResponseHeaders()->XTraceOptionsResponse);
     }
 
-    public function test_missing_settings_ignores_trigger_trace()
+    public function test_missing_settings_ignores_trigger_trace(): void
     {
         $sampler = new TestOboeSampler(
             null,
@@ -391,7 +396,7 @@ class OboeSamplerTest extends TestCase
         $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
     }
 
-    public function test_x_trace_options_respects_keys_and_values()
+    public function test_x_trace_options_respects_keys_and_values(): void
     {
         $sampler = new TestOboeSampler(
             null,
@@ -428,7 +433,7 @@ class OboeSamplerTest extends TestCase
         $this->assertStringContainsString('trigger-trace=not-requested', $sampler->getResponseHeaders()->XTraceOptionsResponse);
     }
 
-    public function test_x_trace_options_ignores_trigger_trace()
+    public function test_x_trace_options_ignores_trigger_trace(): void
     {
         $sampler = new TestOboeSampler(
             null,
@@ -466,7 +471,7 @@ class OboeSamplerTest extends TestCase
         $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
     }
 
-    public function test_sample_through_always_set_respects_parent_sampled()
+    public function test_sample_through_always_set_respects_parent_sampled(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -508,7 +513,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.through_trace_count'] ?? 0);
     }
 
-    public function test_sample_through_always_set_respects_parent_not_sampled()
+    public function test_sample_through_always_set_respects_parent_not_sampled(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -548,7 +553,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_sample_through_always_set_respects_sw_sampled_over_w3c_not_sampled()
+    public function test_sample_through_always_set_respects_sw_sampled_over_w3c_not_sampled(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -591,7 +596,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.through_trace_count'] ?? 0);
     }
 
-    public function test_sample_through_always_set_respects_sw_not_sampled_over_w3c_sampled()
+    public function test_sample_through_always_set_respects_sw_not_sampled_over_w3c_sampled(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -631,7 +636,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_sample_through_always_unset_records_but_does_not_sample_when_sample_start_set()
+    public function test_sample_through_always_unset_records_but_does_not_sample_when_sample_start_set(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -666,7 +671,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_sample_through_always_unset_does_not_record_or_sample_when_sample_start_unset()
+    public function test_sample_through_always_unset_does_not_record_or_sample_when_sample_start_unset(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -701,7 +706,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_trigger_trace_requested_triggered_trace_set_unsigned_records_and_samples_when_capacity()
+    public function test_trigger_trace_requested_triggered_trace_set_unsigned_records_and_samples_when_capacity(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -756,7 +761,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.triggered_trace_count'] ?? 0);
     }
 
-    public function test_trigger_trace_requested_triggered_trace_set_unsigned_records_but_no_sample_when_no_capacity()
+    public function test_trigger_trace_requested_triggered_trace_set_unsigned_records_but_no_sample_when_no_capacity(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -807,7 +812,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_trigger_trace_requested_triggered_trace_set_signed_records_and_samples_when_capacity()
+    public function test_trigger_trace_requested_triggered_trace_set_signed_records_and_samples_when_capacity(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -864,7 +869,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.triggered_trace_count'] ?? 0);
     }
 
-    public function test_trigger_trace_requested_triggered_trace_set_signed_records_but_no_sample_when_no_capacity()
+    public function test_trigger_trace_requested_triggered_trace_set_signed_records_but_no_sample_when_no_capacity(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -917,7 +922,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_trigger_trace_requested_triggered_trace_unset_records_but_no_sample()
+    public function test_trigger_trace_requested_triggered_trace_unset_records_but_no_sample(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -964,7 +969,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_dice_roll_respects_x_trace_options_keys_and_values()
+    public function test_dice_roll_respects_x_trace_options_keys_and_values(): void
     {
         $sampler = new TestOboeSampler(
             null,
@@ -1002,7 +1007,7 @@ class OboeSamplerTest extends TestCase
         $this->assertStringContainsString('trigger-trace=not-requested', $sampler->getResponseHeaders()->XTraceOptionsResponse);
     }
 
-    public function test_dice_roll_records_and_samples_when_dice_success_and_sufficient_capacity()
+    public function test_dice_roll_records_and_samples_when_dice_success_and_sufficient_capacity(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -1049,7 +1054,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.tracecount'] ?? 0);
     }
 
-    public function test_dice_roll_records_but_does_not_sample_when_dice_success_but_insufficient_capacity()
+    public function test_dice_roll_records_but_does_not_sample_when_dice_success_but_insufficient_capacity(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -1096,7 +1101,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.tokenbucket_exhaustion_count'] ?? 0);
     }
 
-    public function test_dice_roll_records_but_does_not_sample_when_dice_failure()
+    public function test_dice_roll_records_but_does_not_sample_when_dice_failure(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -1141,7 +1146,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.samplecount'] ?? 0);
     }
 
-    public function test_sample_start_unset_ignores_trigger_trace()
+    public function test_sample_start_unset_ignores_trigger_trace(): void
     {
         $sampler = new TestOboeSampler(
             null,
@@ -1181,7 +1186,7 @@ class OboeSamplerTest extends TestCase
         $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
     }
 
-    public function test_sample_start_unset_records_when_sample_through_always_set()
+    public function test_sample_start_unset_records_when_sample_through_always_set(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
@@ -1217,7 +1222,7 @@ class OboeSamplerTest extends TestCase
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
-    public function test_sample_start_unset_does_not_record_when_sample_through_always_unset()
+    public function test_sample_start_unset_does_not_record_when_sample_through_always_unset(): void
     {
         $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
