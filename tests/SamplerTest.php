@@ -15,12 +15,12 @@ use Solarwinds\ApmPhp\BucketSettings;
 use Solarwinds\ApmPhp\BucketType;
 use Solarwinds\ApmPhp\Configuration;
 use Solarwinds\ApmPhp\Flags;
+use function Solarwinds\ApmPhp\httpSpanMetadata;
+use function Solarwinds\ApmPhp\parseSettings;
 use Solarwinds\ApmPhp\Sampler;
 use Solarwinds\ApmPhp\SampleSource;
 use Solarwinds\ApmPhp\Settings;
 use Solarwinds\ApmPhp\XTraceOptionsBaggage;
-use function Solarwinds\ApmPhp\httpSpanMetadata;
-use function Solarwinds\ApmPhp\parseSettings;
 
 class TestSampler extends Sampler
 {
@@ -33,7 +33,7 @@ class TestSampler extends Sampler
 #[CoversClass(Sampler::class)]
 class SamplerTest extends TestCase
 {
-    public function testHandlesNonHttpSpansProperly()
+    public function test_handles_non_http_spans_properly()
     {
         $spanKind = SpanKind::KIND_SERVER;
         $attributes = (new AttributesFactory())->builder([
@@ -43,7 +43,7 @@ class SamplerTest extends TestCase
         $this->assertEquals(['http' => false], $output);
     }
 
-    public function testHandlesHttpClientSpansProperly(): void
+    public function test_handles_http_client_spans_properly(): void
     {
         $spanKind = SpanKind::KIND_CLIENT;
         $attributes = (new AttributesFactory())->builder([
@@ -57,7 +57,7 @@ class SamplerTest extends TestCase
         $this->assertEquals(['http' => false], $output);
     }
 
-    public function testHandlesHttpServerSpansProperly(): void
+    public function test_handles_http_server_spans_properly(): void
     {
         $spanKind = SpanKind::KIND_SERVER;
         $attributes = (new AttributesFactory())->builder([
@@ -80,7 +80,7 @@ class SamplerTest extends TestCase
         ], $output);
     }
 
-    public function testHandlesLegacyHttpServerSpansProperly(): void
+    public function test_handles_legacy_http_server_spans_properly(): void
     {
         $spanKind = SpanKind::KIND_SERVER;
         $attributes = (new AttributesFactory())->builder([
@@ -102,7 +102,7 @@ class SamplerTest extends TestCase
         ], $output);
     }
 
-    public function testCorrectlyParsesJsonSettings(): void
+    public function test_correctly_parses_json_settings(): void
     {
         $timestamp = time();
         $json = [
@@ -133,7 +133,8 @@ class SamplerTest extends TestCase
             ],
             'key',
             $timestamp,
-            120);
+            120
+        );
         $this->assertTrue(is_array($pair));
         $this->assertArrayHasKey('settings', $pair);
         $setting = $pair['settings'];
@@ -142,7 +143,7 @@ class SamplerTest extends TestCase
         $this->assertEquals('warning', $pair['warning']);
     }
 
-    public function testRespectsEnabledSettingsWhenNoConfigOrTransactionSettings(): void
+    public function test_respects_enabled_settings_when_no_config_or_transaction_settings(): void
     {
         $sampler = new TestSampler(
             null,
@@ -154,7 +155,7 @@ class SamplerTest extends TestCase
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler($sampler)
             ->build();
-        $tracer = $tracerProvider->getTracer("testRespectsEnabledSettingsWhenNoConfigOrTransactionSettings");
+        $tracer = $tracerProvider->getTracer('testRespectsEnabledSettingsWhenNoConfigOrTransactionSettings');
         $main = $tracer->spanBuilder('test')->startSpan();
         $mainScope = $main->activate();
         $this->assertTrue($main->isRecording());
@@ -170,20 +171,21 @@ class SamplerTest extends TestCase
     {
         return new Configuration(
             true,
-            "test",
-            "localhost",
+            'test',
+            'localhost',
             [],
             $options['tracing'] ?? null,
             $options['triggerTrace'] ?? false,
             null,
-            $options['transactionSettings'] ?? []);
+            $options['transactionSettings'] ?? []
+        );
     }
 
     private function createSettings(bool $enabled, ?string $signatureKey): array
     {
         return [
             'value' => 1000000,
-            'flags' => $enabled ? "SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE" : "",
+            'flags' => $enabled ? 'SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE' : '',
             'arguments' => [
                 'BucketCapacity' => 10,
                 'BucketRate' => 1,
@@ -198,7 +200,7 @@ class SamplerTest extends TestCase
         ];
     }
 
-    public function testRespectsDisabledSettingsWhenNoConfigOrTransactionSettings(): void
+    public function test_respects_disabled_settings_when_no_config_or_transaction_settings(): void
     {
         $sampler = new TestSampler(
             null,
@@ -210,7 +212,7 @@ class SamplerTest extends TestCase
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler($sampler)
             ->build();
-        $tracer = $tracerProvider->getTracer("testRespectsDisabledSettingsWhenNoConfigOrTransactionSettings");
+        $tracer = $tracerProvider->getTracer('testRespectsDisabledSettingsWhenNoConfigOrTransactionSettings');
         $main = $tracer->spanBuilder('test')->startSpan();
         $mainScope = $main->activate();
         $this->assertFalse($main->isRecording());
@@ -221,7 +223,7 @@ class SamplerTest extends TestCase
         $this->assertCount(0, $spans);
     }
 
-    public function testRespectsEnabledConfigWhenNoTransactionSettings(): void
+    public function test_respects_enabled_config_when_no_transaction_settings(): void
     {
         $sampler = new TestSampler(
             null,
@@ -233,7 +235,7 @@ class SamplerTest extends TestCase
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler($sampler)
             ->build();
-        $tracer = $tracerProvider->getTracer("testRespectsEnabledConfigWhenNoTransactionSettings");
+        $tracer = $tracerProvider->getTracer('testRespectsEnabledConfigWhenNoTransactionSettings');
         $main = $tracer->spanBuilder('test')->startSpan();
         $mainScope = $main->activate();
         $this->assertTrue($main->isRecording());
@@ -245,7 +247,7 @@ class SamplerTest extends TestCase
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1], $spans[0]->getAttributes()->toArray());
     }
 
-    public function testRespectsDisabledConfigWhenNoTransactionSettings(): void
+    public function test_respects_disabled_config_when_no_transaction_settings(): void
     {
         $sampler = new TestSampler(
             null,
@@ -257,7 +259,7 @@ class SamplerTest extends TestCase
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler($sampler)
             ->build();
-        $tracer = $tracerProvider->getTracer("testRespectsDisabledConfigWhenNoTransactionSettings");
+        $tracer = $tracerProvider->getTracer('testRespectsDisabledConfigWhenNoTransactionSettings');
         $main = $tracer->spanBuilder('test')->startSpan();
         $mainScope = $main->activate();
         $this->assertFalse($main->isRecording());
@@ -268,11 +270,11 @@ class SamplerTest extends TestCase
         $this->assertCount(0, $spans);
     }
 
-    public function testRespectsEnabledMatchingTransactionSetting(): void
+    public function test_respects_enabled_matching_transaction_setting(): void
     {
         $sampler = new TestSampler(
             null,
-            $this->createConfig(['tracing' => false, 'triggerTrace' => false, 'transactionSettings' => [['tracing' => true, 'matcher' => fn() => true]]]),
+            $this->createConfig(['tracing' => false, 'triggerTrace' => false, 'transactionSettings' => [['tracing' => true, 'matcher' => fn () => true]]]),
             $this->createSettings(false, null)
         );
         $spanExporter = new InMemoryExporter();
@@ -280,7 +282,7 @@ class SamplerTest extends TestCase
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler($sampler)
             ->build();
-        $tracer = $tracerProvider->getTracer("testRespectsEnabledMatchingTransactionSetting");
+        $tracer = $tracerProvider->getTracer('testRespectsEnabledMatchingTransactionSetting');
         $main = $tracer->spanBuilder('test')->startSpan();
         $mainScope = $main->activate();
         $this->assertTrue($main->isRecording());
@@ -292,11 +294,11 @@ class SamplerTest extends TestCase
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1], $spans[0]->getAttributes()->toArray());
     }
 
-    public function testRespectsDisabledMatchingTransactionSetting(): void
+    public function test_respects_disabled_matching_transaction_setting(): void
     {
         $sampler = new TestSampler(
             null,
-            $this->createConfig(['tracing' => true, 'triggerTrace' => true, 'transactionSettings' => [['tracing' => false, 'matcher' => fn() => true]]]),
+            $this->createConfig(['tracing' => true, 'triggerTrace' => true, 'transactionSettings' => [['tracing' => false, 'matcher' => fn () => true]]]),
             $this->createSettings(true, null)
         );
         $spanExporter = new InMemoryExporter();
@@ -304,7 +306,7 @@ class SamplerTest extends TestCase
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler($sampler)
             ->build();
-        $tracer = $tracerProvider->getTracer("testRespectsDisabledMatchingTransactionSetting");
+        $tracer = $tracerProvider->getTracer('testRespectsDisabledMatchingTransactionSetting');
         $main = $tracer->spanBuilder('test')->startSpan();
         $mainScope = $main->activate();
         $this->assertFalse($main->isRecording());
@@ -315,11 +317,11 @@ class SamplerTest extends TestCase
         $this->assertCount(0, $spans);
     }
 
-    public function testRespectsFirstMatchingTransactionSetting(): void
+    public function test_respects_first_matching_transaction_setting(): void
     {
         $sampler = new TestSampler(
             null,
-            $this->createConfig(['tracing' => false, 'triggerTrace' => false, 'transactionSettings' => [['tracing' => true, 'matcher' => fn() => true], ['tracing' => false, 'matcher' => fn() => true]]]),
+            $this->createConfig(['tracing' => false, 'triggerTrace' => false, 'transactionSettings' => [['tracing' => true, 'matcher' => fn () => true], ['tracing' => false, 'matcher' => fn () => true]]]),
             $this->createSettings(false, null)
         );
         $spanExporter = new InMemoryExporter();
@@ -327,7 +329,7 @@ class SamplerTest extends TestCase
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler($sampler)
             ->build();
-        $tracer = $tracerProvider->getTracer("testRespectsEnabledMatchingTransactionSetting");
+        $tracer = $tracerProvider->getTracer('testRespectsEnabledMatchingTransactionSetting');
         $main = $tracer->spanBuilder('test')->startSpan();
         $mainScope = $main->activate();
         $this->assertTrue($main->isRecording());
@@ -339,14 +341,14 @@ class SamplerTest extends TestCase
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1], $spans[0]->getAttributes()->toArray());
     }
 
-    public function testMatchesNonHttpSpansProperly(): void
+    public function test_matches_non_http_spans_properly(): void
     {
         $sampler = new TestSampler(
             null,
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => true, 'matcher' => fn($name) => $name === "1:test"]],
+                'transactionSettings' => [['tracing' => true, 'matcher' => fn ($name) => $name === '1:test']],
             ]),
             $this->createSettings(false, null)
         );
@@ -357,7 +359,7 @@ class SamplerTest extends TestCase
             ->setSampler($sampler)
             ->build();
 
-        $tracer = $tracerProvider->getTracer("testMatchesNonHttpSpansProperly");
+        $tracer = $tracerProvider->getTracer('testMatchesNonHttpSpansProperly');
         $main = $tracer->spanBuilder('test')->setSpanKind(SpanKind::KIND_CLIENT)->startSpan();
         $mainScope = $main->activate();
         $this->assertTrue($main->isRecording());
@@ -369,14 +371,14 @@ class SamplerTest extends TestCase
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1], $spans[0]->getAttributes()->toArray());
     }
 
-    public function testMatchesHttpSpansProperly(): void
+    public function test_matches_http_spans_properly(): void
     {
         $sampler = new TestSampler(
             null,
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => true, 'matcher' => fn($name) => $name === "http://localhost/test"]],
+                'transactionSettings' => [['tracing' => true, 'matcher' => fn ($name) => $name === 'http://localhost/test']],
             ]),
             $this->createSettings(false, null)
         );
@@ -387,7 +389,7 @@ class SamplerTest extends TestCase
             ->setSampler($sampler)
             ->build();
 
-        $tracer = $tracerProvider->getTracer("testMatchesHttpSpansProperly");
+        $tracer = $tracerProvider->getTracer('testMatchesHttpSpansProperly');
         $main = $tracer->spanBuilder('test')
             ->setSpanKind(SpanKind::KIND_SERVER)
             ->setAttributes([
@@ -407,14 +409,14 @@ class SamplerTest extends TestCase
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1, 'http.request.method' => 'GET', 'url.scheme' => 'http', 'server.address' => 'localhost', 'url.path' => '/test'], $spans[0]->getAttributes()->toArray());
     }
 
-    public function testMatchesDeprecatedHttpSpansProperly(): void
+    public function test_matches_deprecated_http_spans_properly(): void
     {
         $sampler = new TestSampler(
             null,
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => true, 'matcher' => fn($name) => $name === "http://localhost/test"]],
+                'transactionSettings' => [['tracing' => true, 'matcher' => fn ($name) => $name === 'http://localhost/test']],
             ]),
             $this->createSettings(false, null)
         );
@@ -425,7 +427,7 @@ class SamplerTest extends TestCase
             ->setSampler($sampler)
             ->build();
 
-        $tracer = $tracerProvider->getTracer("testMatchesDeprecatedHttpSpansProperly");
+        $tracer = $tracerProvider->getTracer('testMatchesDeprecatedHttpSpansProperly');
         $main = $tracer->spanBuilder('test')
             ->setSpanKind(SpanKind::KIND_SERVER)
             ->setAttributes([
@@ -445,7 +447,7 @@ class SamplerTest extends TestCase
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10, 'BucketRate' => 1, 'http.method' => 'GET', 'http.scheme' => 'http', 'net.host.name' => 'localhost', 'http.target' => '/test'], $spans[0]->getAttributes()->toArray());
     }
 
-    public function testPicksUpTriggerTrace(): void
+    public function test_picks_up_trigger_trace(): void
     {
         $sampler = new TestSampler(
             null,
@@ -459,7 +461,7 @@ class SamplerTest extends TestCase
             ->build();
         $baggage = XTraceOptionsBaggage::getBuilder()->set('x-trace-options', 'trigger-trace')->build();
         $context = Context::getCurrent()->withContextValue($baggage);
-        $tracer = $tracerProvider->getTracer("testPicksUpTriggerTrace");
+        $tracer = $tracerProvider->getTracer('testPicksUpTriggerTrace');
         $main = $tracer->spanBuilder('test')
             ->setParent($context)
             ->startSpan();

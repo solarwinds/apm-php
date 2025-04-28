@@ -9,7 +9,7 @@ use Solarwinds\ApmPhp\TriggerTrace;
 #[CoversClass(TriggerTrace::class)]
 class TriggerTraceTest extends TestCase
 {
-    public function testEnumValues(): void
+    public function test_enum_values(): void
     {
         $this->assertEquals('ok', TriggerTrace::OK->value);
         $this->assertEquals('not-requested', TriggerTrace::NOT_REQUESTED->value);
@@ -20,7 +20,7 @@ class TriggerTraceTest extends TestCase
         $this->assertEquals('settings-not-available', TriggerTrace::SETTINGS_NOT_AVAILABLE->value);
     }
 
-    public function testEnumKeys(): void
+    public function test_enum_keys(): void
     {
         $this->assertTrue(TriggerTrace::tryFrom('ok') === TriggerTrace::OK);
         $this->assertTrue(TriggerTrace::tryFrom('not-requested') === TriggerTrace::NOT_REQUESTED);

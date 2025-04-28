@@ -11,22 +11,22 @@ use Solarwinds\ApmPhp\TriggerTrace;
 #[CoversClass(TraceOptionsResponse::class)]
 class TraceOptionsResponseTest extends TestCase
 {
-    public function testBasic()
+    public function test_basic()
     {
         $response = new TraceOptionsResponse();
         $response->auth = Auth::OK;
         $response->triggerTrace = TriggerTrace::OK;
         $expected = 'auth=ok;trigger-trace=ok';
-        $this->assertEquals($expected, (string)$response);
+        $this->assertEquals($expected, (string) $response);
     }
 
-    public function testIgnoredValues()
+    public function test_ignored_values()
     {
         $response = new TraceOptionsResponse();
         $response->auth = Auth::OK;
         $response->triggerTrace = TriggerTrace::TRIGGER_TRACING_DISABLED;
-        $response->ignored = ["invalid-key1", "invalid_key2"];
+        $response->ignored = ['invalid-key1', 'invalid_key2'];
         $expected = 'auth=ok;trigger-trace=trigger-tracing-disabled;ignored=invalid-key1,invalid_key2';
-        $this->assertEquals($expected, (string)$response);
+        $this->assertEquals($expected, (string) $response);
     }
 }

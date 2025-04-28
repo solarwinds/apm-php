@@ -9,14 +9,14 @@ use Solarwinds\ApmPhp\RequestHeaders;
 #[CoversClass(RequestHeaders::class)]
 class RequestHeadersTest extends TestCase
 {
-    public function testDefaultValues(): void
+    public function test_default_values(): void
     {
         $headers = new RequestHeaders();
         $this->assertNull($headers->XTraceOptions);
         $this->assertNull($headers->XTraceOptionsSignature);
     }
 
-    public function testSetValues(): void
+    public function test_set_values(): void
     {
         $headers = new RequestHeaders();
         $headers->XTraceOptions = 'trace-options';

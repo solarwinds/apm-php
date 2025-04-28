@@ -13,7 +13,7 @@ use Solarwinds\ApmPhp\TracingMode;
 #[CoversClass(Settings::class)]
 class SettingsTest extends TestCase
 {
-    public function testMergeOverrideUnsetRespectsTracingModeNeverAndTriggerModeDisabled(): void
+    public function test_merge_override_unset_respects_tracing_mode_never_and_trigger_mode_disabled(): void
     {
         $remote = new Settings(
             1,
@@ -30,7 +30,7 @@ class SettingsTest extends TestCase
         $this->assertEquals(0x0, $merged->flags);
     }
 
-    public function testMergeOverrideUnsetRespectsTracingModeAlwaysAndTriggerModeEnabled(): void
+    public function test_merge_override_unset_respects_tracing_mode_always_and_trigger_mode_enabled(): void
     {
         $remote = new Settings(
             1,
@@ -50,7 +50,7 @@ class SettingsTest extends TestCase
         );
     }
 
-    public function testMergeOverrideUnsetDefaultsToRemoteValueWhenLocalIsUnset(): void
+    public function test_merge_override_unset_defaults_to_remote_value_when_local_is_unset(): void
     {
         $remote = new Settings(
             1,
@@ -67,7 +67,7 @@ class SettingsTest extends TestCase
         $this->assertEquals($remote, $merged);
     }
 
-    public function testMergeOverrideSetRespectsTracingModeNeverAndTriggerModeDisabled(): void
+    public function test_merge_override_set_respects_tracing_mode_never_and_trigger_mode_disabled(): void
     {
         $remote = new Settings(
             1,
@@ -84,7 +84,7 @@ class SettingsTest extends TestCase
         $this->assertEquals(Flags::OVERRIDE->value, $merged->flags);
     }
 
-    public function testMergeOverrideSetDoesNotRespectTracingModeAlwaysAndTriggerModeEnabled(): void
+    public function test_merge_override_set_does_not_respect_tracing_mode_always_and_trigger_mode_enabled(): void
     {
         $remote = new Settings(
             1,
@@ -101,7 +101,7 @@ class SettingsTest extends TestCase
         $this->assertEquals($remote, $merged);
     }
 
-    public function testMergeOverrideSetDefaultsToRemoteValueWhenLocalIsUnset(): void
+    public function test_merge_override_set_defaults_to_remote_value_when_local_is_unset(): void
     {
         $remote = new Settings(
             1,

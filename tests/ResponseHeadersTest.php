@@ -9,13 +9,13 @@ use Solarwinds\ApmPhp\ResponseHeaders;
 #[CoversClass(ResponseHeaders::class)]
 class ResponseHeadersTest extends TestCase
 {
-    public function testDefaultValues(): void
+    public function test_default_values(): void
     {
         $headers = new ResponseHeaders();
         $this->assertNull($headers->XTraceOptionsResponse);
     }
 
-    public function testSetValues(): void
+    public function test_set_values(): void
     {
         $headers = new ResponseHeaders();
         $headers->XTraceOptionsResponse = 'trace-options-response';

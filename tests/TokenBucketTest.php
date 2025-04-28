@@ -9,14 +9,14 @@ use Solarwinds\ApmPhp\TokenBucket;
 #[CoversClass(TokenBucket::class)]
 class TokenBucketTest extends TestCase
 {
-    public function testInitialization(): void
+    public function test_initialization(): void
     {
         $bucket = new TokenBucket(10, 1);
         $this->assertEquals(10, $bucket->getCapacity());
         $this->assertEquals(1, $bucket->getRate());
     }
 
-    public function testUpdate(): void
+    public function test_update(): void
     {
         $bucket = new TokenBucket(10, 1);
         $bucket->update(20, 2);
@@ -24,7 +24,7 @@ class TokenBucketTest extends TestCase
         $this->assertEquals(2, $bucket->getRate());
     }
 
-    public function testConsume(): void
+    public function test_consume(): void
     {
         $bucket = new TokenBucket(10);
         $this->assertTrue($bucket->consume(5));
@@ -33,20 +33,20 @@ class TokenBucketTest extends TestCase
         $this->assertEquals(5, $bucket->getTokens());
     }
 
-    public function testStartsFull(): void
+    public function test_starts_full(): void
     {
         $bucket = new TokenBucket(2, 1);
         $this->assertTrue($bucket->consume(2));
     }
 
-    public function testCannotConsumeMoreThanItContains(): void
+    public function test_cannot_consume_more_than_it_contains(): void
     {
         $bucket = new TokenBucket(1, 1);
         $this->assertFalse($bucket->consume(2));
         $this->assertTrue($bucket->consume());
     }
 
-    public function testReplenishesOverTime(): void
+    public function test_replenishes_over_time(): void
     {
         $bucket = new TokenBucket(2, 1);
         $this->assertTrue($bucket->consume(2));
@@ -54,7 +54,7 @@ class TokenBucketTest extends TestCase
         $this->assertTrue($bucket->consume(2));
     }
 
-    public function testDoesNotReplenishMoreThanItsCapacity(): void
+    public function test_does_not_replenish_more_than_its_capacity(): void
     {
         $bucket = new TokenBucket(2, 1);
         $this->assertTrue($bucket->consume(2));
@@ -62,7 +62,7 @@ class TokenBucketTest extends TestCase
         $this->assertFalse($bucket->consume(4));
     }
 
-    public function testCanBeUpdated(): void
+    public function test_can_be_updated(): void
     {
         $bucket = new TokenBucket(1, 1);
         $this->assertFalse($bucket->consume(2));
@@ -70,14 +70,14 @@ class TokenBucketTest extends TestCase
         $this->assertTrue($bucket->consume(2));
     }
 
-    public function testDecreasesTokensToCapacityWhenUpdatingToALowerOne(): void
+    public function test_decreases_tokens_to_capacity_when_updating_to_a_lower_one(): void
     {
         $bucket = new TokenBucket(2, 1);
         $bucket->update(1);
         $this->assertFalse($bucket->consume(2));
     }
 
-    public function testCanBeUpdatedWhileRunning(): void
+    public function test_can_be_updated_while_running(): void
     {
         $bucket = new TokenBucket(8, 0);
         $this->assertTrue($bucket->consume(8));
@@ -86,7 +86,7 @@ class TokenBucketTest extends TestCase
         $this->assertTrue($bucket->consume(8));
     }
 
-    public function testDefaultsToZero(): void
+    public function test_defaults_to_zero(): void
     {
         $bucket = new TokenBucket();
         sleep(1);

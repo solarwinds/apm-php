@@ -8,8 +8,7 @@ class BucketSettings
 {
     public function __construct(
         public float $capacity,
-        public float $rate
-    )
-    {
+        public float $rate,
+    ) {
     }
 }

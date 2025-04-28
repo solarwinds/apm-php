@@ -43,8 +43,8 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
         if ($traceState === null) {
             $traceState = new TraceState();
         }
-        $updatedTraceState = $traceState->without("sw")->with("sw", $swTraceState);
-        $setter->set($carrier, self::TRACESTATE, (string)$updatedTraceState);
+        $updatedTraceState = $traceState->without('sw')->with('sw', $swTraceState);
+        $setter->set($carrier, self::TRACESTATE, (string) $updatedTraceState);
     }
 
     public static function getInstance(): self
@@ -52,6 +52,7 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
         if (null === self::$instance) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -59,6 +60,7 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
     public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $context ??= Context::getCurrent();
+
         return $context;
     }
 }

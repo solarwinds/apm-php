@@ -25,6 +25,7 @@ $child1->setAttribute('http.method"', 'GET');
 $child1->setAttribute('http.route"', '/posts/:id');
 $child1->setAttribute('http.url', 'http://localhost:8080/posts/123');
 $child1->setAttribute('http.status_code', 200);
+
 try {
     throw new Exception('Some error message');
 } catch (Exception $exc) {

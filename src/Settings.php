@@ -7,15 +7,14 @@ namespace Solarwinds\ApmPhp;
 class Settings
 {
     public function __construct(
-        public int          $sampleRate,
+        public int $sampleRate,
         public SampleSource $sampleSource,
-        public int          $flags,
-        public array        $buckets,
-        public ?string      $signatureKey,
-        public int          $timestamp,
-        public int          $ttl
-    )
-    {
+        public int $flags,
+        public array $buckets,
+        public ?string $signatureKey,
+        public int $timestamp,
+        public int $ttl,
+    ) {
     }
 
     public static function merge(Settings $remote, LocalSettings $local): Settings
@@ -53,7 +52,7 @@ class Settings
             'buckets' => $this->buckets,
             'signatureKey' => $this->signatureKey,
             'timestamp' => $this->timestamp,
-            'ttl' => $this->ttl
+            'ttl' => $this->ttl,
         ]);
     }
 }

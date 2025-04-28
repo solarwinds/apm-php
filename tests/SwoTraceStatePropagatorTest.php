@@ -18,19 +18,19 @@ class SwoTraceStatePropagatorTest extends TestCase
 {
     private TextMapPropagatorInterface $propagator;
 
-    public function testFields(): void
+    public function test_fields(): void
     {
         $this->assertSame(SwoTraceStatePropagator::FIELDS, $this->propagator->fields());
     }
 
-    public function testInjectEmptyBaggage(): void
+    public function test_inject_empty_baggage(): void
     {
         $carrier = [];
         $this->propagator->inject($carrier);
         $this->assertEmpty($carrier);
     }
 
-    public function testInjectNotSampledNoTraceState(): void
+    public function test_inject_not_sampled_no_trace_state(): void
     {
         $carrier = [];
         $generator = new RandomIdGenerator();
@@ -42,7 +42,7 @@ class SwoTraceStatePropagatorTest extends TestCase
         $this->assertEquals(['tracestate' => 'sw=' . $spanId . '-00'], $carrier);
     }
 
-    public function testInjectSampledNoTraceState(): void
+    public function test_inject_sampled_no_trace_state(): void
     {
         $carrier = [];
         $generator = new RandomIdGenerator();
@@ -54,7 +54,7 @@ class SwoTraceStatePropagatorTest extends TestCase
         $this->assertEquals(['tracestate' => 'sw=' . $spanId . '-01'], $carrier);
     }
 
-    public function testInjectSampledTraceState(): void
+    public function test_inject_sampled_trace_state(): void
     {
         $carrier = [];
         $generator = new RandomIdGenerator();
@@ -66,7 +66,7 @@ class SwoTraceStatePropagatorTest extends TestCase
         $this->assertEquals(['tracestate' => 'sw=' . $spanId . '-01' . ',a=b,c=d'], $carrier);
     }
 
-    public function testInjectSampledTraceStateReplaceSw(): void
+    public function test_inject_sampled_trace_state_replace_sw(): void
     {
         $carrier = [];
         $generator = new RandomIdGenerator();
@@ -78,12 +78,12 @@ class SwoTraceStatePropagatorTest extends TestCase
         $this->assertEquals(['tracestate' => 'sw=' . $spanId . '-01' . ',a=b,c=d'], $carrier);
     }
 
-    public function testExtractEmptyBaggage(): void
+    public function test_extract_empty_baggage(): void
     {
         $this->assertEquals(Context::getCurrent(), $this->propagator->extract([]));
     }
 
-    public function testExtract(): void
+    public function test_extract(): void
     {
         $carrier = [];
         $context = $this->propagator->extract($carrier);

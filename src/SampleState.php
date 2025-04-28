@@ -16,14 +16,13 @@ class SampleState
     public ?TraceOptionsWithResponse $traceOptions;
 
     public function __construct(
-        int                       $decision,
-        AttributesInterface       $attributes,
-        ?Settings                 $settings,
-        ?string                   $traceState,
-        RequestHeaders            $headers,
+        int $decision,
+        AttributesInterface $attributes,
+        ?Settings $settings,
+        ?string $traceState,
+        RequestHeaders $headers,
         ?TraceOptionsWithResponse $traceOptions,
-    )
-    {
+    ) {
         $this->decision = $decision;
         $this->attributes = $attributes;
         $this->settings = $settings;

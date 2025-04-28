@@ -67,15 +67,19 @@ function parseSettings($unparsed): ?array
             switch ($flag) {
                 case 'OVERRIDE':
                     $flags |= Flags::OVERRIDE->value;
+
                     break;
                 case 'SAMPLE_START':
                     $flags |= Flags::SAMPLE_START->value;
+
                     break;
                 case 'SAMPLE_THROUGH_ALWAYS':
                     $flags |= Flags::SAMPLE_THROUGH_ALWAYS->value;
+
                     break;
                 case 'TRIGGER_TRACE':
                     $flags |= Flags::TRIGGERED_TRACE->value;
+
                     break;
 
             }
@@ -119,13 +123,15 @@ function parseSettings($unparsed): ?array
     $warning = $unparsed['warning'] ?? null;
 
     return [
-        'settings' => new Settings($sampleRate,
+        'settings' => new Settings(
+            $sampleRate,
             SampleSource::Remote,
             $flags,
             $buckets,
             $signatureKey,
             $timestamp,
-            $ttl),
+            $ttl
+        ),
         'warning' => $warning,
     ];
 }
@@ -168,16 +174,18 @@ abstract class Sampler extends OboeSampler
             $this->logDebug('Valid settings ' . $parsed['settings']);
             parent::updateSettings($parsed['settings']);
             if (!$this->ready->await()) {
-                $this->ready->map(static fn(): bool => true);
+                $this->ready->map(static fn (): bool => true);
             }
-//            if (!empty($parsed['warning'])) {
-//                // $this->logger->warn($parsed['warning']);
-//            }
+
+            //            if (!empty($parsed['warning'])) {
+            //                // $this->logger->warn($parsed['warning']);
+            //            }
             return $parsed['settings'];
-        } else {
-//            $this->logger->debug('Invalid settings', $settings);
-            return null;
         }
+
+        //            $this->logger->debug('Invalid settings', $settings);
+        return null;
+
     }
 
     public function waitUntilReady(int $timeout): bool
@@ -189,17 +197,19 @@ abstract class Sampler extends OboeSampler
             }
             usleep(5 * 1000);
         }
+
         return $this->ready->await();
     }
 
     #[Override]
-    public function localSettings(ContextInterface    $parentContext,
-                                  string              $traceId,
-                                  string              $spanName,
-                                  int                 $spanKind,
-                                  AttributesInterface $attributes,
-                                  array               $links): LocalSettings
-    {
+    public function localSettings(
+        ContextInterface $parentContext,
+        string $traceId,
+        string $spanName,
+        int $spanKind,
+        AttributesInterface $attributes,
+        array $links,
+    ): LocalSettings {
         $settings = new LocalSettings($this->tracingMode, $this->triggerMode);
 
         if ($this->transactionSettings === []) {
@@ -212,6 +222,7 @@ abstract class Sampler extends OboeSampler
         foreach ($this->transactionSettings as $transactionSetting) {
             if (is_a($transactionSetting, TransactionSetting::class) && $transactionSetting->getMatcher()($identifier)) {
                 $settings->setTracingMode($transactionSetting->getTracing() ? TracingMode::ALWAYS : TracingMode::NEVER);
+
                 break;
             }
         }
@@ -220,37 +231,41 @@ abstract class Sampler extends OboeSampler
     }
 
     #[Override]
-    public function requestHeaders(ContextInterface    $parentContext,
-                                   string              $traceId,
-                                   string              $spanName,
-                                   int                 $spanKind,
-                                   AttributesInterface $attributes,
-                                   array               $links): RequestHeaders
-    {
+    public function requestHeaders(
+        ContextInterface $parentContext,
+        string $traceId,
+        string $spanName,
+        int $spanKind,
+        AttributesInterface $attributes,
+        array $links,
+    ): RequestHeaders {
         $xTraceOptionsBaggage = XTraceOptionsBaggage::fromContext($parentContext);
         if (!$xTraceOptionsBaggage->isEmpty()) {
             $xTraceOptions = $xTraceOptionsBaggage->getValue(XTraceOptionsPropagator::XTRACEOPTIONS);
             $xTraceOptionsSignature = $xTraceOptionsBaggage->getValue(XTraceOptionsPropagator::XTRACEOPTIONSSIGNATURE);
-            if (is_null($xTraceOptions) || is_string($xTraceOptions) && is_null($xTraceOptionsSignature) || is_string($xTraceOptionsSignature)) {
+            if (null === $xTraceOptions || is_string($xTraceOptions) && null === $xTraceOptionsSignature || is_string($xTraceOptionsSignature)) {
                 return new RequestHeaders($xTraceOptions, $xTraceOptionsSignature);
             }
         }
+
         return new RequestHeaders();
     }
 
     #[Override]
-    public function setResponseHeaders(ResponseHeaders     $headers,
-                                       ContextInterface    $parentContext,
-                                       string              $traceId,
-                                       string              $spanName,
-                                       int                 $spanKind,
-                                       AttributesInterface $attributes,
-                                       array               $links): ?TraceState
-    {
+    public function setResponseHeaders(
+        ResponseHeaders $headers,
+        ContextInterface $parentContext,
+        string $traceId,
+        string $spanName,
+        int $spanKind,
+        AttributesInterface $attributes,
+        array $links,
+    ): ?TraceState {
         // To do: check if the header is set in context
         $xTraceOptionsResponseBaggageBuilder = XTraceOptionsResponseBaggage::getBuilder();
         $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set(XTraceOptionsPropagator::XTRACEOPTIONSRESPONSE, $headers->XTraceOptionsResponse)->build();
         $xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent());
+
         return null;
     }
 }

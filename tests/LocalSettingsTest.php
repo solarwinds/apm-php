@@ -10,7 +10,7 @@ use Solarwinds\ApmPhp\TracingMode;
 #[CoversClass(LocalSettings::class)]
 class LocalSettingsTest extends TestCase
 {
-    public function testLocalSettingsInitialization(): void
+    public function test_local_settings_initialization(): void
     {
         $tracingMode = TracingMode::ALWAYS;
         $triggerMode = true;
@@ -20,7 +20,7 @@ class LocalSettingsTest extends TestCase
         $this->assertTrue($localSettings->getTriggerMode());
     }
 
-    public function testLocalSettingsInitializationWithNullTracingMode(): void
+    public function test_local_settings_initialization_with_null_tracing_mode(): void
     {
         $tracingMode = null;
         $triggerMode = false;
@@ -30,7 +30,7 @@ class LocalSettingsTest extends TestCase
         $this->assertFalse($localSettings->getTriggerMode());
     }
 
-    public function testSetAndGetTracingMode(): void
+    public function test_set_and_get_tracing_mode(): void
     {
         $localSettings = new LocalSettings(null, true);
         $localSettings->setTracingMode(TracingMode::NEVER);
@@ -38,7 +38,7 @@ class LocalSettingsTest extends TestCase
         $this->assertEquals(TracingMode::NEVER, $localSettings->getTracingMode());
     }
 
-    public function testSetAndGetTriggerMode(): void
+    public function test_set_and_get_trigger_mode(): void
     {
         $localSettings = new LocalSettings(TracingMode::ALWAYS, false);
         $localSettings->setTriggerMode(true);

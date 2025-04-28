@@ -40,21 +40,23 @@ class HttpSampler extends Sampler
         if ($this->request_timestamp && $this->request_timestamp + 60 >= time()) {
             return;
         }
+
         try {
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
             $ctx = stream_context_create(
-                array(
-                    'http' => array(
+                [
+                    'http' => [
                         'header' => $this->headers,
                         'method' => 'GET',
-                    ),
-                )
+                    ],
+                ]
             );
             $this->request_timestamp = time();
             $response = file_get_contents($url, false, $ctx);
             if ($response === false) {
                 $this->warn('Unable to get content from ' . $url);
+
                 return;
             }
             $this->logDebug('Received sampling settings response ' . $response);
@@ -62,6 +64,7 @@ class HttpSampler extends Sampler
             $parsed = $this->parsedAndUpdateSettings($unparsed);
             if (!$parsed) {
                 $this->warn('Retrieved sampling settings are invalid');
+
                 return;
             }
             $this->lastWarningMessage = null;
@@ -81,15 +84,15 @@ class HttpSampler extends Sampler
     }
 
     public function shouldSample(
-        ContextInterface    $parentContext,
-        string              $traceId,
-        string              $spanName,
-        int                 $spanKind,
+        ContextInterface $parentContext,
+        string $traceId,
+        string $spanName,
+        int $spanKind,
         AttributesInterface $attributes,
-        array               $links,
-    ): SamplingResult
-    {
+        array $links,
+    ): SamplingResult {
         $this->loop();
+
         return parent::shouldSample(...func_get_args());
     }
 

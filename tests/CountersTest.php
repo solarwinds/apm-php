@@ -14,7 +14,7 @@ class CountersTest extends TestCase
 {
     private Counters $counters;
 
-    public function testCountersInitialization(): void
+    public function test_counters_initialization(): void
     {
         $this->assertInstanceOf(CounterInterface::class, $this->counters->getRequestCount());
         $this->assertInstanceOf(CounterInterface::class, $this->counters->getSampleCount());

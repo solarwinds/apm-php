@@ -9,7 +9,7 @@ use Solarwinds\ApmPhp\Auth;
 #[CoversClass(Auth::class)]
 class AuthTest extends TestCase
 {
-    public function testEnumValues(): void
+    public function test_enum_values(): void
     {
         $this->assertEquals('ok', Auth::OK->value);
         $this->assertEquals('bad-timestamp', Auth::BAD_TIMESTAMP->value);
@@ -17,7 +17,7 @@ class AuthTest extends TestCase
         $this->assertEquals('no-signature-key', Auth::NO_SIGNATURE_KEY->value);
     }
 
-    public function testEnumKeys(): void
+    public function test_enum_keys(): void
     {
         $this->assertTrue(Auth::tryFrom('ok') === Auth::OK);
         $this->assertTrue(Auth::tryFrom('bad-timestamp') === Auth::BAD_TIMESTAMP);

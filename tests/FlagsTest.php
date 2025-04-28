@@ -9,7 +9,7 @@ use Solarwinds\ApmPhp\Flags;
 #[CoversClass(Flags::class)]
 class FlagsTest extends TestCase
 {
-    public function testFlagsValues(): void
+    public function test_flags_values(): void
     {
         $this->assertEquals(0x0, Flags::OK->value);
         $this->assertEquals(0x1, Flags::INVALID->value);
@@ -19,7 +19,7 @@ class FlagsTest extends TestCase
         $this->assertEquals(0x20, Flags::TRIGGERED_TRACE->value);
     }
 
-    public function testFlagsEnumCases(): void
+    public function test_flags_enum_cases(): void
     {
         $this->assertInstanceOf(Flags::class, Flags::OK);
         $this->assertInstanceOf(Flags::class, Flags::INVALID);

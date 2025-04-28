@@ -21,8 +21,7 @@ class Counters
 
     public function __construct(
         ?MeterProviderInterface $meterProvider = null,
-    )
-    {
+    ) {
         $provider = $meterProvider ?? Globals::meterProvider();
         $this->meter = $provider->getMeter('sw.apm.sampling.metrics');
         $this->request_count = $this->meter->createCounter('trace.service.request_count');

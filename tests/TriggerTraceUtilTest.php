@@ -10,35 +10,35 @@ use Solarwinds\ApmPhp\TriggerTraceUtil;
 #[CoversClass(TriggerTraceUtil::class)]
 class TriggerTraceUtilTest extends TestCase
 {
-    public function testValidSignature()
+    public function test_valid_signature()
     {
         $result = TriggerTraceUtil::validateSignature(
-            "trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681",
-            "2c1c398c3e6be898f47f74bf74f035903b48b59c",
-            "8mZ98ZnZhhggcsUmdMbS",
+            'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
+            '2c1c398c3e6be898f47f74bf74f035903b48b59c',
+            '8mZ98ZnZhhggcsUmdMbS',
             time() - 60
         );
 
         $this->assertEquals(Auth::OK, $result);
     }
 
-    public function testInvalidSignature()
+    public function test_invalid_signature()
     {
         $result = TriggerTraceUtil::validateSignature(
-            "trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681",
-            "2c1c398c3e6be898f47f74bf74f035903b48b59d",
-            "8mZ98ZnZhhggcsUmdMbS",
+            'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
+            '2c1c398c3e6be898f47f74bf74f035903b48b59d',
+            '8mZ98ZnZhhggcsUmdMbS',
             time() - 60
         );
 
         $this->assertEquals(Auth::BAD_SIGNATURE, $result);
     }
 
-    public function testMissingSignatureKey()
+    public function test_missing_signature_key()
     {
         $result = TriggerTraceUtil::validateSignature(
-            "trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681",
-            "2c1c398c3e6be898f47f74bf74f035903b48b59c",
+            'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
+            '2c1c398c3e6be898f47f74bf74f035903b48b59c',
             null,
             time() - 60
         );
@@ -46,36 +46,36 @@ class TriggerTraceUtilTest extends TestCase
         $this->assertEquals(Auth::NO_SIGNATURE_KEY, $result);
     }
 
-    public function testTimestampPast()
+    public function test_timestamp_past()
     {
         $result = TriggerTraceUtil::validateSignature(
-            "trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681",
-            "2c1c398c3e6be898f47f74bf74f035903b48b59c",
-            "8mZ98ZnZhhggcsUmdMbS",
+            'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
+            '2c1c398c3e6be898f47f74bf74f035903b48b59c',
+            '8mZ98ZnZhhggcsUmdMbS',
             time() - 10 * 60
         );
 
         $this->assertEquals(Auth::BAD_TIMESTAMP, $result);
     }
 
-    public function testTimestampFuture()
+    public function test_timestamp_future()
     {
         $result = TriggerTraceUtil::validateSignature(
-            "trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681",
-            "2c1c398c3e6be898f47f74bf74f035903b48b59c",
-            "8mZ98ZnZhhggcsUmdMbS",
+            'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
+            '2c1c398c3e6be898f47f74bf74f035903b48b59c',
+            '8mZ98ZnZhhggcsUmdMbS',
             time() + 10 * 60
         );
 
         $this->assertEquals(Auth::BAD_TIMESTAMP, $result);
     }
 
-    public function testMissingTimestamp()
+    public function test_missing_timestamp()
     {
         $result = TriggerTraceUtil::validateSignature(
-            "trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681",
-            "2c1c398c3e6be898f47f74bf74f035903b48b59c",
-            "8mZ98ZnZhhggcsUmdMbS",
+            'trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681',
+            '2c1c398c3e6be898f47f74bf74f035903b48b59c',
+            '8mZ98ZnZhhggcsUmdMbS',
             null
         );
 

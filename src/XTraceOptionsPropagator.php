@@ -42,7 +42,7 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
         }
         $response = '';
         foreach ($xTraceOptionsResponseBaggage->getAll() as $key => $entry) {
-            $value = urlencode((string)$entry->getValue());
+            $value = urlencode((string) $entry->getValue());
             $response .= "{$key}={$value};";
         }
         $response = rtrim($response, ';');
@@ -56,6 +56,7 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
         if (null === self::$instance) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -74,6 +75,7 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
         if ($xTraceOptionsSignature !== null) {
             $xTraceOptionsBaggageBuilder->set(self::XTRACEOPTIONSSIGNATURE, $xTraceOptionsSignature);
         }
+
         return $context->withContextValue($xTraceOptionsBaggageBuilder->build());
     }
 }

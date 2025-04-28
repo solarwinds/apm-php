@@ -18,13 +18,12 @@ class TraceOptions
     public array $ignored = [];
 
     public function __construct(
-        ?bool   $triggerTrace = null,
-        ?int    $timestamp = null,
+        ?bool $triggerTrace = null,
+        ?int $timestamp = null,
         ?string $swKeys = null,
-        array   $custom = [],
-        array   $ignored = []
-    )
-    {
+        array $custom = [],
+        array $ignored = [],
+    ) {
         $this->triggerTrace = $triggerTrace;
         $this->timestamp = $timestamp;
         $this->swKeys = $swKeys;
@@ -37,15 +36,17 @@ class TraceOptions
         $traceOptions = new TraceOptions();
         $kvs = array_filter(array_map(function ($kv) {
             $parts = array_map('trim', explode('=', $kv, 2));
+
             return count($parts) === 2 ? $parts : [$parts[0], null];
         }, explode(';', $header)), function ($kv) {
-            return strlen((string)$kv[0]) > 0;
+            return strlen((string) $kv[0]) > 0;
         });
         foreach ($kvs as [$k, $v]) {
             if ($k === TRIGGER_TRACE_KEY) {
                 if ($v !== null || $traceOptions->triggerTrace !== null) {
                     // error_log('invalid trace option for trigger trace, should not have a value and only be provided once');
                     $traceOptions->ignored[] = [$k, $v];
+
                     continue;
                 }
                 $traceOptions->triggerTrace = true;
@@ -53,25 +54,29 @@ class TraceOptions
                 if ($v === null || $traceOptions->timestamp !== null) {
                     // error_log('invalid trace option for timestamp, should have a value and only be provided once');
                     $traceOptions->ignored[] = [$k, $v];
+
                     continue;
                 }
                 if (!is_numeric($v) || str_contains($v, '.')) {
                     // error_log('invalid trace option for timestamp, should be an integer');
                     $traceOptions->ignored[] = [$k, $v];
+
                     continue;
                 }
-                $traceOptions->timestamp = intval($v);
+                $traceOptions->timestamp = (int) $v;
             } elseif ($k === SW_KEYS_KEY) {
                 if ($v === null || $traceOptions->swKeys !== null) {
                     // error_log('invalid trace option for sw keys, should have a value and only be provided once');
                     $traceOptions->ignored[] = [$k, $v];
+
                     continue;
                 }
                 $traceOptions->swKeys = $v;
-            } elseif (preg_match(CUSTOM_KEY_REGEX, (string)$k)) {
+            } elseif (preg_match(CUSTOM_KEY_REGEX, (string) $k)) {
                 if ($v === null || array_key_exists($k, $traceOptions->custom)) {
                     // error_log("invalid trace option for custom key $k, should have a value and only be provided once");
                     $traceOptions->ignored[] = [$k, $v];
+
                     continue;
                 }
                 $traceOptions->custom[$k] = $v;
@@ -79,6 +84,7 @@ class TraceOptions
                 $traceOptions->ignored[] = [$k, $v];
             }
         }
+
         return $traceOptions;
     }
 
@@ -86,7 +92,7 @@ class TraceOptions
     {
         $kvs = [
             TRIGGER_TRACE_KEY => $this->triggerTrace ? 'true' : null,
-            TIMESTAMP_KEY => $this->timestamp !== null ? strval($this->timestamp) : null,
+            TIMESTAMP_KEY => $this->timestamp !== null ? (string) ($this->timestamp) : null,
             SW_KEYS_KEY => $this->swKeys,
             'custom' => implode(';', array_map(function ($k, $v) {
                 return "$k=$v";
@@ -94,11 +100,13 @@ class TraceOptions
             'ignored' => implode(';', array_map(function ($k, $v) {
                 if (is_array($v) && count($v) === 2) {
                     return "$v[0]=$v[1]";
-                } else {
-                    return "$k=$v";
                 }
+
+                return "$k=$v";
+
             }, array_keys($this->ignored), $this->ignored)),
         ];
+
         return implode(',', array_filter(array_map(function ($k, $v) {
             return $v !== null ? "$k=$v" : '';
         }, array_keys($kvs), $kvs)));

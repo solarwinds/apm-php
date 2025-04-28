@@ -13,7 +13,7 @@ use Solarwinds\ApmPhp\HttpSampler;
 #[CoversClass(HttpSampler::class)]
 class HttpSamplerTest extends TestCase
 {
-    public function testValidServiceKeySamplesCreatedSpans(): void
+    public function test_valid_service_key_samples_created_spans(): void
     {
         $serviceKey = getenv('SW_APM_SERVICE_KEY');
         if ($serviceKey === false) {
@@ -21,7 +21,7 @@ class HttpSamplerTest extends TestCase
         }
         [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
-        $sampler = new HttpSampler(null, new Configuration(true, $service, "https://apm.collector.na-01.cloud.solarwinds.com", ['Authorization: Bearer ' . $token,], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://apm.collector.na-01.cloud.solarwinds.com', ['Authorization: Bearer ' . $token,], true, true, null, []), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         // $sampler->waitUntilReady(1000);
@@ -37,10 +37,10 @@ class HttpSamplerTest extends TestCase
         $this->assertArrayHasKey('BucketRate', $spans[0]->getAttributes()->toArray());
     }
 
-    public function testInvalidServiceKeyDoesNotSampleCreatedSpans(): void
+    public function test_invalid_service_key_does_not_sample_created_spans(): void
     {
         $spanExporter = new InMemoryExporter();
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', "https://apm.collector.na-01.cloud.solarwinds.com", ['Authorization: Bearer oh no',], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'https://apm.collector.na-01.cloud.solarwinds.com', ['Authorization: Bearer oh no',], true, true, null, []), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         // $sampler->waitUntilReady(1000);
@@ -52,7 +52,7 @@ class HttpSamplerTest extends TestCase
         $this->assertCount(0, $spans);
     }
 
-    public function testInvalidCollectorDoesNotSampleCreatedSpans(): void
+    public function test_invalid_collector_does_not_sample_created_spans(): void
     {
         $serviceKey = getenv('SW_APM_SERVICE_KEY');
         if ($serviceKey === false) {
@@ -60,7 +60,7 @@ class HttpSamplerTest extends TestCase
         }
         [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
-        $sampler = new HttpSampler(null, new Configuration(true, $service, "https://collector.invalid", ['Authorization: Bearer ' . $token,], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://collector.invalid', ['Authorization: Bearer ' . $token,], true, true, null, []), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         // $sampler->waitUntilReady(1000);

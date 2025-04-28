@@ -9,7 +9,7 @@ use Solarwinds\ApmPhp\BucketSettings;
 #[CoversClass(BucketSettings::class)]
 class BucketSettingsTest extends TestCase
 {
-    public function testBucketSettingsInitialization(): void
+    public function test_bucket_settings_initialization(): void
     {
         $capacity = 100;
         $rate = 10;
