@@ -33,7 +33,6 @@
     "psalm/plugin-mockery": "^1",
     "psalm/plugin-phpunit": "^0.18.4",
     "symfony/http-client": "^5.2",
-    "infection/infection": "^0.28.1"
   },
   "require": {
     "php": "^8.1",
@@ -46,7 +45,6 @@
     "allow-plugins": {
       "php-http/discovery": true,
       "tbachert/spi": true,
-      "infection/extension-installer": true
     }
   }
 }
