@@ -204,7 +204,7 @@ abstract class OboeSampler implements SamplerInterface
         ]);
         $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $parentIdAttributes);
 
-        if ($s->traceOptions?->triggerTrace) {
+        if ($s->traceOptions && $s->traceOptions->triggerTrace) {
             $this->logDebug('trigger trace requested but ignored');
             $s->traceOptions->response->triggerTrace = TriggerTrace::IGNORED;
         }
@@ -236,7 +236,7 @@ abstract class OboeSampler implements SamplerInterface
 
     private function triggerTraceAlgo(SampleState $s, ContextInterface $parentContext)
     {
-        if ($s->settings->flags & Flags::TRIGGERED_TRACE->value) {
+        if ($s->settings?->flags & Flags::TRIGGERED_TRACE->value) {
             $this->logDebug('TRIGGERED_TRACE set; trigger tracing');
             $bucket = $s->traceOptions?->response->auth ? $this->buckets[BucketType::TRIGGER_RELAXED->value] : $this->buckets[BucketType::TRIGGER_STRICT->value];
             $newAttributes = Attributes::create([
@@ -251,16 +251,22 @@ abstract class OboeSampler implements SamplerInterface
                 $this->counters->getTriggeredTraceCount()->add(1, [], $parentContext);
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
 
-                $s->traceOptions->response->triggerTrace = TriggerTrace::OK;
+                if ($s->traceOptions) {
+                    $s->traceOptions->response->triggerTrace = TriggerTrace::OK;
+                }
                 $s->decision = SamplingResult::RECORD_AND_SAMPLE;
             } else {
                 $this->logDebug('insufficient capacity; record only');
-                $s->traceOptions->response->triggerTrace = TriggerTrace::RATE_EXCEEDED;
+                if ($s->traceOptions) {
+                    $s->traceOptions->response->triggerTrace = TriggerTrace::RATE_EXCEEDED;
+                }
                 $s->decision = SamplingResult::RECORD_ONLY;
             }
         } else {
             $this->logDebug('TRIGGERED_TRACE unset; record only');
-            $s->traceOptions->response->triggerTrace = TriggerTrace::TRIGGER_TRACING_DISABLED;
+            if ($s->traceOptions) {
+                $s->traceOptions->response->triggerTrace = TriggerTrace::TRIGGER_TRACING_DISABLED;
+            }
             $s->decision = SamplingResult::RECORD_ONLY;
         }
     }

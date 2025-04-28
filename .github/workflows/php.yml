@@ -13,12 +13,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ '8.1', '8.2', '8.3' ]
+        php-version: [ '8.1' ]
+#        php-version: [ '8.1', '8.2', '8.3' ]
         composer_args: [""]
-        include:
-          - php-version: 8.4
-            experimental: false
-            composer_args: "--ignore-platform-reqs"
+#        include:
+#          - php-version: 8.4
+#            experimental: false
+#            composer_args: "--ignore-platform-reqs"
     env:
       extensions: ast, grpc, opentelemetry, protobuf
 
