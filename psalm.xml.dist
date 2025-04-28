@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="3"
+    cacheDirectory="var/cache/psalm"
+    findUnusedBaselineEntry="false"
+    findUnusedCode="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd">
+    <projectFiles>
+        <directory name="./src"/>
+        <directory name="./tests"/>
+        <directory name="./examples"/>
+        <ignoreFiles>
+            <directory name="./examples/traces/demo/"/>
+            <directory name="tests/Unit/Config/SDK/Configuration/ExampleSdk"/>
+            <directory name="tests/TraceContext/W3CTestService"/>
+        </ignoreFiles>
+    </projectFiles>
+    <plugins>
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+        <pluginClass class="Psalm\MockeryPlugin\Plugin"/>
+    </plugins>
+    <issueHandlers>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <referencedClass name="GMP"/>
+            </errorLevel>
+        </UndefinedClass>
+        <UndefinedFunction>
+            <errorLevel type="suppress">
+                <referencedFunction name="OpenTelemetry\Instrumentation\hook"/>
+            </errorLevel>
+        </UndefinedFunction>
+        <ArgumentTypeCoercion>
+            <errorLevel type="suppress">
+                <directory name="./examples"/>
+            </errorLevel>
+        </ArgumentTypeCoercion>
+        <InvalidArgument>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration/Internal"/>
+            </errorLevel>
+        </InvalidArgument>
+        <UndefinedInterfaceMethod>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/ComponentProvider"/>
+                <directory name="tests/Integration/Config/ComponentProvider"/>
+            </errorLevel>
+        </UndefinedInterfaceMethod>
+        <PossiblyInvalidArgument>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration"/>
+            </errorLevel>
+        </PossiblyInvalidArgument>
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/ComponentProvider"/>
+                <directory name="tests/Integration/Config/ComponentProvider"/>
+            </errorLevel>
+        </PossiblyNullReference>
+        <MoreSpecificImplementedParamType>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/ComponentProvider"/>
+                <directory name="tests/Integration/Config/ComponentProvider"/>
+            </errorLevel>
+        </MoreSpecificImplementedParamType>
+        <InvalidDocblock>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/ComponentProvider"/>
+            </errorLevel>
+        </InvalidDocblock>
+        <NonInvariantDocblockPropertyType>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration/Internal"/>
+            </errorLevel>
+        </NonInvariantDocblockPropertyType>
+        <NonInvariantPropertyType>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration/Internal"/>
+            </errorLevel>
+        </NonInvariantPropertyType>
+    </issueHandlers>
+</psalm>

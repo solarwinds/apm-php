@@ -30,6 +30,24 @@ jobs:
 
     - uses: actions/checkout@v4
 
+    - uses: gacts/run-and-post-run@v1
+      id: post-run-command
+      with:
+        post: |
+          echo "::group::Steps"
+          echo "composer=${{steps.composer.outcome}}"
+          echo "style=${{steps.style.outcome}}"
+          echo "deps=${{steps.deps.outcome}}"
+          echo "phan=${{steps.phan.outcome}}"
+          echo "psalm=${{steps.psalm.outcome}}"
+          echo "phpstan=${{steps.phpstan.outcome}}"
+          echo "unit=${{steps.unit.outcome}}"
+          echo "::endgroup::"
+
+          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.phan.outcome == 'failure' || steps.psalm.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' }} == true ]; then \
+            echo "::error::One or more steps failed"; \
+          fi
+
     - name: Setup cache environment
       id: extcache
       uses: shivammathur/cache-extensions@v1
@@ -104,10 +122,15 @@ jobs:
         PHAN_DISABLE_XDEBUG_WARN: 1
       run: vendor-bin/phan/vendor/bin/phan
 
+    - name: Run Psalm
+      id: psalm
+      continue-on-error: true
+      run: vendor-bin/psalm/vendor/bin/psalm --output-format=github
+
     - name: Run Phpstan
       id: phpstan
       continue-on-error: true
-      run: vendor-bin/psalm/vendor/bin/psalm --output-format=github
+      run: vendor/bin/phpstan analyse --error-format=github
 
     - name: Run PHPUnit (unit tests)
       id: unit
@@ -122,3 +145,4 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.clover
         flags: ${{ matrix.php-version }}
+        verbose: false
