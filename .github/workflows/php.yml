@@ -84,6 +84,14 @@ jobs:
 
     # - name: Run test suite
     #   run: composer run-script test
+    - name: Run Phan
+      id: phan
+      continue-on-error: true
+      env:
+        XDEBUG_MODE: off
+        PHAN_DISABLE_XDEBUG_WARN: 1
+      run: vendor/phan/phan/phan
+
     - name: Run Phpstan
       id: phpstan
       continue-on-error: true
