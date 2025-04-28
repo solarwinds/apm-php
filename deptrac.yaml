@@ -1,0 +1,19 @@
+deptrac:
+    analyser:
+        types:
+            - class
+            - class_superglobal
+            - use
+            - file
+            - function
+            - function_superglobal
+    paths:
+        - ./src
+    layers:
+      -   name: Composer
+          collectors:
+              - type: className
+                regex: ^Composer\\*
+    ruleset:
+      SDK:
+          - Composer
