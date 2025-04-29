@@ -37,7 +37,7 @@ class HttpSampler extends Sampler
 
     private function loop(): void
     {
-        if ($this->request_timestamp && $this->request_timestamp + 60 >= time()) {
+        if ($this->request_timestamp !== null && $this->request_timestamp + 60 >= time()) {
             return;
         }
 

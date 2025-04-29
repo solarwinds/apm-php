@@ -66,11 +66,11 @@ abstract class OboeSampler implements SamplerInterface
             null
         );
         $this->counters->getRequestCount()->add(1, [], $parentContext);
-        if ($s->headers->XTraceOptions) {
+        if ($s->headers->XTraceOptions !== null) {
             $parsed = TraceOptions::from($s->headers->XTraceOptions);
             $s->traceOptions = new TraceOptionsWithResponse($parsed, new TraceOptionsResponse());
             $this->logDebug('X-Trace-Options present ' . $s->traceOptions);
-            if ($s->headers->XTraceOptionsSignature) {
+            if ($s->headers->XTraceOptionsSignature !== null) {
                 $this->logDebug('X-Trace-Options-Signature present; validating');
                 $s->traceOptions->response->auth = TriggerTraceUtil::validateSignature(
                     $s->headers->XTraceOptions,
@@ -88,7 +88,7 @@ abstract class OboeSampler implements SamplerInterface
             if (!$s->traceOptions->triggerTrace) {
                 $s->traceOptions->response->triggerTrace = TriggerTrace::NOT_REQUESTED;
             }
-            if ($s->traceOptions->swKeys) {
+            if ($s->traceOptions->swKeys !== null) {
                 $swKeyAttributes = Attributes::create([
                     SW_KEYS_ATTRIBUTE => $s->traceOptions->swKeys,
                 ]);
@@ -97,7 +97,7 @@ abstract class OboeSampler implements SamplerInterface
             $customAttributes = Attributes::create($s->traceOptions->custom);
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $customAttributes);
             if ($s->traceOptions->ignored !== []) {
-                $s->traceOptions->response->ignored = array_map(fn ($item) => $item[0], $s->traceOptions->ignored);
+                $s->traceOptions->response->ignored = array_map(fn ($item) => is_array($item) && count($item) > 0? $item[0] : '', $s->traceOptions->ignored);
             }
         }
         if (!$s->settings) {
@@ -110,7 +110,7 @@ abstract class OboeSampler implements SamplerInterface
 
             return new SamplingResult(SamplingResult::DROP, $s->attributes, $new_trace_state);
         }
-        if ($s->traceState && preg_match('/^[0-9a-f]{16}-[0-9a-f]{2}$/', $s->traceState)) {
+        if ($s->traceState !== null && preg_match('/^[0-9a-f]{16}-[0-9a-f]{2}$/', $s->traceState)) {
             $this->logDebug('context is valid for parent-based sampling');
             $this->parentBasedAlgo($s, $parentContext);
         } elseif ($s->settings->flags & Flags::SAMPLE_START->value) {
@@ -209,7 +209,7 @@ abstract class OboeSampler implements SamplerInterface
             $s->traceOptions->response->triggerTrace = TriggerTrace::IGNORED;
         }
 
-        if ($s->settings?->flags & Flags::SAMPLE_THROUGH_ALWAYS->value) {
+        if ($s->settings !== null && $s->settings->flags & Flags::SAMPLE_THROUGH_ALWAYS->value) {
             $this->logDebug('SAMPLE_THROUGH_ALWAYS is set; parent-based sampling');
             $flags = hexdec(substr((string) $s->traceState, -2));
             $sampled = $flags & TraceFlags::SAMPLED;
@@ -224,7 +224,7 @@ abstract class OboeSampler implements SamplerInterface
             }
         } else {
             $this->logDebug('SAMPLE_THROUGH_ALWAYS is unset; sampling disabled');
-            if ($s->settings?->flags & Flags::SAMPLE_START->value) {
+            if ($s->settings !== null && $s->settings->flags & Flags::SAMPLE_START->value) {
                 $this->logDebug('SAMPLE_START is set; record');
                 $s->decision = SamplingResult::RECORD_ONLY;
             } else {
@@ -236,7 +236,7 @@ abstract class OboeSampler implements SamplerInterface
 
     private function triggerTraceAlgo(SampleState $s, ContextInterface $parentContext): void
     {
-        if ($s->settings?->flags & Flags::TRIGGERED_TRACE->value) {
+        if ($s->settings !== null && $s->settings->flags & Flags::TRIGGERED_TRACE->value) {
             $this->logDebug('TRIGGERED_TRACE set; trigger tracing');
             $bucket = $s->traceOptions?->response->auth ? $this->buckets[BucketType::TRIGGER_RELAXED->value] : $this->buckets[BucketType::TRIGGER_STRICT->value];
             $newAttributes = Attributes::create([
@@ -329,7 +329,7 @@ abstract class OboeSampler implements SamplerInterface
             $this->settings = $settings;
             foreach ($this->buckets as $type => $bucket) {
                 $bucketSettings = $this->settings->buckets[$type] ?? null;
-                if ($bucketSettings && is_a($bucketSettings, BucketSettings::class)) {
+                if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
                     $bucket->update($bucketSettings->capacity, $bucketSettings->rate);
                 }
             }

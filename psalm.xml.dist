@@ -27,5 +27,10 @@
                 <directory name="./tests/" />
             </errorLevel>
         </InternalMethod>
+        <DeprecatedConstant>
+            <errorLevel type="suppress">
+                <file name="./src/Sampler.php" />
+            </errorLevel>
+        </DeprecatedConstant>
     </issueHandlers>
 </psalm>
