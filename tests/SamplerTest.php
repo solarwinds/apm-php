@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Common\Attribute\AttributesFactory;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
@@ -36,9 +36,9 @@ class SamplerTest extends TestCase
     public function test_handles_non_http_spans_properly(): void
     {
         $spanKind = SpanKind::KIND_SERVER;
-        $attributes = (new AttributesFactory())->builder([
+        $attributes = Attributes::create([
             'network.transport' => 'udp',
-        ])->build();
+        ]);
         $output = httpSpanMetadata($spanKind, $attributes);
         $this->assertEquals(['http' => false], $output);
     }
@@ -46,13 +46,13 @@ class SamplerTest extends TestCase
     public function test_handles_http_client_spans_properly(): void
     {
         $spanKind = SpanKind::KIND_CLIENT;
-        $attributes = (new AttributesFactory())->builder([
+        $attributes = Attributes::create([
             'http.request.method' => 'GET',
             'http.response.status_code' => 200,
             'server.address' => 'solarwinds.com',
             'url.scheme' => 'https',
             'url.path' => '',
-        ])->build();
+        ]);
         $output = httpSpanMetadata($spanKind, $attributes);
         $this->assertEquals(['http' => false], $output);
     }
@@ -60,13 +60,13 @@ class SamplerTest extends TestCase
     public function test_handles_http_server_spans_properly(): void
     {
         $spanKind = SpanKind::KIND_SERVER;
-        $attributes = (new AttributesFactory())->builder([
+        $attributes = Attributes::create([
             'http.request.method' => 'GET',
             'http.response.status_code' => 200,
             'server.address' => 'solarwinds.com',
             'url.scheme' => 'https',
             'url.path' => '',
-        ])->build();
+        ]);
 
         $output = httpSpanMetadata($spanKind, $attributes);
         $this->assertEquals([
@@ -83,13 +83,13 @@ class SamplerTest extends TestCase
     public function test_handles_legacy_http_server_spans_properly(): void
     {
         $spanKind = SpanKind::KIND_SERVER;
-        $attributes = (new AttributesFactory())->builder([
+        $attributes = Attributes::create([
             'http.method' => 'GET',
             'http.status_code' => '200',
             'http.scheme' => 'https',
             'net.host.name' => 'solarwinds.com',
             'http.target' => '',
-        ])->build();
+        ]);
         $output = httpSpanMetadata($spanKind, $attributes);
         $this->assertEquals([
             'http' => true,
