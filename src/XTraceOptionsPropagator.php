@@ -25,15 +25,11 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
 
     private static ?self $instance = null;
 
-    /** {@inheritdoc} */
-    #[\Override]
     public function fields(): array
     {
         return self::FIELDS;
     }
 
-    /** {@inheritdoc} */
-    #[\Override]
     public function inject(mixed &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
@@ -62,8 +58,6 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
         return self::$instance;
     }
 
-    /** {@inheritdoc} */
-    #[\Override]
     public function extract(mixed $carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();

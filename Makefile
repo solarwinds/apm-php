@@ -11,7 +11,7 @@ help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "  \033[32m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 all: update all-checks ## Update to latest and run all checks
 all-lowest: update-lowest all-checks ## Update to lowest dependencies and run all checks
-all-checks: rector style deptrac packages-composer phan psalm phpstan test ## Run all checks
+all-checks: rector style deptrac phan psalm phpstan test ## Run all checks
 pull: ## Pull latest developer image
 	$(DOCKER_COMPOSE) pull php
 build: ## Build developer image locally
@@ -38,8 +38,6 @@ phpstan: ## Run phpstan
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/phpstan analyse --memory-limit=256M
 infection: ## Run infection (mutation testing)
 	$(DC_RUN_PHP) env XDEBUG_MODE=coverage php -d memory_limit=1024M vendor-bin/infection/vendor/bin/infection --threads=max
-packages-composer: ## Validate composer packages
-	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/otel packages:composer:validate
 benchmark: ## Run phpbench
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/phpbench/vendor/bin/phpbench run --report=default
 phpmetrics: ## Run php metrics

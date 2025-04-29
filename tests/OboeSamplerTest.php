@@ -52,7 +52,6 @@ class TestOboeSampler extends OboeSampler
         return $this->responseHeaders;
     }
 
-    #[Override]
     public function setResponseHeaders(ResponseHeaders $headers, ContextInterface $parentContext, string $traceId, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): ?TraceState
     {
         $this->responseHeaders = $headers;
@@ -60,13 +59,11 @@ class TestOboeSampler extends OboeSampler
         return null;
     }
 
-    #[Override]
     public function localSettings(ContextInterface $parentContext, string $traceId, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): LocalSettings
     {
         return $this->localSettings;
     }
 
-    #[Override]
     public function requestHeaders(ContextInterface $parentContext, string $traceId, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): RequestHeaders
     {
         return $this->requestHeaders;

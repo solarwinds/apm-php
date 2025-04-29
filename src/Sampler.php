@@ -13,7 +13,6 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
-use Override;
 
 function httpSpanMetadata(int $kind, AttributesInterface $attributes): array
 {
@@ -201,7 +200,6 @@ abstract class Sampler extends OboeSampler
         return $this->ready->await();
     }
 
-    #[Override]
     public function localSettings(
         ContextInterface $parentContext,
         string $traceId,
@@ -230,7 +228,6 @@ abstract class Sampler extends OboeSampler
         return $settings;
     }
 
-    #[Override]
     public function requestHeaders(
         ContextInterface $parentContext,
         string $traceId,
@@ -251,7 +248,6 @@ abstract class Sampler extends OboeSampler
         return new RequestHeaders();
     }
 
-    #[Override]
     public function setResponseHeaders(
         ResponseHeaders $headers,
         ContextInterface $parentContext,

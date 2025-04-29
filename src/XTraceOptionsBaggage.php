@@ -10,7 +10,6 @@ use OpenTelemetry\API\Baggage\Entry;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ScopeInterface;
-use Override;
 
 final class XTraceOptionsBaggage implements BaggageInterface
 {
@@ -80,7 +79,6 @@ final class XTraceOptionsBaggage implements BaggageInterface
         return new XTraceOptionsBaggageBuilder($this->entries);
     }
 
-    #[Override]
     public function storeInContext(ContextInterface $context): ContextInterface
     {
         return $context->with(SwoContextKeys::xtraceoptions(), $this);
