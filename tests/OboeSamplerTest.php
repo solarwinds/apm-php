@@ -362,8 +362,8 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertEquals('sw-values', $attributes['SWKeys']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
+        $this->assertEquals('sw-values', $attributes['SWKeys'] ?? '');
         $this->assertStringContainsString('trigger-trace=not-requested', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
     }
 
@@ -391,7 +391,7 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
         $this->assertStringContainsString('trigger-trace=settings-not-available', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
         $this->assertStringContainsString('ignored=invalid-key', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
     }
@@ -428,8 +428,8 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertEquals('sw-values', $attributes['SWKeys']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
+        $this->assertEquals('sw-values', $attributes['SWKeys'] ?? '');
         $this->assertStringContainsString('trigger-trace=not-requested', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
     }
 
@@ -466,7 +466,7 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
         $this->assertStringContainsString('trigger-trace=ignored', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
         $this->assertStringContainsString('ignored=invalid-key', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
     }
@@ -507,7 +507,7 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals(Span::fromContext($parentContext)->getContext()->getSpanId(), $attributes['sw.tracestate_parent_id']);
+        $this->assertEquals(Span::fromContext($parentContext)->getContext()->getSpanId(), $attributes['sw.tracestate_parent_id'] ?? '');
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.tracecount'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.through_trace_count'] ?? 0);
@@ -549,7 +549,7 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals(Span::fromContext($parentContext)->getContext()->getSpanId(), $attributes['sw.tracestate_parent_id']);
+        $this->assertEquals(Span::fromContext($parentContext)->getContext()->getSpanId(), $attributes['sw.tracestate_parent_id'] ?? '');
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
@@ -590,7 +590,7 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals(Span::fromContext($parentContext)->getContext()->getSpanId(), $attributes['sw.tracestate_parent_id']);
+        $this->assertEquals(Span::fromContext($parentContext)->getContext()->getSpanId(), $attributes['sw.tracestate_parent_id'] ?? '');
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.tracecount'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.through_trace_count'] ?? 0);
@@ -632,7 +632,7 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals(Span::fromContext($parentContext)->getContext()->getSpanId(), $attributes['sw.tracestate_parent_id']);
+        $this->assertEquals(Span::fromContext($parentContext)->getContext()->getSpanId(), $attributes['sw.tracestate_parent_id'] ?? '');
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
 
@@ -750,10 +750,10 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertEquals('sw-values', $attributes['SWKeys']);
-        $this->assertEquals(10, $attributes['BucketCapacity']);
-        $this->assertEquals(5, $attributes['BucketRate']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
+        $this->assertEquals('sw-values', $attributes['SWKeys'] ?? '');
+        $this->assertEquals(10, $attributes['BucketCapacity'] ?? -1);
+        $this->assertEquals(5, $attributes['BucketRate'] ?? -1);
         $this->assertStringContainsString('trigger-trace=ok', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.tracecount'] ?? 0);
@@ -802,9 +802,9 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertEquals(0, $attributes['BucketCapacity']);
-        $this->assertEquals(0, $attributes['BucketRate']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
+        $this->assertEquals(0, $attributes['BucketCapacity'] ?? -1);
+        $this->assertEquals(0, $attributes['BucketRate'] ?? -1);
         $this->assertStringContainsString('trigger-trace=rate-exceeded', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
         $this->assertStringContainsString('ignored=invalid-key', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
 
@@ -856,10 +856,10 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertEquals('sw-values', $attributes['SWKeys']);
-        $this->assertEquals(20, $attributes['BucketCapacity']);
-        $this->assertEquals(10, $attributes['BucketRate']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
+        $this->assertEquals('sw-values', $attributes['SWKeys'] ?? '');
+        $this->assertEquals(20, $attributes['BucketCapacity'] ?? -1);
+        $this->assertEquals(10, $attributes['BucketRate'] ?? -1);
         $this->assertStringContainsString('auth=ok', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
         $this->assertStringContainsString('trigger-trace=ok', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
 
@@ -912,9 +912,9 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertEquals(0, $attributes['BucketCapacity']);
-        $this->assertEquals(0, $attributes['BucketRate']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
+        $this->assertEquals(0, $attributes['BucketCapacity'] ?? -1);
+        $this->assertEquals(0, $attributes['BucketRate'] ?? -1);
         $this->assertStringContainsString('trigger-trace=rate-exceeded', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
         $this->assertStringContainsString('ignored=invalid-key', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
 
@@ -961,7 +961,7 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
         $this->assertStringContainsString('trigger-trace=trigger-tracing-disabled', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
         $this->assertStringContainsString('ignored=invalid-key', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
 
@@ -1001,8 +1001,8 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertEquals('sw-values', $attributes['SWKeys']);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
+        $this->assertEquals('sw-values', $attributes['SWKeys'] ?? '');
         $this->assertStringContainsString('trigger-trace=not-requested', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
     }
 
@@ -1043,10 +1043,10 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals(1000000, $attributes['SampleRate']);
-        $this->assertEquals(6, $attributes['SampleSource']);
-        $this->assertEquals(10, $attributes['BucketCapacity']);
-        $this->assertEquals(5, $attributes['BucketRate']);
+        $this->assertEquals(1000000, $attributes['SampleRate'] ?? -1);
+        $this->assertEquals(6, $attributes['SampleSource'] ?? -1);
+        $this->assertEquals(10, $attributes['BucketCapacity'] ?? -1);
+        $this->assertEquals(5, $attributes['BucketRate'] ?? -1);
 
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.samplecount'] ?? 0);
@@ -1090,10 +1090,10 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals(1000000, $attributes['SampleRate']);
-        $this->assertEquals(6, $attributes['SampleSource']);
-        $this->assertEquals(0, $attributes['BucketCapacity']);
-        $this->assertEquals(0, $attributes['BucketRate']);
+        $this->assertEquals(1000000, $attributes['SampleRate'] ?? -1);
+        $this->assertEquals(6, $attributes['SampleSource'] ?? -1);
+        $this->assertEquals(0, $attributes['BucketCapacity'] ?? -1);
+        $this->assertEquals(0, $attributes['BucketRate'] ?? -1);
 
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.samplecount'] ?? 0);
@@ -1137,10 +1137,10 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals(0, $attributes['SampleRate']);
-        $this->assertEquals(2, $attributes['SampleSource']);
-        $this->assertArrayNotHasKey('BucketCapacity', $attributes);
-        $this->assertArrayNotHasKey('BucketRate', $attributes);
+        $this->assertEquals(0, $attributes['SampleRate'] ?? -1);
+        $this->assertEquals(2, $attributes['SampleSource'] ?? -1);
+        $this->assertArrayNotHasKey('BucketCapacity', $attributes ?? []);
+        $this->assertArrayNotHasKey('BucketRate', $attributes ?? []);
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.samplecount'] ?? 0);
     }
@@ -1179,8 +1179,7 @@ class OboeSamplerTest extends TestCase
         foreach ($sample->getAttributes() as $key => $value) {
             $attributes[$key] = $value;
         }
-        $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertNotNull($sampler->getResponseHeaders()->XTraceOptionsResponse);
+        $this->assertEquals('value', $attributes['custom-key'] ?? '');
         $this->assertStringContainsString('trigger-trace=tracing-disabled', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
         $this->assertStringContainsString('ignored=invalid-key', strval($sampler->getResponseHeaders()?->XTraceOptionsResponse));
     }
