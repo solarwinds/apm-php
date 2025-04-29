@@ -39,7 +39,7 @@ class TraceOptions
 
             return count($parts) === 2 ? $parts : [$parts[0], null];
         }, explode(';', $header)), function ($kv) {
-            return strlen((string) $kv[0]) > 0;
+            return strlen($kv[0]) > 0;
         });
         foreach ($kvs as [$k, $v]) {
             if ($k === TRIGGER_TRACE_KEY) {
@@ -72,7 +72,7 @@ class TraceOptions
                     continue;
                 }
                 $traceOptions->swKeys = $v;
-            } elseif (preg_match(CUSTOM_KEY_REGEX, (string) $k)) {
+            } elseif (preg_match(CUSTOM_KEY_REGEX, $k)) {
                 if ($v === null || array_key_exists($k, $traceOptions->custom)) {
                     // error_log("invalid trace option for custom key $k, should have a value and only be provided once");
                     $traceOptions->ignored[] = [$k, $v];

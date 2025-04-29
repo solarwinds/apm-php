@@ -42,7 +42,7 @@ function httpSpanMetadata(int $kind, AttributesInterface $attributes): array
     ];
 }
 
-function parseSettings($unparsed): ?array
+function parseSettings(mixed $unparsed): ?array
 {
     if (!is_array($unparsed)) {
         return null;

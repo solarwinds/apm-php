@@ -103,7 +103,7 @@ class OboeSamplerTest extends TestCase
         $kvs = is_array($optionsKvs) ? array_map(fn ($k, $v) => "$k=$v", array_keys($optionsKvs), $optionsKvs) : [];
         $headers = new RequestHeaders(implode(';', array_filter(array_merge([$triggerTrace], $kvs, [$ts]))));
 
-        if ($optionsSignature) {
+        if ($optionsSignature !== null) {
             $optionsSignatureKey ??= bin2hex(random_bytes(8));
             $headers->XTraceOptionsSignature = hash_hmac('sha1', (string) $headers->XTraceOptions, (string) $optionsSignatureKey);
         }

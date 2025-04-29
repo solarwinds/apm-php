@@ -16,12 +16,10 @@ final class XTraceOptionsBaggage implements BaggageInterface
 {
     private static ?self $emptyBaggage = null;
 
-    /** @param array<string, Entry> $entries */
     public function __construct(private readonly array $entries = [])
     {
     }
 
-    /** @inheritDoc */
     public static function getBuilder(): BaggageBuilderInterface
     {
         return new XTraceOptionsBaggageBuilder();
@@ -32,19 +30,16 @@ final class XTraceOptionsBaggage implements BaggageInterface
         return Context::getCurrent()->withContextValue($this)->activate();
     }
 
-    /** @inheritDoc */
     public static function getCurrent(): BaggageInterface
     {
         return self::fromContext(Context::getCurrent());
     }
 
-    /** @inheritDoc */
     public static function fromContext(ContextInterface $context): BaggageInterface
     {
         return $context->get(SwoContextKeys::xtraceoptions()) ?? self::getEmpty();
     }
 
-    /** @inheritDoc */
     public static function getEmpty(): BaggageInterface
     {
         if (null === self::$emptyBaggage) {
@@ -54,7 +49,6 @@ final class XTraceOptionsBaggage implements BaggageInterface
         return self::$emptyBaggage;
     }
 
-    /** @inheritDoc */
     public function getValue(string $key)
     {
         if (($entry = $this->getEntry($key)) !== null) {
@@ -64,13 +58,11 @@ final class XTraceOptionsBaggage implements BaggageInterface
         return null;
     }
 
-    /** @inheritDoc */
     public function getEntry(string $key): ?Entry
     {
         return $this->entries[$key] ?? null;
     }
 
-    /** @inheritDoc */
     public function getAll(): iterable
     {
         foreach ($this->entries as $key => $entry) {
@@ -78,19 +70,16 @@ final class XTraceOptionsBaggage implements BaggageInterface
         }
     }
 
-    /** @inheritDoc */
     public function isEmpty(): bool
     {
         return $this->entries === [];
     }
 
-    /** @inheritDoc */
     public function toBuilder(): BaggageBuilderInterface
     {
         return new XTraceOptionsBaggageBuilder($this->entries);
     }
 
-    /** @inheritDoc */
     #[Override]
     public function storeInContext(ContextInterface $context): ContextInterface
     {

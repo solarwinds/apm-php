@@ -341,7 +341,7 @@ class SamplerTest extends TestCase
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => true, 'matcher' => fn ($name) => $name === '1:test']],
+                'transactionSettings' => [['tracing' => true, 'matcher' => fn (string $name) => $name === '1:test']],
             ]),
             $this->createSettings(false, null)
         );
@@ -370,7 +370,7 @@ class SamplerTest extends TestCase
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => true, 'matcher' => fn ($name) => $name === 'http://localhost/test']],
+                'transactionSettings' => [['tracing' => true, 'matcher' => fn (string $name) => $name === 'http://localhost/test']],
             ]),
             $this->createSettings(false, null)
         );
@@ -407,7 +407,7 @@ class SamplerTest extends TestCase
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => true, 'matcher' => fn ($name) => $name === 'http://localhost/test']],
+                'transactionSettings' => [['tracing' => true, 'matcher' => fn (string $name) => $name === 'http://localhost/test']],
             ]),
             $this->createSettings(false, null)
         );
