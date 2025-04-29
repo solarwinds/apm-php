@@ -157,7 +157,7 @@ abstract class Sampler extends OboeSampler
         $this->triggerMode = $config->isTriggerTraceEnabled();
 
         foreach ($config->getTransactionSettings() as $transactionSetting) {
-            $this->transactionSettings[] = new TransactionSetting($transactionSetting['tracing'] ?? false, $transactionSetting['matcher'] ?? fn() => false);
+            $this->transactionSettings[] = new TransactionSetting($transactionSetting['tracing'] ?? false, $transactionSetting['matcher'] ?? fn () => false);
         }
 
         $this->ready = new CompletedFuture(false);

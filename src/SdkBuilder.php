@@ -73,6 +73,7 @@ class SdkBuilder
         Registry::registerTextMapPropagator('xtraceoptions', new XTraceOptionsPropagator());
         putenv('OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions');
         $propagator = (new PropagatorFactory())->create();
+
         return Sdk::builder()
             ->setTracerProvider($tracerProvider)
             ->setMeterProvider($meterProvider)
