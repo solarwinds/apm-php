@@ -17,5 +17,15 @@
         <pluginClass class="Psalm\MockeryPlugin\Plugin"/>
     </plugins>
     <issueHandlers>
+        <InternalClass>
+            <errorLevel type="suppress">
+                <directory name="./tests/" />
+            </errorLevel>
+        </InternalClass>
+        <InternalMethod>
+            <errorLevel type="suppress">
+                <directory name="./tests/" />
+            </errorLevel>
+        </InternalMethod>
     </issueHandlers>
 </psalm>
