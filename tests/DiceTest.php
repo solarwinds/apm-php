@@ -23,7 +23,7 @@ class DiceTest extends TestCase
     {
         $t = 0;
         $f = 0;
-        for($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             $this->dice->roll() ? $t++ : $f++;
         }
         $this->assertLessThan(100, abs($t - $f));
@@ -45,7 +45,7 @@ class DiceTest extends TestCase
     {
         $t = 0;
         $f = 0;
-        for($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             $this->diceZeroRate->roll() ? $t++ : $f++;
         }
         $this->assertEquals(0, $t);
@@ -56,7 +56,7 @@ class DiceTest extends TestCase
     {
         $t = 0;
         $f = 0;
-        for($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             $this->diceFullRate->roll() ? $t++ : $f++;
         }
         $this->assertEquals(1000, $t);
