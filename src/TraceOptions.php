@@ -39,7 +39,7 @@ class TraceOptions
 
             return count($parts) === 2 ? $parts : [$parts[0], null];
         }, explode(';', $header)), function ($kv) {
-            return strlen($kv[0]) > 0;
+            return strlen((string) $kv[0]) > 0;
         });
         foreach ($kvs as [$k, $v]) {
             if ($k === TRIGGER_TRACE_KEY) {
@@ -72,7 +72,7 @@ class TraceOptions
                     continue;
                 }
                 $traceOptions->swKeys = $v;
-            } elseif (preg_match(CUSTOM_KEY_REGEX, $k)) {
+            } elseif (preg_match(CUSTOM_KEY_REGEX, (string) $k)) {
                 if ($v === null || array_key_exists($k, $traceOptions->custom)) {
                     // error_log("invalid trace option for custom key $k, should have a value and only be provided once");
                     $traceOptions->ignored[] = [$k, $v];
@@ -97,14 +97,13 @@ class TraceOptions
             'custom' => implode(';', array_map(function ($k, $v) {
                 return "$k=$v";
             }, array_keys($this->custom), $this->custom)),
-            'ignored' => implode(';', array_map(function ($k, $v) {
-                if (is_array($v) && count($v) === 2) {
-                    return "$v[0]=$v[1]";
+            'ignored' => implode(';', array_map(function ($item) {
+                if (is_array($item) && count($item) === 2) {
+                    return "{$item[0]}={$item[1]}";
                 }
 
-                return "$k=$v";
-
-            }, array_keys($this->ignored), $this->ignored)),
+                return (string) $item;
+            }, $this->ignored)),
         ];
 
         return implode(',', array_filter(array_map(function ($k, $v) {

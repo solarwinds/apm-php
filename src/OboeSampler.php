@@ -48,6 +48,10 @@ abstract class OboeSampler implements SamplerInterface
         ];
     }
 
+    /**
+     * phan's result conflicted to rector's result
+     * @phan-suppress PhanTypeMismatchArgumentNullable
+     */
     public function shouldSample(
         ContextInterface $parentContext,
         string $traceId,
@@ -110,7 +114,7 @@ abstract class OboeSampler implements SamplerInterface
 
             return new SamplingResult(SamplingResult::DROP, $s->attributes, $new_trace_state);
         }
-        if ($s->traceState !== null && preg_match('/^[0-9a-f]{16}-[0-9a-f]{2}$/', $s->traceState)) {
+        if (preg_match('/^[0-9a-f]{16}-[0-9a-f]{2}$/', $s->traceState ?? '')) {
             $this->logDebug('context is valid for parent-based sampling');
             $this->parentBasedAlgo($s, $parentContext);
         } elseif ($s->settings->flags & Flags::SAMPLE_START->value) {

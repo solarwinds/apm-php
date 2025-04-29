@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp;
 
-use Random\RandomException;
-
 class Dice
 {
     private int $scale;
@@ -37,13 +35,13 @@ class Dice
 
     public function roll(): bool
     {
-        try {
-            /**
-             * random_int() return a cryptographically secure, uniformly selected integer from the closed interval [min, max]
-             */
-            return random_int(0, $this->scale - 1) < $this->rate;
-        } catch (RandomException $e) {
+        if ($this->scale <= 0) {
             return false;
         }
+
+        /**
+         * random_int() return a cryptographically secure, uniformly selected integer from the closed interval [min, max]
+         */
+        return random_int(0, $this->scale - 1) < $this->rate;
     }
 }

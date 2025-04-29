@@ -14,6 +14,10 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
 
+/**
+ * Still need the deprecated class constant
+ * @phan-suppress PhanDeprecatedClassConstant
+ */
 function httpSpanMetadata(int $kind, AttributesInterface $attributes): array
 {
     if (

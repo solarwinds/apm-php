@@ -11,6 +11,11 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 
+/**
+ * Phan seems to struggle with the variadic arguments in the latest version
+ * @phan-file-suppress PhanParamTooFewUnpack
+ */
+
 class JsonSampler extends Sampler
 {
     use LogsMessagesTrait;

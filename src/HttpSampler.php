@@ -11,6 +11,11 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 
+/**
+ * Phan seems to struggle with the variadic arguments in the latest version
+ * @phan-file-suppress PhanParamTooFewUnpack
+ */
+
 class HttpSampler extends Sampler
 {
     use LogsMessagesTrait;
