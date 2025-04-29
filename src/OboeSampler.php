@@ -97,7 +97,7 @@ abstract class OboeSampler implements SamplerInterface
             $customAttributes = Attributes::create($s->traceOptions->custom);
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $customAttributes);
             if ($s->traceOptions->ignored !== []) {
-                $s->traceOptions->response->ignored = array_map(fn ($item) => is_array($item) && count($item) > 0? $item[0] : '', $s->traceOptions->ignored);
+                $s->traceOptions->response->ignored = array_map(fn ($item) => is_array($item) && $item !== []? $item[0] : '', $s->traceOptions->ignored);
             }
         }
         if (!$s->settings) {
@@ -110,7 +110,7 @@ abstract class OboeSampler implements SamplerInterface
 
             return new SamplingResult(SamplingResult::DROP, $s->attributes, $new_trace_state);
         }
-        if ($s->traceState !== null && preg_match('/^[0-9a-f]{16}-[0-9a-f]{2}$/', $s->traceState)) {
+        if ($s->traceState !== null && preg_match('/^[0-9a-f]{16}-[0-9a-f]{2}$/', (string) $s->traceState)) {
             $this->logDebug('context is valid for parent-based sampling');
             $this->parentBasedAlgo($s, $parentContext);
         } elseif ($s->settings->flags & Flags::SAMPLE_START->value) {

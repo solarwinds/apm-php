@@ -54,9 +54,9 @@ function parseSettings(mixed $unparsed): ?array
         is_numeric($unparsed['timestamp']) &&
         is_numeric($unparsed['ttl'])
     ) {
-        $sampleRate = intval($unparsed['value']);
-        $timestamp = intval($unparsed['timestamp']);
-        $ttl = intval($unparsed['ttl']);
+        $sampleRate = (int) $unparsed['value'];
+        $timestamp = (int) $unparsed['timestamp'];
+        $ttl = (int) $unparsed['ttl'];
     } else {
         return null;
     }
@@ -96,7 +96,7 @@ function parseSettings(mixed $unparsed): ?array
             is_numeric($unparsed['arguments']['BucketCapacity']) &&
             is_numeric($unparsed['arguments']['BucketRate'])
         ) {
-            $buckets[BucketType::DEFAULT->value] = new BucketSettings(floatval($unparsed['arguments']['BucketCapacity']), floatval($unparsed['arguments']['BucketRate']));
+            $buckets[BucketType::DEFAULT->value] = new BucketSettings((float) $unparsed['arguments']['BucketCapacity'], (float) $unparsed['arguments']['BucketRate']);
         }
 
         if (
@@ -104,7 +104,7 @@ function parseSettings(mixed $unparsed): ?array
             is_numeric($unparsed['arguments']['TriggerRelaxedBucketCapacity']) &&
             is_numeric($unparsed['arguments']['TriggerRelaxedBucketRate'])
         ) {
-            $buckets[BucketType::TRIGGER_RELAXED->value] = new BucketSettings(floatval($unparsed['arguments']['TriggerRelaxedBucketCapacity']), floatval($unparsed['arguments']['TriggerRelaxedBucketRate']));
+            $buckets[BucketType::TRIGGER_RELAXED->value] = new BucketSettings((float) $unparsed['arguments']['TriggerRelaxedBucketCapacity'], (float) $unparsed['arguments']['TriggerRelaxedBucketRate']);
         }
 
         if (
@@ -112,7 +112,7 @@ function parseSettings(mixed $unparsed): ?array
             is_numeric($unparsed['arguments']['TriggerStrictBucketCapacity']) &&
             is_numeric($unparsed['arguments']['TriggerStrictBucketRate'])
         ) {
-            $buckets[BucketType::TRIGGER_STRICT->value] = new BucketSettings(floatval($unparsed['arguments']['TriggerStrictBucketCapacity']), floatval($unparsed['arguments']['TriggerStrictBucketRate']));
+            $buckets[BucketType::TRIGGER_STRICT->value] = new BucketSettings((float) $unparsed['arguments']['TriggerStrictBucketCapacity'], (float) $unparsed['arguments']['TriggerStrictBucketRate']);
         }
 
         if (isset($unparsed['arguments']['SignatureKey']) && is_string($unparsed['arguments']['SignatureKey'])) {
