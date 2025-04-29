@@ -36,7 +36,6 @@ class JsonSamplerTest extends TestCase
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertTrue($span->isRecording());
         $span->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['BucketCapacity' => 100, 'BucketRate' => 10, 'SampleRate' => 1000000, 'SampleSource' => 6], $spans[0]->getAttributes()->toArray());
@@ -52,7 +51,6 @@ class JsonSamplerTest extends TestCase
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertFalse($span->isRecording());
         $span->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
     }
@@ -67,7 +65,6 @@ class JsonSamplerTest extends TestCase
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertFalse($span->isRecording());
         $span->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
     }
@@ -93,7 +90,6 @@ class JsonSamplerTest extends TestCase
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertFalse($span->isRecording());
         $span->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
     }
@@ -119,7 +115,6 @@ class JsonSamplerTest extends TestCase
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertFalse($span->isRecording());
         $span->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
         // Update the settings file to a valid state

@@ -43,14 +43,24 @@ class DiceTest extends TestCase
 
     public function test_roll_zero_rate(): void
     {
-        $results = array_map(fn () => $this->diceZeroRate->roll(), range(1, 1000));
-        $this->assertTrue(array_reduce($results, fn ($carry, $item) => $carry && !$item, true));
+        $t = 0;
+        $f = 0;
+        for($i = 0; $i < 1000; $i++) {
+            $this->diceZeroRate->roll() ? $t++ : $f++;
+        }
+        $this->assertEquals(0, $t);
+        $this->assertEquals(1000, $f);
     }
 
     public function test_roll_full_rate(): void
     {
-        $results = array_map(fn () => $this->diceFullRate->roll(), range(1, 1000));
-        $this->assertTrue(array_reduce($results, fn ($carry, $item) => $carry && $item, true));
+        $t = 0;
+        $f = 0;
+        for($i = 0; $i < 1000; $i++) {
+            $this->diceFullRate->roll() ? $t++ : $f++;
+        }
+        $this->assertEquals(1000, $t);
+        $this->assertEquals(0, $f);
     }
 
     protected function setUp(): void

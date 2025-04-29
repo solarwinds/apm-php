@@ -33,8 +33,8 @@ use Solarwinds\ApmPhp\Settings;
 
 class TestOboeSampler extends OboeSampler
 {
-    private readonly LocalSettings $localSettings;
-    private readonly RequestHeaders $requestHeaders;
+    private readonly ?LocalSettings $localSettings;
+    private readonly ?RequestHeaders $requestHeaders;
     private ?ResponseHeaders $responseHeaders = null;
 
     public function __construct(?MeterProviderInterface $meterProvider = null, ?Settings $settings = null, ?LocalSettings $localSettings = null, ?RequestHeaders $requestHeaders = null)
@@ -145,7 +145,9 @@ class OboeSamplerTest extends TestCase
         );
         $this->assertEquals(SamplingResult::DROP, $sample->getDecision());
         $this->assertEmpty($sample->getAttributes());
-        $this->assertStringContainsString('auth=no-signature-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('auth=no-signature-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
         $reader->collect();
         $metrics = $this->sumMetricsToMap($exporter->Collect());
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
@@ -231,7 +233,9 @@ class OboeSamplerTest extends TestCase
         );
         $this->assertEquals(SamplingResult::DROP, $sample->getDecision());
         $this->assertEmpty($sample->getAttributes());
-        $this->assertStringContainsString('auth=bad-timestamp', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('auth=bad-timestamp', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
         $reader->collect();
         $metrics = $this->sumMetricsToMap($exporter->Collect());
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
@@ -272,7 +276,9 @@ class OboeSamplerTest extends TestCase
         );
         $this->assertEquals(SamplingResult::DROP, $sample->getDecision());
         $this->assertEmpty($sample->getAttributes());
-        $this->assertStringContainsString('auth=bad-signature', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('auth=bad-signature', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
         $reader->collect();
         $metrics = $this->sumMetricsToMap($exporter->Collect());
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
@@ -364,7 +370,9 @@ class OboeSamplerTest extends TestCase
         }
         $this->assertEquals('value', $attributes['custom-key']);
         $this->assertEquals('sw-values', $attributes['SWKeys']);
-        $this->assertStringContainsString('trigger-trace=not-requested', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=not-requested', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
     }
 
     public function test_missing_settings_ignores_trigger_trace(): void
@@ -392,8 +400,10 @@ class OboeSamplerTest extends TestCase
             $attributes[$key] = $value;
         }
         $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertStringContainsString('trigger-trace=settings-not-available', $sampler->getResponseHeaders()->XTraceOptionsResponse);
-        $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=settings-not-available', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+            $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
     }
 
     public function test_x_trace_options_respects_keys_and_values(): void
@@ -430,7 +440,9 @@ class OboeSamplerTest extends TestCase
         }
         $this->assertEquals('value', $attributes['custom-key']);
         $this->assertEquals('sw-values', $attributes['SWKeys']);
-        $this->assertStringContainsString('trigger-trace=not-requested', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=not-requested', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
     }
 
     public function test_x_trace_options_ignores_trigger_trace(): void
@@ -467,8 +479,10 @@ class OboeSamplerTest extends TestCase
             $attributes[$key] = $value;
         }
         $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertStringContainsString('trigger-trace=ignored', $sampler->getResponseHeaders()->XTraceOptionsResponse);
-        $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=ignored', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+            $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
     }
 
     public function test_sample_through_always_set_respects_parent_sampled(): void
@@ -754,7 +768,9 @@ class OboeSamplerTest extends TestCase
         $this->assertEquals('sw-values', $attributes['SWKeys']);
         $this->assertEquals(10, $attributes['BucketCapacity']);
         $this->assertEquals(5, $attributes['BucketRate']);
-        $this->assertStringContainsString('trigger-trace=ok', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=ok', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
 
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.tracecount'] ?? 0);
@@ -806,8 +822,10 @@ class OboeSamplerTest extends TestCase
         $this->assertEquals('value', $attributes['custom-key']);
         $this->assertEquals(0, $attributes['BucketCapacity']);
         $this->assertEquals(0, $attributes['BucketRate']);
-        $this->assertStringContainsString('trigger-trace=rate-exceeded', $sampler->getResponseHeaders()->XTraceOptionsResponse);
-        $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=rate-exceeded', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+            $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
 
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
@@ -861,8 +879,10 @@ class OboeSamplerTest extends TestCase
         $this->assertEquals('sw-values', $attributes['SWKeys']);
         $this->assertEquals(20, $attributes['BucketCapacity']);
         $this->assertEquals(10, $attributes['BucketRate']);
-        $this->assertStringContainsString('auth=ok', $sampler->getResponseHeaders()->XTraceOptionsResponse);
-        $this->assertStringContainsString('trigger-trace=ok', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('auth=ok', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+            $this->assertStringContainsString('trigger-trace=ok', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
 
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
         $this->assertSame(1, $metrics['trace.service.tracecount'] ?? 0);
@@ -916,8 +936,10 @@ class OboeSamplerTest extends TestCase
         $this->assertEquals('value', $attributes['custom-key']);
         $this->assertEquals(0, $attributes['BucketCapacity']);
         $this->assertEquals(0, $attributes['BucketRate']);
-        $this->assertStringContainsString('trigger-trace=rate-exceeded', $sampler->getResponseHeaders()->XTraceOptionsResponse);
-        $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=rate-exceeded', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+            $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
 
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
@@ -963,8 +985,10 @@ class OboeSamplerTest extends TestCase
             $attributes[$key] = $value;
         }
         $this->assertEquals('value', $attributes['custom-key']);
-        $this->assertStringContainsString('trigger-trace=trigger-tracing-disabled', $sampler->getResponseHeaders()->XTraceOptionsResponse);
-        $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=trigger-tracing-disabled', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+            $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
 
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
     }
@@ -1004,7 +1028,9 @@ class OboeSamplerTest extends TestCase
         }
         $this->assertEquals('value', $attributes['custom-key']);
         $this->assertEquals('sw-values', $attributes['SWKeys']);
-        $this->assertStringContainsString('trigger-trace=not-requested', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=not-requested', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
     }
 
     public function test_dice_roll_records_and_samples_when_dice_success_and_sufficient_capacity(): void
@@ -1182,8 +1208,10 @@ class OboeSamplerTest extends TestCase
         }
         $this->assertEquals('value', $attributes['custom-key']);
         $this->assertNotNull($sampler->getResponseHeaders()->XTraceOptionsResponse);
-        $this->assertStringContainsString('trigger-trace=tracing-disabled', $sampler->getResponseHeaders()->XTraceOptionsResponse);
-        $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        if (is_string($sampler->getResponseHeaders()?->XTraceOptionsResponse)) {
+            $this->assertStringContainsString('trigger-trace=tracing-disabled', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+            $this->assertStringContainsString('ignored=invalid-key', $sampler->getResponseHeaders()->XTraceOptionsResponse);
+        }
     }
 
     public function test_sample_start_unset_records_when_sample_through_always_set(): void

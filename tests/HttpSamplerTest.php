@@ -28,7 +28,6 @@ class HttpSamplerTest extends TestCase
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertTrue($span->isRecording());
         $span->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertArrayHasKey('SampleRate', $spans[0]->getAttributes()->toArray());
@@ -47,7 +46,6 @@ class HttpSamplerTest extends TestCase
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertFalse($span->isRecording());
         $span->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
     }
@@ -67,7 +65,6 @@ class HttpSamplerTest extends TestCase
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertFalse($span->isRecording());
         $span->end();
-        $this->assertTrue($spanExporter instanceof InMemoryExporter);
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
     }
