@@ -21,9 +21,12 @@ class DiceTest extends TestCase
 
     public function test_roll_randomness(): void
     {
-        $results = array_map(fn () => $this->dice->roll() ? 1 : 0, range(1, 1000));
-        $count = array_count_values($results);
-        $this->assertLessThan(100, abs(($count[true] ?? 0) - ($count[false] ?? 0)));
+        $t = 0;
+        $f = 0;
+        for($i = 0; $i < 1000; $i++) {
+            $this->dice->roll() ? $t++ : $f++;
+        }
+        $this->assertLessThan(100, abs($t - $f));
     }
 
     public function test_rate_setter_getter(): void

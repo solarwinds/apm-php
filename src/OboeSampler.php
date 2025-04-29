@@ -276,7 +276,7 @@ abstract class OboeSampler implements SamplerInterface
         $dice = new Dice(1000000, $s->settings? $s->settings->sampleRate : 0);
         $sampleAttributes = Attributes::create([
             SAMPLE_RATE_ATTRIBUTE => $dice->getRate(),
-            SAMPLE_SOURCE_ATTRIBUTE => $s->settings->sampleSource->value,
+            SAMPLE_SOURCE_ATTRIBUTE => $s->settings? $s->settings->sampleSource->value : SampleSource::LocalDefault,
         ]);
         $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $sampleAttributes);
         $this->counters->getSampleCount()->add(1, [], $parentContext);
@@ -305,7 +305,7 @@ abstract class OboeSampler implements SamplerInterface
 
     private function disabledAlgo(SampleState $s): void
     {
-        if ($s->traceOptions?->triggerTrace) {
+        if ($s->traceOptions && $s->traceOptions->triggerTrace) {
             $this->logDebug('trigger trace requested but tracing disabled');
             $s->traceOptions->response->triggerTrace = TriggerTrace::TRACING_DISABLED;
         }

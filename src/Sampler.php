@@ -54,9 +54,9 @@ function parseSettings($unparsed): ?array
         is_numeric($unparsed['timestamp']) &&
         is_numeric($unparsed['ttl'])
     ) {
-        $sampleRate = $unparsed['value'];
-        $timestamp = $unparsed['timestamp'];
-        $ttl = $unparsed['ttl'];
+        $sampleRate = intval($unparsed['value']);
+        $timestamp = intval($unparsed['timestamp']);
+        $ttl = intval($unparsed['ttl']);
     } else {
         return null;
     }
@@ -96,7 +96,7 @@ function parseSettings($unparsed): ?array
             is_numeric($unparsed['arguments']['BucketCapacity']) &&
             is_numeric($unparsed['arguments']['BucketRate'])
         ) {
-            $buckets[BucketType::DEFAULT->value] = new BucketSettings($unparsed['arguments']['BucketCapacity'], $unparsed['arguments']['BucketRate']);
+            $buckets[BucketType::DEFAULT->value] = new BucketSettings(floatval($unparsed['arguments']['BucketCapacity']), floatval($unparsed['arguments']['BucketRate']));
         }
 
         if (
@@ -104,7 +104,7 @@ function parseSettings($unparsed): ?array
             is_numeric($unparsed['arguments']['TriggerRelaxedBucketCapacity']) &&
             is_numeric($unparsed['arguments']['TriggerRelaxedBucketRate'])
         ) {
-            $buckets[BucketType::TRIGGER_RELAXED->value] = new BucketSettings($unparsed['arguments']['TriggerRelaxedBucketCapacity'], $unparsed['arguments']['TriggerRelaxedBucketRate']);
+            $buckets[BucketType::TRIGGER_RELAXED->value] = new BucketSettings(floatval($unparsed['arguments']['TriggerRelaxedBucketCapacity']), floatval($unparsed['arguments']['TriggerRelaxedBucketRate']));
         }
 
         if (
@@ -112,7 +112,7 @@ function parseSettings($unparsed): ?array
             is_numeric($unparsed['arguments']['TriggerStrictBucketCapacity']) &&
             is_numeric($unparsed['arguments']['TriggerStrictBucketRate'])
         ) {
-            $buckets[BucketType::TRIGGER_STRICT->value] = new BucketSettings($unparsed['arguments']['TriggerStrictBucketCapacity'], $unparsed['arguments']['TriggerStrictBucketRate']);
+            $buckets[BucketType::TRIGGER_STRICT->value] = new BucketSettings(floatval($unparsed['arguments']['TriggerStrictBucketCapacity']), floatval($unparsed['arguments']['TriggerStrictBucketRate']));
         }
 
         if (isset($unparsed['arguments']['SignatureKey']) && is_string($unparsed['arguments']['SignatureKey'])) {
@@ -157,7 +157,7 @@ abstract class Sampler extends OboeSampler
         $this->triggerMode = $config->isTriggerTraceEnabled();
 
         foreach ($config->getTransactionSettings() as $transactionSetting) {
-            $this->transactionSettings[] = new TransactionSetting($transactionSetting['tracing'] ?? false, $transactionSetting['matcher'] ?? null);
+            $this->transactionSettings[] = new TransactionSetting($transactionSetting['tracing'] ?? false, $transactionSetting['matcher'] ?? fn() => false);
         }
 
         $this->ready = new CompletedFuture(false);
