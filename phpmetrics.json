@@ -11,12 +11,6 @@
         "json": "var/metrics/metrics.json",
         "violations": "var/metrics/violations.xml"
     },
-    "groups": [
-        {
-            "name": "ApmPhp",
-            "match": "!^Solarwinds\\\\ApmPhp\\\\!i"
-        }
-    ],
     "plugins": {
         "git": {
             "binary": "git"
