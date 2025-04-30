@@ -9,17 +9,20 @@ on:
 jobs:
   php:
     runs-on: ubuntu-latest
-    continue-on-error: true
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ '8.1' ]
-#        php-version: [ '8.1', '8.2', '8.3' ]
+        php-version: [ '8.1', '8.2', '8.3' ]
+        experimental: [false]
         composer_args: [""]
-#        include:
-#          - php-version: 8.4
-#            experimental: false
-#            composer_args: "--ignore-platform-reqs"
+        include:
+          - php-version: 8.4
+            experimental: false
+            composer_args: "--ignore-platform-reqs"
+          - php-version: 8.5
+            experimental: true
+            composer_args: "--ignore-platform-reqs"
     env:
       extensions: ast, grpc, opentelemetry, protobuf
 
@@ -105,19 +108,19 @@ jobs:
     #   run: composer run-script test
     - name: Check Style
       id: style
-      continue-on-error: true
+      continue-on-error: ${{ matrix.experimental }}
       env:
         PHP_CS_FIXER_IGNORE_ENV: 1
       run: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
 
     - name: Check Dependencies
       id: deps
-      continue-on-error: true
+      continue-on-error: ${{ matrix.experimental }}
       run: vendor-bin/deptrac/vendor/bin/deptrac --formatter=github-actions --report-uncovered
 
     - name: Run Phan
       id: phan
-      continue-on-error: true
+      continue-on-error: ${{ matrix.experimental }}
       env:
         XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
@@ -125,17 +128,17 @@ jobs:
 
     - name: Run Psalm
       id: psalm
-      continue-on-error: true
+      continue-on-error: ${{ matrix.experimental }}
       run: vendor-bin/psalm/vendor/bin/psalm --output-format=github
 
     - name: Run Phpstan
       id: phpstan
-      continue-on-error: true
+      continue-on-error: ${{ matrix.experimental }}
       run: vendor/bin/phpstan analyse --error-format=github
 
     - name: Run PHPUnit (unit tests)
       id: unit
-      continue-on-error: true
+      continue-on-error: ${{ matrix.experimental }}
       env:
         OTEL_LOG_LEVEL: none
       run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
