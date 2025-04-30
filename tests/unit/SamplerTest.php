@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace unit;
+
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;

@@ -23,11 +23,11 @@ update: ## Update dependencies
 update-lowest: ## Update dependencies to lowest supported versions
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer update --prefer-lowest
 test: ## Run tests
-	$(DC_RUN_PHP) env OTEL_LOG_LEVEL=none XDEBUG_MODE=coverage vendor/bin/phpunit --colors=always
+	$(DC_RUN_PHP) env OTEL_LOG_LEVEL=none XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite unit --colors=always
 test-verbose: ## Run tests with verbose (testdox) output
-	$(DC_RUN_PHP) env OTEL_LOG_LEVEL=none XDEBUG_MODE=coverage vendor/bin/phpunit --colors=always --testdox --coverage-clover coverage.clover --coverage-html=tests/coverage/html --log-junit=junit.xml
+	$(DC_RUN_PHP) env OTEL_LOG_LEVEL=none XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite unit --colors=always --testdox --coverage-clover coverage.clover --coverage-html=tests/coverage/html --log-junit=junit.xml
 test-coverage: ## Run tests and generate code coverage
-	$(DC_RUN_PHP) env OTEL_LOG_LEVEL=none XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-html=tests/coverage/html
+	$(DC_RUN_PHP) env OTEL_LOG_LEVEL=none XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite unit --coverage-html=tests/coverage/html
 phan: ## Run phan
 	$(DC_RUN_PHP) env XDEBUG_MODE=off env PHAN_DISABLE_XDEBUG_WARN=1 vendor-bin/phan/vendor/bin/phan
 psalm: ## Run psalm

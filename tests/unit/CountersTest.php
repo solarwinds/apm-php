@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace unit;
+
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace unit;
+
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
