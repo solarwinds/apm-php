@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp;
+
 class RequestHeaders
 {
     public ?string $XTraceOptions = null;

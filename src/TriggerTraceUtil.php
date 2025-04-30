@@ -18,6 +18,7 @@ class TriggerTraceUtil
         }
 
         $digest = hash_hmac('sha1', $header, $key);
+
         return hash_equals($signature, $digest) ? Auth::OK : Auth::BAD_SIGNATURE;
     }
 }

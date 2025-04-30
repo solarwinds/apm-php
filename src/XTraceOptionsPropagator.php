@@ -25,14 +25,12 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
 
     private static ?self $instance = null;
 
-    /** {@inheritdoc} */
     public function fields(): array
     {
         return self::FIELDS;
     }
 
-    /** {@inheritdoc} */
-    public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
+    public function inject(mixed &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -42,7 +40,7 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
         }
         $response = '';
         foreach ($xTraceOptionsResponseBaggage->getAll() as $key => $entry) {
-            $value = urlencode((string)$entry->getValue());
+            $value = urlencode((string) $entry->getValue());
             $response .= "{$key}={$value};";
         }
         $response = rtrim($response, ';');
@@ -56,11 +54,11 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
         if (null === self::$instance) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
-    /** {@inheritdoc} */
-    public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
+    public function extract(mixed $carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -74,6 +72,7 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
         if ($xTraceOptionsSignature !== null) {
             $xTraceOptionsBaggageBuilder->set(self::XTRACEOPTIONSSIGNATURE, $xTraceOptionsSignature);
         }
+
         return $context->withContextValue($xTraceOptionsBaggageBuilder->build());
     }
 }

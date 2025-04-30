@@ -2,6 +2,8 @@
 composer.phar
 composer.lock
 vendor/
+vendor-bin/**/vendor/
+vendor-bin/**/composer.lock
 
 # JetBrains PhpStorm
 .idea/
@@ -10,14 +12,27 @@ vendor/
 # PHPUnit
 .phpunit.result.cache
 
+# php-cs-fixer
+.php-cs-fixer.cache
+
 # Coverage
 html-coverage/
+coverage.clover
+tests/coverage
 
 # Package
 package.xml
 
 # phpstan
 var/
+
+# deptrac cache
+/.deptrac.cache
+
+# phpmetrics
+var/metrics/
+!var/metrics/.gitkeep
+junit.xml
 
 # Commit your application's lock file https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control
 # You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file

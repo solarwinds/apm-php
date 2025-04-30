@@ -1,0 +1,23 @@
+{
+    "includes": [
+        "src"
+    ],
+    "exclude": [
+        "tests"
+    ],
+    "report": {
+        "html": "var/metrics",
+        "csv": "var/metrics/metrics.csv",
+        "json": "var/metrics/metrics.json",
+        "violations": "var/metrics/violations.xml"
+    },
+    "plugins": {
+        "git": {
+            "binary": "git"
+        },
+        "junit": {
+            "file": "junit.xml"
+        }
+    },
+    "extensions": [ "php" ]
+}

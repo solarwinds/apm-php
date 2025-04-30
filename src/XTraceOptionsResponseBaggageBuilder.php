@@ -12,12 +12,10 @@ use OpenTelemetry\API\Baggage\MetadataInterface;
 
 final class XTraceOptionsResponseBaggageBuilder implements BaggageBuilderInterface
 {
-    /** @param array<string, Entry> $entries */
     public function __construct(private array $entries = [])
     {
     }
 
-    /** @inheritDoc */
     public function remove(string $key): BaggageBuilderInterface
     {
         unset($this->entries[$key]);
@@ -25,8 +23,7 @@ final class XTraceOptionsResponseBaggageBuilder implements BaggageBuilderInterfa
         return $this;
     }
 
-    /** @inheritDoc */
-    public function set(string $key, $value, ?MetadataInterface $metadata = null): BaggageBuilderInterface
+    public function set(string $key, mixed $value, ?MetadataInterface $metadata = null): BaggageBuilderInterface
     {
         if ($key === '') {
             return $this;

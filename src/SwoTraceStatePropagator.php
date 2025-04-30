@@ -23,14 +23,12 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
 
     private static ?self $instance = null;
 
-    /** {@inheritdoc} */
     public function fields(): array
     {
         return self::FIELDS;
     }
 
-    /** {@inheritdoc} */
-    public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
+    public function inject(mixed &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -43,8 +41,8 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
         if ($traceState === null) {
             $traceState = new TraceState();
         }
-        $updatedTraceState = $traceState->without("sw")->with("sw", $swTraceState);
-        $setter->set($carrier, self::TRACESTATE, (string)$updatedTraceState);
+        $updatedTraceState = $traceState->without('sw')->with('sw', $swTraceState);
+        $setter->set($carrier, self::TRACESTATE, (string) $updatedTraceState);
     }
 
     public static function getInstance(): self
@@ -52,13 +50,14 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
         if (null === self::$instance) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
-    /** {@inheritdoc} */
-    public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
+    public function extract(mixed $carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $context ??= Context::getCurrent();
+
         return $context;
     }
 }

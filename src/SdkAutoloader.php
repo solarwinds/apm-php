@@ -15,6 +15,7 @@ class SdkAutoloader
             return false;
         }
         Sdk::builder()->buildAndRegisterGlobal();
+
         return true;
     }
 }

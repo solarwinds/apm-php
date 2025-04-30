@@ -18,16 +18,15 @@ class Configuration
     private array $transactionSettings;
 
     public function __construct(
-        bool     $enabled,
-        string   $service,
-        string   $collector,
-        array    $headers,
-        ?bool    $tracingMode,
-        bool     $triggerTraceEnabled,
+        bool $enabled,
+        string $service,
+        string $collector,
+        array $headers,
+        ?bool $tracingMode,
+        bool $triggerTraceEnabled,
         ?Closure $transactionName,
-        array    $transactionSettings
-    )
-    {
+        array $transactionSettings,
+    ) {
         $this->enabled = $enabled;
         $this->service = $service;
         $this->collector = $collector;
@@ -121,7 +120,7 @@ class Configuration
     public function __toString(): string
     {
         return sprintf(
-            "Configuration(enabled=%s, service=%s, collector=%s, headers=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)",
+            'Configuration(enabled=%s, service=%s, collector=%s, headers=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)',
             $this->enabled ? 'true' : 'false',
             $this->service,
             $this->collector,

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="3"
+    cacheDirectory="var/cache/psalm"
+    findUnusedBaselineEntry="false"
+    findUnusedCode="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd">
+    <projectFiles>
+        <directory name="./src"/>
+        <directory name="./tests"/>
+        <directory name="./examples"/>
+    </projectFiles>
+    <plugins>
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+        <pluginClass class="Psalm\MockeryPlugin\Plugin"/>
+    </plugins>
+    <issueHandlers>
+        <InternalClass>
+            <errorLevel type="suppress">
+                <directory name="./tests/" />
+            </errorLevel>
+        </InternalClass>
+        <InternalMethod>
+            <errorLevel type="suppress">
+                <directory name="./tests/" />
+            </errorLevel>
+        </InternalMethod>
+        <DeprecatedConstant>
+            <errorLevel type="suppress">
+                <file name="./src/Sampler.php" />
+            </errorLevel>
+        </DeprecatedConstant>
+    </issueHandlers>
+</psalm>

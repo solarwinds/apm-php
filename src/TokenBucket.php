@@ -32,6 +32,7 @@ class TokenBucket
     public function getTokens(): float
     {
         $this->calculateTokens();
+
         return $this->tokens;
     }
 
@@ -65,8 +66,10 @@ class TokenBucket
         $this->calculateTokens();
         if ($this->tokens >= $tokens) {
             $this->tokens -= $tokens;
+
             return true;
         }
+
         return false;
     }
 

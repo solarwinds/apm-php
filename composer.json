@@ -21,25 +21,44 @@
   ],
   "minimum-stability": "dev",
   "prefer-stable": true,
+  "autoload-dev": {
+    "psr-4": {
+      "Solarwinds\\ApmPhp\\Tests\\Unit\\": "tests/unit/",
+      "Solarwinds\\ApmPhp\\Tests\\Benchmark\\": "tests/benchmark/"
+    }
+  },
   "require-dev": {
-    "phpunit/phpunit": "^10 || ^11",
-    "rector/rector": "^1.0",
-    "phpstan/phpstan": "^1.10.13",
+    "bamarni/composer-bin-plugin": "^1.8",
+    "open-telemetry/dev-tools": "dev-main",
+    "phpspec/prophecy": "^1.22",
+    "phpspec/prophecy-phpunit": "^2",
+    "phpstan/phpstan": "^1.12",
     "phpstan/phpstan-mockery": "^1.1",
-    "phpstan/phpstan-phpunit": "^1.3",
-    "symfony/http-client": "^5.2"
+    "phpstan/phpstan-phpunit": "^1.4",
+    "phpunit/phpunit": "^10 || ^11"
   },
   "require": {
     "php": "^8.1",
-    "open-telemetry/sdk": "^1.1",
-    "psr/http-client": "^1.0",
-    "nyholm/psr7": "^1.4",
-    "open-telemetry/exporter-otlp": "^1.1"
+    "open-telemetry/sdk": "^1.2",
+    "open-telemetry/sem-conv": "^1.30",
+    "open-telemetry/api": "^1.2",
+    "open-telemetry/exporter-otlp": "^1.2"
   },
   "config": {
+    "sort-packages": true,
     "allow-plugins": {
+      "bamarni/composer-bin-plugin": true,
+      "composer/package-versions-deprecated": true,
       "php-http/discovery": true,
+      "symfony/runtime": true,
       "tbachert/spi": true
+    }
+  },
+  "extra": {
+    "bamarni-bin": {
+      "bin-links": false,
+      "target-directory": "vendor-bin",
+      "forward-command": true
     }
   }
 }
