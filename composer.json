@@ -23,7 +23,6 @@
   "prefer-stable": true,
   "require-dev": {
     "bamarni/composer-bin-plugin": "^1.8",
-    "mockery/mockery": "^1.5.1",
     "open-telemetry/dev-tools": "dev-main",
     "php-http/mock-client": "^1.5",
     "phpspec/prophecy": "^1.17.0",
