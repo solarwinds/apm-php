@@ -14,7 +14,7 @@ use Solarwinds\ApmPhp\JsonSampler;
 
 class JsonSamplerSpanCreationBench
 {
-    private TracerInterface $tracer;
+    private readonly TracerInterface $tracer;
     private readonly SamplerInterface $sampler;
     private readonly ResourceInfo $resource;
 
@@ -39,17 +39,12 @@ class JsonSamplerSpanCreationBench
             'sw.apm.version' => '0.0.0',
             ResourceAttributes::SERVICE_NAME => 'apm-php-benchmark',
         ]));
-    }
-
-    public function setUpNoExporter(): void
-    {
         $processor = new NoopSpanProcessor();
         $provider = new TracerProvider($processor, $this->sampler, $this->resource);
         $this->tracer = $provider->getTracer('apm-php-benchmark');
     }
 
     /**
-     * @BeforeMethods("setUpNoExporter")
      * @Revs(1000)
      * @Iterations(10)
      * @OutputTimeUnit("microseconds")

@@ -17,6 +17,7 @@ use OpenTelemetry\SDK\Trace\Span;
 
 const SW_KEYS_ATTRIBUTE = 'SWKeys';
 const PARENT_ID_ATTRIBUTE = 'sw.tracestate_parent_id';
+const TRACESTATE_CAPTURE_ATTRIBUTE = 'sw.w3c.tracestate';
 const SAMPLE_RATE_ATTRIBUTE = 'SampleRate';
 const SAMPLE_SOURCE_ATTRIBUTE = 'SampleSource';
 const BUCKET_CAPACITY_ATTRIBUTE = 'BucketCapacity';
@@ -69,6 +70,13 @@ abstract class OboeSampler implements SamplerInterface
             $this->requestHeaders($parentContext, $traceId, $spanName, $spanKind, $attributes, $links),
             null
         );
+        $parentSpanTraceState = $parentSpan->getContext()->getTraceState()?->toString();
+        if ($parentSpanTraceState !== null && $parentSpanTraceState !== '') {
+            $swKeyAttributes = Attributes::create([
+                TRACESTATE_CAPTURE_ATTRIBUTE => $parentSpanTraceState,
+            ]);
+            $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $swKeyAttributes);
+        }
         $this->counters->getRequestCount()->add(1, [], $parentContext);
         if ($s->headers->XTraceOptions !== null) {
             $parsed = TraceOptions::from($s->headers->XTraceOptions);

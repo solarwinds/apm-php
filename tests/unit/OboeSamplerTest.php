@@ -32,6 +32,7 @@ use Solarwinds\ApmPhp\RequestHeaders;
 use Solarwinds\ApmPhp\ResponseHeaders;
 use Solarwinds\ApmPhp\SampleSource;
 use Solarwinds\ApmPhp\Settings;
+use const Solarwinds\ApmPhp\TRACESTATE_CAPTURE_ATTRIBUTE;
 
 class TestOboeSampler extends OboeSampler
 {
@@ -155,26 +156,37 @@ class OboeSamplerTest extends TestCase
      *
      * @psalm-param 'inverse'|null|true $sw
      */
-    private function createParentContext(?string $traceId, ?string $spanId, bool $sampled, bool $isRemote, string|bool|null $sw): ContextInterface
+    private function createParentContext(?string $traceId, ?string $spanId, bool $sampled, bool $isRemote, string|bool|null $sw, bool $otherTraceState = false): ContextInterface
     {
         $generator = new RandomIdGenerator();
         $traceId = $traceId ?? $generator->generateTraceId();
         $spanId = $spanId ?? $generator->generateSpanId();
         $traceFlag = $sampled ? TraceFlags::SAMPLED : TraceFlags::DEFAULT;
         $swFlags = $sw === 'inverse' ? ($sampled ? '00' : '01') : ($sampled ? '01' : '00');
+        $traceState = null;
+        if ($otherTraceState) {
+            $traceState = (new TraceState())->with('vendor1', 'vendor1-value')->with('vendor2', 'vendor2-value');
+        }
+        if ($sw) {
+            if ($traceState !== null) {
+                $traceState = $traceState->with('sw', $spanId . '-' . $swFlags);
+            } else {
+                $traceState = (new TraceState())->with('sw', $spanId . '-' . $swFlags);
+            }
+        }
         if ($isRemote) {
             $spanContext = SpanContext::createFromRemoteParent(
                 $traceId,
                 $spanId,
                 $traceFlag,
-                $sw ? new TraceState('sw=' . $spanId . '-' . $swFlags) : null
+                $traceState
             );
         } else {
             $spanContext = SpanContext::create(
                 $traceId,
                 $spanId,
                 $traceFlag,
-                $sw ? new TraceState('sw=' . $spanId . '-' . $swFlags) : null
+                $traceState
             );
         }
 
@@ -193,6 +205,84 @@ class OboeSamplerTest extends TestCase
         }
 
         return $map;
+    }
+
+    public function test_sw_w3c_tracestate_other_vendors(): void
+    {
+        $exporter = new InMemoryExporter();
+        $reader = new ExportingReader($exporter);
+        $meterProvider = (new MeterProviderBuilder())->addReader($reader)->build();
+        $sampler = new TestOboeSampler(
+            $meterProvider,
+            new Settings(
+                1000000,
+                SampleSource::Remote,
+                Flags::SAMPLE_START->value | Flags::SAMPLE_THROUGH_ALWAYS->value,
+                [
+                    BucketType::DEFAULT->value => new BucketSettings(10, 100),
+                ],
+                'key',
+                time(),
+                10
+            ),
+            new LocalSettings(null, true),
+            $this->makeRequestHeaders([])
+        );
+        $parentContext = $this->createParentContext(null, null, true, true, null, true);
+        $sample = $sampler->shouldSample(
+            $parentContext,
+            Span::fromContext($parentContext)->getContext()->getTraceId(),
+            'testSwW3cTracestateOtherVendors',
+            SpanKind::KIND_INTERNAL,
+            Attributes::create([]),
+            [],
+        );
+        $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $sample->getDecision());
+        $this->assertNotEmpty($sample->getAttributes());
+        $attributes = [];
+        foreach ($sample->getAttributes() as $key => $value) {
+            $attributes[$key] = $value;
+        }
+        $this->assertEquals('vendor2=vendor2-value,vendor1=vendor1-value', $attributes[TRACESTATE_CAPTURE_ATTRIBUTE] ?? '');
+    }
+
+    public function test_sw_w3c_tracestate_empty(): void
+    {
+        $exporter = new InMemoryExporter();
+        $reader = new ExportingReader($exporter);
+        $meterProvider = (new MeterProviderBuilder())->addReader($reader)->build();
+        $sampler = new TestOboeSampler(
+            $meterProvider,
+            new Settings(
+                1000000,
+                SampleSource::Remote,
+                Flags::SAMPLE_START->value | Flags::SAMPLE_THROUGH_ALWAYS->value,
+                [
+                    BucketType::DEFAULT->value => new BucketSettings(10, 100),
+                ],
+                'key',
+                time(),
+                10
+            ),
+            new LocalSettings(null, true),
+            $this->makeRequestHeaders([])
+        );
+        $parentContext = $this->createParentContext(null, null, true, true, null);
+        $sample = $sampler->shouldSample(
+            $parentContext,
+            Span::fromContext($parentContext)->getContext()->getTraceId(),
+            'testSwW3cTracestateEmpty',
+            SpanKind::KIND_INTERNAL,
+            Attributes::create([]),
+            [],
+        );
+        $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $sample->getDecision());
+        $this->assertNotEmpty($sample->getAttributes());
+        $attributes = null;
+        foreach ($sample->getAttributes() as $key => $value) {
+            $attributes[$key] = $value;
+        }
+        $this->assertArrayNotHasKey(TRACESTATE_CAPTURE_ATTRIBUTE, $attributes?? []);
     }
 
     public function test_invalid_x_trace_options_signature_rejects_bad_timestamp(): void
