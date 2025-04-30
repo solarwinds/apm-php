@@ -21,6 +21,12 @@
   ],
   "minimum-stability": "dev",
   "prefer-stable": true,
+  "autoload-dev": {
+    "psr-4": {
+      "Solarwinds\\ApmPhp\\Tests\\Unit\\": "tests/unit/",
+      "Solarwinds\\ApmPhp\\Tests\\Benchmark\\": "tests/benchmark/"
+    }
+  },
   "require-dev": {
     "bamarni/composer-bin-plugin": "^1.8",
     "open-telemetry/dev-tools": "dev-main",

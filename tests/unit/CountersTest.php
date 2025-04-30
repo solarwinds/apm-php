@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace unit;
+namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace unit;
+namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Solarwinds\ApmPhp\Tests\Benchmark;
+
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
