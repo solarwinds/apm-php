@@ -1,5 +1,5 @@
 {
-  "name": "solarwinds/apm-php",
+  "name": "solarwinds/apm",
   "description": "OpenTelemetry custom distro to connect to Solarwinds",
   "keywords": ["solarwinds_apm", "swo", "instrumentation", "performance", "opentelemetry", "observability"],
   "type": "library",
