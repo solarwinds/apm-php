@@ -38,6 +38,7 @@ class HttpSampler extends Sampler
         $this->hostname = urlencode(gethostname());
 
         $this->loop();
+        self::logInfo('Starting HTTP sampler loop');
     }
 
     private function loop(): void
