@@ -25,6 +25,12 @@ class SwoSamplerFactory
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
     private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
 
+    private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
+
+    private const DUMMY_SERVICE_KEY = 'your-token:default-service';
+
+    private const  DEFAULT_APM_SETTINGS_JSON_FILE = 'solarwinds-apm-settings.json';
+
     public function create(): SamplerInterface
     {
         $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
@@ -40,22 +46,15 @@ class SwoSamplerFactory
 
                     return new ParentBased(new TraceIdRatioBasedSampler($arg));
                 case self::VALUE_SOLARWINDS_HTTP:
-                    $collector = Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR);
-                    if (empty($collector)) {
-                        $collector = 'apm.collector.na-01.cloud.solarwinds.com';
-                    }
-                    $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY);
+                    $collector = Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR, self::DEFAULT_APM_COLLECTOR);
+                    $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY, self::DUMMY_SERVICE_KEY);
                     [$token, $service] = explode(':', $serviceKey);
-                    $endpoint = 'https://' . $collector;
-                    $http = new HttpSampler(null, new SolarwindsConfiguration(true, $service, $endpoint, ['Authorization: Bearer ' . $token,], true, true, null, []), null);
+                    $http = new HttpSampler(null, new SolarwindsConfiguration(true, $service, 'https://' . $collector, ['Authorization: Bearer ' . $token,], true, true, null, []), null);
 
                     return new ParentBased($http, $http, $http);
                 case self::VALUE_SOLARWINDS_JSON:
-                    $path = Configuration::getString(SolarwindsEnv::SW_APM_SETTINGS_JSON_PATH);
-                    if (empty($path)) {
-                        $path = sys_get_temp_dir() . 'solarwinds-apm-settings.json';
-                    }
-                    $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY);
+                    $path = Configuration::getString(SolarwindsEnv::SW_APM_SETTINGS_JSON_PATH, sys_get_temp_dir() . self::DEFAULT_APM_SETTINGS_JSON_FILE);
+                     $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY, self::DUMMY_SERVICE_KEY);
                     [, $service] = explode(':', $serviceKey);
                     $json = new JsonSampler(null, new SolarwindsConfiguration(true, $service, '', [], true, true, null, []), $path);
 
