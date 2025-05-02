@@ -24,12 +24,9 @@ class SwoSamplerFactory
     private const SOLARWINDS_PREFIX = 'solarwinds';
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
     private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
-
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
-
     private const DUMMY_SERVICE_KEY = 'your-token:default-service';
-
-    private const  DEFAULT_APM_SETTINGS_JSON_FILE = 'solarwinds-apm-settings.json';
+    private const DEFAULT_APM_SETTINGS_JSON_FILE = 'solarwinds-apm-settings.json';
 
     public function create(): SamplerInterface
     {
