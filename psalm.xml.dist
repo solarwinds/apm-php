@@ -19,17 +19,19 @@
     <issueHandlers>
         <InternalClass>
             <errorLevel type="suppress">
+                <file name="./src/SdkAutoloader.php" />
                 <directory name="./tests/" />
             </errorLevel>
         </InternalClass>
         <InternalMethod>
             <errorLevel type="suppress">
+                <file name="./src/SdkAutoloader.php" />
                 <directory name="./tests/" />
             </errorLevel>
         </InternalMethod>
         <DeprecatedConstant>
             <errorLevel type="suppress">
-                <file name="./src/Sampler.php" />
+                <file name="./src/Trace/Sampler/Sampler.php" />
             </errorLevel>
         </DeprecatedConstant>
     </issueHandlers>

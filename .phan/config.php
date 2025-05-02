@@ -367,9 +367,11 @@ return [
     // your application should be included in this list.
     'directory_list' => [
         'src',
+        'src/Trace/Sampler/',
         'vendor/composer',
         'vendor/open-telemetry',
-        'vendor/phpunit/phpunit/src'
+        'vendor/phpunit/phpunit/src',
+        'vendor/tbachert/spi/src',
     ],
 
     // A list of individual files to include in analysis
