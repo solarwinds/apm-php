@@ -10,7 +10,9 @@
       "Solarwinds\\ApmPhp\\": "src/"
     },
     "files": [
-      "src/_autoload.php"
+      "src/_autoload.php",
+      "src/Propagator/SwoTraceState/_register.php",
+      "src/Propagator/XTraceOptions/_register.php"
     ]
   },
   "authors": [
