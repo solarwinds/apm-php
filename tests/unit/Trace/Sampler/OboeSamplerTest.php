@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp\Tests\Unit;
+namespace Solarwinds\ApmPhp\Tests\Unit\Trace\Sampler;
 
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\NonRecordingSpan;

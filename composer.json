@@ -25,8 +25,8 @@
   "prefer-stable": true,
   "autoload-dev": {
     "psr-4": {
-      "Solarwinds\\ApmPhp\\Tests\\Unit\\": "tests/unit/",
-      "Solarwinds\\ApmPhp\\Tests\\Benchmark\\": "tests/benchmark/"
+      "Solarwinds\\ApmPhp\\Tests\\Unit\\": "tests/Unit/",
+      "Solarwinds\\ApmPhp\\Tests\\Benchmark\\": "tests/Benchmark/"
     }
   },
   "require-dev": {
