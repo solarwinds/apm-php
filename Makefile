@@ -3,6 +3,7 @@ include .env
 PHP_VERSION ?= 8.1
 DOCKER_COMPOSE ?= docker compose
 DC_RUN_PHP = $(DOCKER_COMPOSE) run --rm php
+SW_APM_SERVICE_KEY ?= token:service
 
 .DEFAULT_GOAL : help
 
