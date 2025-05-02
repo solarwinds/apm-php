@@ -30,12 +30,14 @@ class SwoSamplerFactory
         $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
 
         if (str_contains($name, self::TRACEIDRATIO_PREFIX) || str_contains($name, self::SOLARWINDS_PREFIX)) {
-            $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
-
             switch ($name) {
                 case Values::VALUE_TRACE_ID_RATIO:
+                    $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
+
                     return new TraceIdRatioBasedSampler($arg);
                 case Values::VALUE_PARENT_BASED_TRACE_ID_RATIO:
+                    $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
+
                     return new ParentBased(new TraceIdRatioBasedSampler($arg));
                 case self::VALUE_SOLARWINDS_HTTP:
                     $collector = Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR);
