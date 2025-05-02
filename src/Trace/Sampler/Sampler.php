@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp;
+namespace Solarwinds\ApmPhp\Trace\Sampler;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
@@ -13,6 +13,8 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Solarwinds\ApmPhp\Common\Configuration\Configuration;
+use Solarwinds\ApmPhp\Common\Configuration\TracingMode;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsPropagator;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsResponseBaggage;

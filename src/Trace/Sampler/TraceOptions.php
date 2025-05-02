@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp;
+namespace Solarwinds\ApmPhp\Trace\Sampler;
 
 const TRIGGER_TRACE_KEY = 'trigger-trace';
 const TIMESTAMP_KEY = 'ts';

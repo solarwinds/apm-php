@@ -9,7 +9,7 @@ use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Counters;
+use Solarwinds\ApmPhp\Trace\Sampler\Counters;
 
 #[CoversClass(Counters::class)]
 class CountersTest extends TestCase

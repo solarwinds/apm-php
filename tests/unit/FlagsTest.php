@@ -6,7 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Flags;
+use Solarwinds\ApmPhp\Trace\Sampler\Flags;
 
 #[CoversClass(Flags::class)]
 class FlagsTest extends TestCase

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp;
+namespace Solarwinds\ApmPhp\Trace\Sampler;
 
 use Exception;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
@@ -10,6 +10,7 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
+use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 
 /**
  * Phan seems to struggle with the variadic arguments in the latest version

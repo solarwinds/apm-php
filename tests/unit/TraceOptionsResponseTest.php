@@ -6,9 +6,9 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Auth;
-use Solarwinds\ApmPhp\TraceOptionsResponse;
-use Solarwinds\ApmPhp\TriggerTrace;
+use Solarwinds\ApmPhp\Trace\Sampler\Auth;
+use Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsResponse;
+use Solarwinds\ApmPhp\Trace\Sampler\TriggerTrace;
 
 #[CoversClass(TraceOptionsResponse::class)]
 class TraceOptionsResponseTest extends TestCase

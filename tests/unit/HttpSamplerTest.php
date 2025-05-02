@@ -9,8 +9,8 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Configuration;
-use Solarwinds\ApmPhp\HttpSampler;
+use Solarwinds\ApmPhp\Common\Configuration\Configuration;
+use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 
 #[CoversClass(HttpSampler::class)]
 class HttpSamplerTest extends TestCase

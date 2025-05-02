@@ -6,7 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\BucketType;
+use Solarwinds\ApmPhp\Trace\Sampler\BucketType;
 
 #[CoversClass(BucketType::class)]
 class BucketTypeTest extends TestCase

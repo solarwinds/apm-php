@@ -31,7 +31,7 @@
         </InternalMethod>
         <DeprecatedConstant>
             <errorLevel type="suppress">
-                <file name="./src/Sampler.php" />
+                <file name="./src/Trace/Sampler/Sampler.php" />
             </errorLevel>
         </DeprecatedConstant>
     </issueHandlers>

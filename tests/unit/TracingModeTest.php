@@ -6,8 +6,8 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Flags;
-use Solarwinds\ApmPhp\TracingMode;
+use Solarwinds\ApmPhp\Common\Configuration\TracingMode;
+use Solarwinds\ApmPhp\Trace\Sampler\Flags;
 
 #[CoversClass(TracingMode::class)]
 class TracingModeTest extends TestCase

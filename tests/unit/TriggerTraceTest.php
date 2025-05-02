@@ -6,7 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\TriggerTrace;
+use Solarwinds\ApmPhp\Trace\Sampler\TriggerTrace;
 
 #[CoversClass(TriggerTrace::class)]
 class TriggerTraceTest extends TestCase

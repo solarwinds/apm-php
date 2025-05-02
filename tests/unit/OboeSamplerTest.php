@@ -23,16 +23,16 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\BucketSettings;
-use Solarwinds\ApmPhp\BucketType;
-use Solarwinds\ApmPhp\Flags;
-use Solarwinds\ApmPhp\LocalSettings;
-use Solarwinds\ApmPhp\OboeSampler;
-use Solarwinds\ApmPhp\RequestHeaders;
-use Solarwinds\ApmPhp\ResponseHeaders;
-use Solarwinds\ApmPhp\SampleSource;
-use Solarwinds\ApmPhp\Settings;
-use const Solarwinds\ApmPhp\TRACESTATE_CAPTURE_ATTRIBUTE;
+use Solarwinds\ApmPhp\Trace\Sampler\BucketSettings;
+use Solarwinds\ApmPhp\Trace\Sampler\BucketType;
+use Solarwinds\ApmPhp\Trace\Sampler\Flags;
+use Solarwinds\ApmPhp\Trace\Sampler\LocalSettings;
+use Solarwinds\ApmPhp\Trace\Sampler\OboeSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\RequestHeaders;
+use Solarwinds\ApmPhp\Trace\Sampler\ResponseHeaders;
+use Solarwinds\ApmPhp\Trace\Sampler\SampleSource;
+use Solarwinds\ApmPhp\Trace\Sampler\Settings;
+use const Solarwinds\ApmPhp\Trace\Sampler\TRACESTATE_CAPTURE_ATTRIBUTE;
 
 class TestOboeSampler extends OboeSampler
 {

@@ -9,8 +9,8 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Configuration;
-use Solarwinds\ApmPhp\JsonSampler;
+use Solarwinds\ApmPhp\Common\Configuration\Configuration;
+use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 
 #[CoversClass(JsonSampler::class)]
 class JsonSamplerTest extends TestCase

@@ -11,8 +11,8 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SemConv\ResourceAttributes;
-use Solarwinds\ApmPhp\Configuration;
-use Solarwinds\ApmPhp\JsonSampler;
+use Solarwinds\ApmPhp\Common\Configuration\Configuration;
+use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 
 class JsonSamplerSpanCreationBench
 {

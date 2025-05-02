@@ -6,7 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\TokenBucket;
+use Solarwinds\ApmPhp\Trace\Sampler\TokenBucket;
 
 #[CoversClass(TokenBucket::class)]
 class TokenBucketTest extends TestCase

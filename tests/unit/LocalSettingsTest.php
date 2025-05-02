@@ -6,8 +6,8 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\LocalSettings;
-use Solarwinds\ApmPhp\TracingMode;
+use Solarwinds\ApmPhp\Common\Configuration\TracingMode;
+use Solarwinds\ApmPhp\Trace\Sampler\LocalSettings;
 
 #[CoversClass(LocalSettings::class)]
 class LocalSettingsTest extends TestCase

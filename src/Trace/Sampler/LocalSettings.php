@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp;
+namespace Solarwinds\ApmPhp\Trace\Sampler;
+
+use Solarwinds\ApmPhp\Common\Configuration\TracingMode;
 
 class LocalSettings
 {

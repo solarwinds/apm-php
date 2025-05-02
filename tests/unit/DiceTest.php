@@ -6,7 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Dice;
+use Solarwinds\ApmPhp\Trace\Sampler\Dice;
 
 #[CoversClass(Dice::class)]
 class DiceTest extends TestCase

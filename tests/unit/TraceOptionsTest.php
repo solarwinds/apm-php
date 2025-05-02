@@ -6,7 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\TraceOptions;
+use Solarwinds\ApmPhp\Trace\Sampler\TraceOptions;
 
 #[CoversClass(TraceOptions::class)]
 class TraceOptionsTest extends TestCase

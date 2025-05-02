@@ -13,16 +13,16 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\BucketSettings;
-use Solarwinds\ApmPhp\BucketType;
-use Solarwinds\ApmPhp\Configuration;
-use Solarwinds\ApmPhp\Flags;
-use function Solarwinds\ApmPhp\httpSpanMetadata;
-use function Solarwinds\ApmPhp\parseSettings;
+use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
-use Solarwinds\ApmPhp\Sampler;
-use Solarwinds\ApmPhp\SampleSource;
-use Solarwinds\ApmPhp\Settings;
+use Solarwinds\ApmPhp\Trace\Sampler\BucketSettings;
+use Solarwinds\ApmPhp\Trace\Sampler\BucketType;
+use Solarwinds\ApmPhp\Trace\Sampler\Flags;
+use function Solarwinds\ApmPhp\Trace\Sampler\httpSpanMetadata;
+use function Solarwinds\ApmPhp\Trace\Sampler\parseSettings;
+use Solarwinds\ApmPhp\Trace\Sampler\Sampler;
+use Solarwinds\ApmPhp\Trace\Sampler\SampleSource;
+use Solarwinds\ApmPhp\Trace\Sampler\Settings;
 
 class TestSampler extends Sampler
 {

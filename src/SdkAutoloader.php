@@ -39,6 +39,7 @@ use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 use RuntimeException;
+use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 use Throwable;
 
 /**

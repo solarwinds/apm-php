@@ -6,7 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\ResponseHeaders;
+use Solarwinds\ApmPhp\Trace\Sampler\ResponseHeaders;
 
 #[CoversClass(ResponseHeaders::class)]
 class ResponseHeadersTest extends TestCase

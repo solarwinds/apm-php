@@ -6,7 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Auth;
+use Solarwinds\ApmPhp\Trace\Sampler\Auth;
 
 #[CoversClass(Auth::class)]
 class AuthTest extends TestCase

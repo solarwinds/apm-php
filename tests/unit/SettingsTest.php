@@ -6,11 +6,11 @@ namespace Solarwinds\ApmPhp\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Flags;
-use Solarwinds\ApmPhp\LocalSettings;
-use Solarwinds\ApmPhp\SampleSource;
-use Solarwinds\ApmPhp\Settings;
-use Solarwinds\ApmPhp\TracingMode;
+use Solarwinds\ApmPhp\Common\Configuration\TracingMode;
+use Solarwinds\ApmPhp\Trace\Sampler\Flags;
+use Solarwinds\ApmPhp\Trace\Sampler\LocalSettings;
+use Solarwinds\ApmPhp\Trace\Sampler\SampleSource;
+use Solarwinds\ApmPhp\Trace\Sampler\Settings;
 
 #[CoversClass(Settings::class)]
 class SettingsTest extends TestCase

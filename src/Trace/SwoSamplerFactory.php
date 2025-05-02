@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp;
+namespace Solarwinds\ApmPhp\Trace;
 
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
@@ -13,9 +13,10 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
-
-use Solarwinds\ApmPhp\Configuration as SolarwindsConfiguration;
-use Solarwinds\ApmPhp\Variables as SolarwindsEnv;
+use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
+use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
+use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 
 class SwoSamplerFactory
 {

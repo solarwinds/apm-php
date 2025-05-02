@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp;
+namespace Solarwinds\ApmPhp\Common\Configuration;
 
 /**
  * Environment variables defined by the Solarwinds for the PHP SDK.
