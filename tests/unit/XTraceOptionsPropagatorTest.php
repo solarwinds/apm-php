@@ -8,9 +8,9 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\XTraceOptionsBaggage;
-use Solarwinds\ApmPhp\XTraceOptionsPropagator;
-use Solarwinds\ApmPhp\XTraceOptionsResponseBaggage;
+use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
+use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsPropagator;
+use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsResponseBaggage;
 
 #[CoversClass(XTraceOptionsPropagator::class)]
 class XTraceOptionsPropagatorTest extends TestCase

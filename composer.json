@@ -43,7 +43,8 @@
     "open-telemetry/sdk-configuration": "^0.0.8",
     "open-telemetry/sem-conv": "^1.30",
     "open-telemetry/api": "^1.2",
-    "open-telemetry/exporter-otlp": "^1.2"
+    "open-telemetry/exporter-otlp": "^1.2",
+    "tbachert/spi": "^1.0.3"
   },
   "config": {
     "sort-packages": true,

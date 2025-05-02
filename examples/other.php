@@ -16,7 +16,7 @@ putenv('OTEL_LOG_LEVEL=info');
 putenv('OTEL_TRACES_SAMPLER=solarwinds_http');
 putenv('OTEL_TRACES_SAMPLER_ARG=0.1');
 putenv('SW_APM_COLLECTOR=apm.collector.na-01.cloud.solarwinds.com');
-putenv('SW_APM_SERVICE_KEY=');
+putenv('SW_APM_SERVICE_KEY=abc:abc');
 putenv('OTEL_PROPAGATORS=baggage,tracecontext');
 
 echo 'autoloading SDK example starting...' . PHP_EOL;

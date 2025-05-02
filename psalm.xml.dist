@@ -19,11 +19,13 @@
     <issueHandlers>
         <InternalClass>
             <errorLevel type="suppress">
+                <file name="./src/SdkAutoloader.php" />
                 <directory name="./tests/" />
             </errorLevel>
         </InternalClass>
         <InternalMethod>
             <errorLevel type="suppress">
+                <file name="./src/SdkAutoloader.php" />
                 <directory name="./tests/" />
             </errorLevel>
         </InternalMethod>

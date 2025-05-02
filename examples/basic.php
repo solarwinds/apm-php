@@ -7,7 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Trace\SpanKind;
 
-$solarwinds = Solarwinds\ApmPhp\Sdk::builder()->buildAndRegisterGlobal();
+//$solarwinds = Solarwinds\ApmPhp\Sdk::builder()->buildAndRegisterGlobal();
 
 // Create a tracer. Usually, tracer is a global variable.
 $tracer = Globals::tracerProvider()->getTracer('app_or_package_name');

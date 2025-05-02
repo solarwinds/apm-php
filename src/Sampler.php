@@ -13,6 +13,9 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
+use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsPropagator;
+use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsResponseBaggage;
 
 /**
  * Still need the deprecated class constant

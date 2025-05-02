@@ -19,10 +19,10 @@ use Solarwinds\ApmPhp\Configuration;
 use Solarwinds\ApmPhp\Flags;
 use function Solarwinds\ApmPhp\httpSpanMetadata;
 use function Solarwinds\ApmPhp\parseSettings;
+use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
 use Solarwinds\ApmPhp\Sampler;
 use Solarwinds\ApmPhp\SampleSource;
 use Solarwinds\ApmPhp\Settings;
-use Solarwinds\ApmPhp\XTraceOptionsBaggage;
 
 class TestSampler extends Sampler
 {

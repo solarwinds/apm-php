@@ -13,7 +13,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\SwoTraceStatePropagator;
+use Solarwinds\ApmPhp\Propagator\SwoTraceState\SwoTraceStatePropagator;
 
 #[CoversClass(SwoTraceStatePropagator::class)]
 class SwoTraceStatePropagatorTest extends TestCase

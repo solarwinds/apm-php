@@ -45,6 +45,7 @@ class SwoSamplerFactory
                     [$token, $service] = explode(':', $serviceKey);
                     $endpoint = 'https://' . $collector;
                     $http = new HttpSampler(null, new SolarwindsConfiguration(true, $service, $endpoint, ['Authorization: Bearer ' . $token,], true, true, null, []), null);
+
                     return new ParentBased($http, $http, $http);
                 case self::VALUE_SOLARWINDS_JSON:
                     $path = Configuration::getString(SolarwindsEnv::SW_APM_SETTINGS_JSON_PATH);
@@ -54,9 +55,11 @@ class SwoSamplerFactory
                     $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY);
                     [, $service] = explode(':', $serviceKey);
                     $json = new JsonSampler(null, new SolarwindsConfiguration(true, $service, '', [], true, true, null, []), $path);
+
                     return new ParentBased($json, $json, $json);
             }
         }
+
         return match ($name) {
             Values::VALUE_ALWAYS_ON => new AlwaysOnSampler(),
             Values::VALUE_ALWAYS_OFF => new AlwaysOffSampler(),

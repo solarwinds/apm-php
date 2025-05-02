@@ -60,9 +60,9 @@ class SdkAutoloader
             if (!class_exists(SdkConfiguration::class)) {
                 throw new RuntimeException('File-based configuration requires open-telemetry/sdk-configuration');
             }
-            Globals::registerInitializer(fn($configurator) => self::fileBasedInitializer($configurator));
+            Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator));
         } else {
-            Globals::registerInitializer(fn($configurator) => self::environmentBasedInitializer($configurator));
+            Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
         }
         self::registerInstrumentations();
 
@@ -164,7 +164,6 @@ class SdkAutoloader
         $context = new InstrumentationContext($tracerProvider, $meterProvider, $loggerProvider, $propagator);
 
         foreach (ServiceLoader::load(Instrumentation::class) as $instrumentation) {
-            /** @var Instrumentation $instrumentation */
             try {
                 $instrumentation->register($hookManager, $configuration, $context);
             } catch (Throwable $t) {
@@ -259,7 +258,7 @@ class SdkAutoloader
             return false;
         }
         foreach ($excludedUrls as $excludedUrl) {
-            if (preg_match(sprintf('|%s|', $excludedUrl), (string)$url) === 1) {
+            if (preg_match(sprintf('|%s|', $excludedUrl), (string) $url) === 1) {
                 return true;
             }
         }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp;
+namespace Solarwinds\ApmPhp\Propagator\SwoTraceState;
 
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\TraceState;

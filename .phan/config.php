@@ -369,7 +369,8 @@ return [
         'src',
         'vendor/composer',
         'vendor/open-telemetry',
-        'vendor/phpunit/phpunit/src'
+        'vendor/phpunit/phpunit/src',
+        'vendor/tbachert/spi/src',
     ],
 
     // A list of individual files to include in analysis

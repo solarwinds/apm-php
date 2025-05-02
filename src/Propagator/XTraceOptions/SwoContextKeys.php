@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp;
+namespace Solarwinds\ApmPhp\Propagator\XTraceOptions;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeyInterface;
