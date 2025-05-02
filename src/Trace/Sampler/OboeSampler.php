@@ -342,7 +342,7 @@ abstract class OboeSampler implements SamplerInterface
             foreach ($this->buckets as $type => $bucket) {
                 $bucketSettings = $this->settings->buckets[$type] ?? null;
                 if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
-                    $bucket->update($bucketSettings->capacity, $bucketSettings->rate);
+                    $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
                 }
             }
         }

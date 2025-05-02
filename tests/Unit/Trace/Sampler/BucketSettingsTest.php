@@ -17,7 +17,7 @@ class BucketSettingsTest extends TestCase
         $rate = 10;
         $bucketSettings = new BucketSettings($capacity, $rate);
 
-        $this->assertEquals($capacity, $bucketSettings->capacity);
-        $this->assertEquals($rate, $bucketSettings->rate);
+        $this->assertEquals($capacity, $bucketSettings->getCapacity());
+        $this->assertEquals($rate, $bucketSettings->getRate());
     }
 }

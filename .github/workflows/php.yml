@@ -140,6 +140,7 @@ jobs:
       continue-on-error: ${{ matrix.experimental }}
       env:
         OTEL_LOG_LEVEL: none
+        SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
       run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit
 
     - name: Code Coverage

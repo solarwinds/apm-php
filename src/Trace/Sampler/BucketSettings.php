@@ -7,8 +7,18 @@ namespace Solarwinds\ApmPhp\Trace\Sampler;
 class BucketSettings
 {
     public function __construct(
-        public float $capacity,
-        public float $rate,
+        private readonly float $capacity,
+        private readonly float $rate,
     ) {
+    }
+
+    public function getCapacity(): float
+    {
+        return $this->capacity;
+    }
+
+    public function getRate(): float
+    {
+        return $this->rate;
     }
 }
