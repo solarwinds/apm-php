@@ -1,0 +1,17 @@
+name: Packagist
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - '**'
+
+permissions: read-all
+
+jobs:
+  packagist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update
+        run: |
+          curl -XPOST -H'content-type:application/json' ${{ secrets.UPDATE_PACKAGE_HOOK }} -d'{"repository":{"url":"https://github.com/solarwinds/apm-php"}}'
