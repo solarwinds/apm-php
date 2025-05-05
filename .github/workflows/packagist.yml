@@ -14,4 +14,4 @@ jobs:
     steps:
       - name: Update
         run: |
-          curl -XPOST -H'content-type:application/json' ${{ secrets.UPDATE_PACKAGE_HOOK }} -d'{"repository":{"url":"https://github.com/solarwinds/apm-php"}}'
+          curl -XPOST -H'content-type:application/json' "${{ secrets.UPDATE_PACKAGE_HOOK }}" -d'{"repository":{"url":"https://packagist.org/packages/solarwinds/apm"}}'
