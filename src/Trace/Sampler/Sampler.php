@@ -192,7 +192,7 @@ abstract class Sampler extends OboeSampler
             return $parsed['settings'];
         }
 
-        $this->logDebug('Invalid settings', $settings);
+        $this->logDebug('Invalid settings' . $settings);
 
         return null;
 
