@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Trace\Sampler;
 
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+
 const TRIGGER_TRACE_KEY = 'trigger-trace';
 const TIMESTAMP_KEY = 'ts';
 const SW_KEYS_KEY = 'sw-keys';
@@ -11,6 +13,8 @@ const CUSTOM_KEY_REGEX = '/^custom-[^\s]+$/';
 
 class TraceOptions
 {
+    use LogsMessagesTrait;
+
     public ?bool $triggerTrace = null;
     public ?int $timestamp = null;
     public ?string $swKeys = null;
@@ -44,7 +48,7 @@ class TraceOptions
         foreach ($kvs as [$k, $v]) {
             if ($k === TRIGGER_TRACE_KEY) {
                 if ($v !== null || $traceOptions->triggerTrace !== null) {
-                    // error_log('invalid trace option for trigger trace, should not have a value and only be provided once');
+                    self::logDebug('invalid trace option for trigger trace, should not have a value and only be provided once');
                     $traceOptions->ignored[] = [$k, $v];
 
                     continue;
@@ -52,13 +56,13 @@ class TraceOptions
                 $traceOptions->triggerTrace = true;
             } elseif ($k === TIMESTAMP_KEY) {
                 if ($v === null || $traceOptions->timestamp !== null) {
-                    // error_log('invalid trace option for timestamp, should have a value and only be provided once');
+                    self::logDebug('invalid trace option for timestamp, should have a value and only be provided once');
                     $traceOptions->ignored[] = [$k, $v];
 
                     continue;
                 }
                 if (!is_numeric($v) || str_contains($v, '.')) {
-                    // error_log('invalid trace option for timestamp, should be an integer');
+                    self::logDebug('invalid trace option for timestamp, should be an integer');
                     $traceOptions->ignored[] = [$k, $v];
 
                     continue;
@@ -66,7 +70,7 @@ class TraceOptions
                 $traceOptions->timestamp = (int) $v;
             } elseif ($k === SW_KEYS_KEY) {
                 if ($v === null || $traceOptions->swKeys !== null) {
-                    // error_log('invalid trace option for sw keys, should have a value and only be provided once');
+                    self::logDebug('invalid trace option for sw keys, should have a value and only be provided once');
                     $traceOptions->ignored[] = [$k, $v];
 
                     continue;
@@ -74,7 +78,7 @@ class TraceOptions
                 $traceOptions->swKeys = $v;
             } elseif (preg_match(CUSTOM_KEY_REGEX, (string) $k)) {
                 if ($v === null || array_key_exists($k, $traceOptions->custom)) {
-                    // error_log("invalid trace option for custom key $k, should have a value and only be provided once");
+                    self::logDebug("invalid trace option for custom key $k, should have a value and only be provided once");
                     $traceOptions->ignored[] = [$k, $v];
 
                     continue;

@@ -30,4 +30,17 @@ class SampleState
         $this->headers = $headers;
         $this->traceOptions = $traceOptions;
     }
+
+    public function __toString(): string
+    {
+        return sprintf(
+            'SampleState(decision=%d, attributes=%s, settings=%s, traceState=%s, headers=%s, traceOptions=%s)',
+            $this->decision,
+            implode(',', $this->attributes->toArray()),
+            $this->settings ?? 'null',
+            $this->traceState ?? 'null',
+            $this->headers,
+            $this->traceOptions ?? 'null'
+        );
+    }
 }

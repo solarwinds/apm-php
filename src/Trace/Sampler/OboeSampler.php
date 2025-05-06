@@ -137,7 +137,7 @@ abstract class OboeSampler implements SamplerInterface
             $this->logDebug('SAMPLE_START is unset; sampling disabled');
             $this->disabledAlgo($s);
         }
-        // $this->logDebug("final sampling state ".$s);
+        $this->logDebug('final sampling state ' . $s);
         $new_trace_state = $this->setResponseHeadersFromSampleState($s, $parentContext, $traceId, $spanName, $spanKind, $attributes, $links);
 
         return new SamplingResult($s->decision, $s->attributes, $new_trace_state);

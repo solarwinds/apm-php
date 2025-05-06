@@ -14,4 +14,13 @@ class RequestHeaders
         $this->XTraceOptions = $XTraceOptions;
         $this->XTraceOptionsSignature = $XTraceOptionsSignature;
     }
+
+    public function __toString(): string
+    {
+        return sprintf(
+            'RequestHeaders(XTraceOptions=%s, XTraceOptionsSignature=%s)',
+            $this->XTraceOptions ?? 'null',
+            $this->XTraceOptionsSignature ?? 'null'
+        );
+    }
 }
