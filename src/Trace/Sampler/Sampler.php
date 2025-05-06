@@ -185,13 +185,15 @@ abstract class Sampler extends OboeSampler
                 $this->ready->map(static fn (): bool => true);
             }
 
-            //            if (!empty($parsed['warning'])) {
-            //                // $this->logger->warn($parsed['warning']);
-            //            }
+            if (!empty($parsed['warning'])) {
+                $this->logWarning($parsed['warning']);
+            }
+
             return $parsed['settings'];
         }
 
-        //            $this->logger->debug('Invalid settings', $settings);
+        $this->logDebug('Invalid settings' . $settings);
+
         return null;
 
     }
