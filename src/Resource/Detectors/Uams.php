@@ -21,7 +21,7 @@ final class Uams implements ResourceDetectorInterface
 
     private const UAMS_CLIENT_PATH = PHP_OS_FAMILY === 'Windows'
         ? 'C:\\ProgramData\\SolarWinds\\UAMSClient\\uamsclientid'
-        : '/opt/solarwinds/uamsclient/var/uamsclientid';
+    : '/opt/solarwinds/uamsclient/var/uamsclientid';
     private const UAMS_CLIENT_URL = 'http://127.0.0.1:2113/info/uamsclient';
     private const UAMS_CLIENT_ID_FIELD = 'uamsclient_id';
     private string $uamsClientIdFile;
@@ -33,7 +33,7 @@ final class Uams implements ResourceDetectorInterface
     public function __construct(
         ?string $uamsClientIdFile = null,
         ?ClientInterface $client = null,
-        ?RequestFactoryInterface $requestFactory = null
+        ?RequestFactoryInterface $requestFactory = null,
     ) {
         $this->uamsClientIdFile = $uamsClientIdFile ?: self::UAMS_CLIENT_PATH;
         $this->client = $client ?: Psr18ClientDiscovery::find();
@@ -44,12 +44,14 @@ final class Uams implements ResourceDetectorInterface
     {
         if (!file_exists($this->uamsClientIdFile)) {
             $this->logDebug('File not found: ' . $this->uamsClientIdFile);
+
             return null;
         }
         $content = file_get_contents($this->uamsClientIdFile);
         if ($content === false) {
             return null;
         }
+
         return trim($content);
     }
 
@@ -62,9 +64,11 @@ final class Uams implements ResourceDetectorInterface
             if (!is_array($data) || !isset($data[self::UAMS_CLIENT_ID_FIELD]) || !is_string($data[self::UAMS_CLIENT_ID_FIELD])) {
                 $this->logDebug('Invalid response format');
             }
+
             return $data[self::UAMS_CLIENT_ID_FIELD];
         } catch (ClientExceptionInterface $e) {
-            $this->logDebug('API request error'.$e);
+            $this->logDebug('API request error' . $e);
+
             return null;
         }
     }
@@ -78,8 +82,9 @@ final class Uams implements ResourceDetectorInterface
         }
         $attributes = [
             self::ATTR_UAMS_CLIENT_ID => $id,
-            ResourceAttributes::HOST_ID => $id
+            ResourceAttributes::HOST_ID => $id,
         ];
+
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
     }
 

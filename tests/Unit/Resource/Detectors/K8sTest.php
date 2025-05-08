@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Solarwinds\ApmPhp\Tests\Unit\Resource\Detectors;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Solarwinds\ApmPhp\Common\Configuration\Variables;
 use Solarwinds\ApmPhp\Resource\Detectors\K8s;
-use OpenTelemetry\SDK\Resource\ResourceInfo;
 use Solarwinds\ApmPhp\Tests\Unit\TestState;
 
 #[CoversClass(K8s::class)]
 class K8sTest extends TestCase
 {
-    Use TestState;
+    use TestState;
 
-    public function testDetectsAttributesFromEnv(): void
+    public function test_detects_attributes_from_env(): void
     {
         $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'namespace';
         $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mountinfo';
@@ -40,7 +40,7 @@ class K8sTest extends TestCase
         ]), ResourceAttributes::SCHEMA_URL)->getAttributes(), $resource->getAttributes());
     }
 
-    public function testDetectsAttributesFromFiles(): void
+    public function test_detects_attributes_from_files(): void
     {
         $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'namespace';
         $fileNamespace = bin2hex(random_bytes(8));
@@ -92,7 +92,7 @@ EOT);
         @unlink($namespaceFile);
     }
 
-    public function testPrefersEnvOverFiles(): void
+    public function test_prefers_env_over_files(): void
     {
         $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'namespace';
         $fileNamespace = bin2hex(random_bytes(8));
@@ -146,7 +146,7 @@ EOT);
         @unlink($namespaceFile);
     }
 
-    public function testDoesNotDetectUidOrNameWithoutNamespace(): void
+    public function test_does_not_detect_uid_or_name_without_namespace(): void
     {
         $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'namespace';
         $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'mountinfo';

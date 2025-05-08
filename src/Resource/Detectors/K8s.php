@@ -19,7 +19,7 @@ final class K8s implements ResourceDetectorInterface
 
     private const NAMESPACE_FILE = PHP_OS_FAMILY === 'Windows'
         ? 'C:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\namespace'
-        : '/run/secrets/kubernetes.io/serviceaccount/namespace';
+    : '/run/secrets/kubernetes.io/serviceaccount/namespace';
     private const MOUNTINFO_FILE = '/proc/self/mountinfo';
     private const UID_REGEX = '/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/i';
     private string $namespaceFile;
@@ -27,7 +27,7 @@ final class K8s implements ResourceDetectorInterface
 
     public function __construct(
         ?string $namespaceFile = null,
-        ?string $mountInfoFile = null
+        ?string $mountInfoFile = null,
     ) {
         $this->namespaceFile = $namespaceFile ?? self::NAMESPACE_FILE;
         $this->mountInfoFile = $mountInfoFile ?? self::MOUNTINFO_FILE;
@@ -62,8 +62,10 @@ final class K8s implements ResourceDetectorInterface
         if (Configuration::has(Variables::SW_K8S_POD_NAME)) {
             $env = Configuration::getString(Variables::SW_K8S_POD_NAME);
             $this->logDebug('Read pod name from environment variable');
+
             return $env;
         }
+
         return php_uname('n');
     }
 
@@ -72,16 +74,19 @@ final class K8s implements ResourceDetectorInterface
         if (Configuration::has(Variables::SW_K8S_POD_UID)) {
             $env = Configuration::getString(Variables::SW_K8S_POD_UID);
             $this->logDebug('Read pod UID from environment variable');
+
             return $env;
         }
 
         if (PHP_OS_FAMILY === 'Windows') {
             $this->logDebug('Cannot read pod UID on Windows');
+
             return null;
         }
 
         if (!file_exists($this->mountInfoFile)) {
             $this->logDebug('Mount info file not found');
+
             return null;
         }
 
@@ -89,6 +94,7 @@ final class K8s implements ResourceDetectorInterface
             $lines = file($this->mountInfoFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             if ($lines === false) {
                 $this->logDebug('Cannot read mount info file');
+
                 return null;
             }
             foreach ($lines as $line) {
@@ -115,6 +121,7 @@ final class K8s implements ResourceDetectorInterface
         }
 
         $this->logDebug('Cannot read pod UID');
+
         return null;
     }
 
@@ -123,18 +130,22 @@ final class K8s implements ResourceDetectorInterface
         if (Configuration::has(Variables::SW_K8S_POD_NAMESPACE)) {
             $env = Configuration::getString(Variables::SW_K8S_POD_NAMESPACE);
             $this->logDebug('Read pod namespace from environment variable');
+
             return $env;
         }
         if (!file_exists($this->namespaceFile)) {
             $this->logDebug('Namespace file not found');
+
             return null;
         }
         $namespace = file_get_contents($this->namespaceFile);
         if ($namespace !== false) {
             $this->logDebug('Read pod namespace from file');
+
             return trim($namespace);
         }
         $this->logDebug('Cannot read pod namespace');
+
         return null;
     }
 }

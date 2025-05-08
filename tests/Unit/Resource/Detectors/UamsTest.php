@@ -36,10 +36,11 @@ class UamsTest extends TestCase
     {
         $streamMock = $this->getMockBuilder('Psr\Http\Message\StreamInterface')->getMock();
         $streamMock->method('getContents')->willReturn($content);
+
         return $streamMock;
     }
 
-    public function testDetectsIdFromFileWhenFilePresentAndApiRunning(): void
+    public function test_detects_id_from_file_when_file_present_and_api_running(): void
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testDetectsIdFromFileWhenFilePresentAndApiRunning';
         file_put_contents($uamsClientIdFile, $this->fileId);
@@ -72,7 +73,7 @@ class UamsTest extends TestCase
         @unlink($uamsClientIdFile);
     }
 
-    public function testDetectsIdFromFileWhenFilePresentAndApiNotRunning(): void
+    public function test_detects_id_from_file_when_file_present_and_api_not_running(): void
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testDetectsIdFromFileWhenFilePresentAndApiNotRunning';
         file_put_contents($uamsClientIdFile, $this->fileId);
@@ -87,7 +88,7 @@ class UamsTest extends TestCase
         @unlink($uamsClientIdFile);
     }
 
-    public function testDetectsIdFromFileWhenFilePresentAndUnrelatedRunning(): void
+    public function test_detects_id_from_file_when_file_present_and_unrelated_running(): void
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testDetectsIdFromFileWhenFilePresentAndUnrelatedRunning';
         file_put_contents($uamsClientIdFile, $this->fileId);
@@ -100,7 +101,7 @@ class UamsTest extends TestCase
             ->willReturn($requestMock);
         $responseMock
             ->method('getBody')
-            ->willReturn($this->createStreamMock("I am not a valid json"));
+            ->willReturn($this->createStreamMock('I am not a valid json'));
         $this->clientMock
             ->method('sendRequest')
             ->with($requestMock)
@@ -116,7 +117,7 @@ class UamsTest extends TestCase
         @unlink($uamsClientIdFile);
     }
 
-    public function testDetectsIdFromApiWhenFileNotPresentAndApiRunning(): void
+    public function test_detects_id_from_api_when_file_not_present_and_api_running(): void
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'file_not_present';
 
@@ -146,14 +147,14 @@ class UamsTest extends TestCase
         ]), ResourceAttributes::SCHEMA_URL)->getAttributes(), $resource->getAttributes());
     }
 
-    public function testDetectsNothingWhenFileNotPresentAndApiNotRunning(): void
+    public function test_detects_nothing_when_file_not_present_and_api_not_running(): void
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'file_not_present';
         $resource = (new Uams($uamsClientIdFile))->getResource();
         $this->assertEquals(ResourceInfo::emptyResource(), $resource);
     }
 
-    public function testDetectsNothingWhenFileNotPresentAndUnrelatedRunning(): void
+    public function test_detects_nothing_when_file_not_present_and_unrelated_running(): void
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'file_not_present';
 
@@ -165,7 +166,7 @@ class UamsTest extends TestCase
             ->willReturn($requestMock);
         $responseMock
             ->method('getBody')
-            ->willReturn($this->createStreamMock("I am not a valid json"));
+            ->willReturn($this->createStreamMock('I am not a valid json'));
         $this->clientMock
             ->method('sendRequest')
             ->with($requestMock)
