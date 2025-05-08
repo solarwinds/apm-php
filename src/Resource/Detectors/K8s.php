@@ -41,6 +41,7 @@ final class K8s implements ResourceDetectorInterface
         if ($namespace !== null) {
             $attributes[ResourceAttributes::K8S_NAMESPACE_NAME] = $namespace;
         } else {
+            // Namespace is required for Kubernetes resources
             return ResourceInfoFactory::emptyResource();
         }
 

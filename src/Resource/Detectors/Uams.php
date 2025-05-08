@@ -49,6 +49,8 @@ final class Uams implements ResourceDetectorInterface
         }
         $content = file_get_contents($this->uamsClientIdFile);
         if ($content === false) {
+            $this->logDebug('Unable to read file: ' . $this->uamsClientIdFile);
+
             return null;
         }
 
