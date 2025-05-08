@@ -6,23 +6,26 @@ namespace Solarwinds\ApmPhp\Tests\Unit\Resource\Detectors;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 use Ramsey\Uuid\Uuid;
 use Solarwinds\ApmPhp\Resource\Detectors\Uams;
 
 #[CoversClass(Uams::class)]
 class UamsTest extends TestCase
 {
-    private $clientMock;
-    private $requestFactoryMock;
-    private $fileId;
-    private $apiId;
+    private ClientInterface&MockObject $clientMock;
+    private RequestFactoryInterface&MockObject $requestFactoryMock;
+    private string $fileId;
+    private string $apiId;
 
     protected function setUp(): void
     {
@@ -32,9 +35,9 @@ class UamsTest extends TestCase
         $this->apiId = Uuid::uuid4()->toString();
     }
 
-    private function createStreamMock(string $content)
+    private function createStreamMock(string $content): StreamInterface&MockObject
     {
-        $streamMock = $this->getMockBuilder('Psr\Http\Message\StreamInterface')->getMock();
+        $streamMock = $this->getMockBuilder(StreamInterface::class)->getMock();
         $streamMock->method('getContents')->willReturn($content);
 
         return $streamMock;
@@ -151,7 +154,7 @@ class UamsTest extends TestCase
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'file_not_present';
         $resource = (new Uams($uamsClientIdFile))->getResource();
-        $this->assertEquals(ResourceInfo::emptyResource(), $resource);
+        $this->assertEquals(ResourceInfoFactory::emptyResource(), $resource);
     }
 
     public function test_detects_nothing_when_file_not_present_and_unrelated_running(): void
@@ -173,6 +176,6 @@ class UamsTest extends TestCase
             ->willReturn($responseMock);
 
         $resource = (new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock))->getResource();
-        $this->assertEquals(ResourceInfo::emptyResource(), $resource);
+        $this->assertEquals(ResourceInfoFactory::emptyResource(), $resource);
     }
 }

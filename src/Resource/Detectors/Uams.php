@@ -10,6 +10,7 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -19,9 +20,8 @@ final class Uams implements ResourceDetectorInterface
 {
     use LogsMessagesTrait;
 
-    private const UAMS_CLIENT_PATH = PHP_OS_FAMILY === 'Windows'
-        ? 'C:\\ProgramData\\SolarWinds\\UAMSClient\\uamsclientid'
-    : '/opt/solarwinds/uamsclient/var/uamsclientid';
+    private const UAMS_CLIENT_PATH_WINDOWS = 'C:\\ProgramData\\SolarWinds\\UAMSClient\\uamsclientid';
+    private const UAMS_CLIENT_PATH_LINUX = '/opt/solarwinds/uamsclient/var/uamsclientid';
     private const UAMS_CLIENT_URL = 'http://127.0.0.1:2113/info/uamsclient';
     private const UAMS_CLIENT_ID_FIELD = 'uamsclient_id';
     private string $uamsClientIdFile;
@@ -35,9 +35,9 @@ final class Uams implements ResourceDetectorInterface
         ?ClientInterface $client = null,
         ?RequestFactoryInterface $requestFactory = null,
     ) {
-        $this->uamsClientIdFile = $uamsClientIdFile ?: self::UAMS_CLIENT_PATH;
-        $this->client = $client ?: Psr18ClientDiscovery::find();
-        $this->requestFactory = $requestFactory ?: Psr17FactoryDiscovery::findRequestFactory();
+        $this->uamsClientIdFile = $uamsClientIdFile ?? (PHP_OS_FAMILY === 'Windows' ? self::UAMS_CLIENT_PATH_WINDOWS : self::UAMS_CLIENT_PATH_LINUX);
+        $this->client = $client ?? Psr18ClientDiscovery::find();
+        $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
     }
 
     private function readFromFile(): ?string
@@ -63,6 +63,8 @@ final class Uams implements ResourceDetectorInterface
             $data = json_decode($res->getBody()->getContents(), true);
             if (!is_array($data) || !isset($data[self::UAMS_CLIENT_ID_FIELD]) || !is_string($data[self::UAMS_CLIENT_ID_FIELD])) {
                 $this->logDebug('Invalid response format');
+
+                return null;
             }
 
             return $data[self::UAMS_CLIENT_ID_FIELD];
@@ -78,7 +80,7 @@ final class Uams implements ResourceDetectorInterface
         $id = $this->readFromFile();
         $id = $id ?? $this->readFromApi();
         if ($id === null) {
-            return ResourceInfo::emptyResource();
+            return ResourceInfoFactory::emptyResource();
         }
         $attributes = [
             self::ATTR_UAMS_CLIENT_ID => $id,

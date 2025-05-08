@@ -6,6 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit\Resource\Detectors;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -186,7 +187,7 @@ EOT);
 
         $resource = (new K8s($namespaceFile, $mountFile))->getResource();
 
-        $this->assertEquals(ResourceInfo::emptyResource(), $resource);
+        $this->assertEquals(ResourceInfoFactory::emptyResource(), $resource);
 
         @unlink($mountFile);
     }

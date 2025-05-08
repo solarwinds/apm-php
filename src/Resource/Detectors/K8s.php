@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Variables;
 
@@ -17,9 +18,8 @@ final class K8s implements ResourceDetectorInterface
 {
     use LogsMessagesTrait;
 
-    private const NAMESPACE_FILE = PHP_OS_FAMILY === 'Windows'
-        ? 'C:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\namespace'
-    : '/run/secrets/kubernetes.io/serviceaccount/namespace';
+    private const NAMESPACE_FILE_WINDOWS = 'C:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\namespace';
+    private const NAMESPACE_FILE_LINUX = '/run/secrets/kubernetes.io/serviceaccount/namespace';
     private const MOUNTINFO_FILE = '/proc/self/mountinfo';
     private const UID_REGEX = '/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/i';
     private string $namespaceFile;
@@ -29,7 +29,7 @@ final class K8s implements ResourceDetectorInterface
         ?string $namespaceFile = null,
         ?string $mountInfoFile = null,
     ) {
-        $this->namespaceFile = $namespaceFile ?? self::NAMESPACE_FILE;
+        $this->namespaceFile = $namespaceFile ?? (PHP_OS_FAMILY === 'Windows' ? self::NAMESPACE_FILE_WINDOWS : self::NAMESPACE_FILE_LINUX);
         $this->mountInfoFile = $mountInfoFile ?? self::MOUNTINFO_FILE;
     }
 
@@ -41,7 +41,7 @@ final class K8s implements ResourceDetectorInterface
         if ($namespace !== null) {
             $attributes[ResourceAttributes::K8S_NAMESPACE_NAME] = $namespace;
         } else {
-            return ResourceInfo::emptyResource();
+            return ResourceInfoFactory::emptyResource();
         }
 
         $uid = $this->getPodUid();
