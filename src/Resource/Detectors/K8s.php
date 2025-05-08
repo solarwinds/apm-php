@@ -33,6 +33,11 @@ final class K8s implements ResourceDetectorInterface
         $this->mountInfoFile = $mountInfoFile ?? self::MOUNTINFO_FILE;
     }
 
+    /**
+     * Returns resource attributes related to the current Kubernetes pod such as namespace, UID, and name.
+     *
+     * @return ResourceInfo The resource information for the current pod, or an empty resource if the k8s namespace is not available.
+     */
     public function getResource(): ResourceInfo
     {
         $attributes = [];
