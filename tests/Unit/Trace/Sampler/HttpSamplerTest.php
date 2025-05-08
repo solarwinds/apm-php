@@ -23,10 +23,9 @@ class HttpSamplerTest extends TestCase
         }
         [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
-        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://apm.collector.na-01.cloud.solarwinds.com', ['Authorization: Bearer ' . $token,], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://apm.collector.na-01.cloud.solarwinds.com', ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
-        // $sampler->waitUntilReady(1000);
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertTrue($span->isRecording());
         $span->end();
@@ -41,10 +40,9 @@ class HttpSamplerTest extends TestCase
     public function test_invalid_service_key_does_not_sample_created_spans(): void
     {
         $spanExporter = new InMemoryExporter();
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'https://apm.collector.na-01.cloud.solarwinds.com', ['Authorization: Bearer oh no',], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'https://apm.collector.na-01.cloud.solarwinds.com', ['Authorization' => 'Bearer oh no'], true, true, null, []), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
-        // $sampler->waitUntilReady(1000);
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertFalse($span->isRecording());
         $span->end();
@@ -60,10 +58,9 @@ class HttpSamplerTest extends TestCase
         }
         [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
-        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://collector.invalid', ['Authorization: Bearer ' . $token,], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://collector.invalid', ['Authorization' => 'Bearer ' . $token,], true, true, null, []), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
-        // $sampler->waitUntilReady(1000);
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertFalse($span->isRecording());
         $span->end();
