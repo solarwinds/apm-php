@@ -16,7 +16,6 @@ final class Swo implements ResourceDetectorInterface
 {
     public const SW_DATA_MODULE = 'sw.data.module';
     public const SW_APM_VERSION = 'sw.apm.version';
-    private static ?self $instance = null;
     public function getResource(): ResourceInfo
     {
         if (!class_exists(InstalledVersions::class)) {
@@ -29,14 +28,5 @@ final class Swo implements ResourceDetectorInterface
         ];
 
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
-    }
-
-    public static function getInstance(): self
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
     }
 }
