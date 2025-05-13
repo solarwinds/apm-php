@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Trace\SpanProcessor;
+namespace Solarwinds\ApmPhp\Tests\Unit\Trace\SpanProcessor;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\TransactionNamePool;
 
+#[CoversClass(TransactionNamePool::class)]
 final class TransactionNamePoolTest extends TestCase
 {
     private TransactionNamePool $pool;

@@ -14,7 +14,7 @@ use OpenTelemetry\SemConv\TraceAttributes;
 class TransactionNameSpanProcessor extends NoopSpanProcessor implements SpanProcessorInterface
 {
     use LogsMessagesTrait;
-    private const TRANSACTION_NAME_ATTRIBUTE = 'sw.transaction';
+    public const TRANSACTION_NAME_ATTRIBUTE = 'sw.transaction';
     private const TRANSACTION_NAME_POOL_TTL = 60; // 1 minute
     private const TRANSACTION_NAME_POOL_MAX = 200;
     private const TRANSACTION_NAME_MAX_LENGTH = 256;
@@ -31,18 +31,22 @@ class TransactionNameSpanProcessor extends NoopSpanProcessor implements SpanProc
     }
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
-        $parentContext = $span->getParentContext();
-        if ($parentContext->isValid() && !$parentContext->isRemote()) {
+        $parentSpanContext = $span->getParentContext();
+        if ($parentSpanContext->isValid() && !$parentSpanContext->isRemote()) {
             return;
         }
-        $htt_route = $span->getAttribute(TraceAttributes::HTTP_ROUTE);
+        $http_route = $span->getAttribute(TraceAttributes::HTTP_ROUTE);
+        $this->logDebug('Name from http.route: ' . ($http_route !== null ? $http_route : 'null'));
         $url_path = $span->getAttribute(TraceAttributes::URL_PATH);
-        if ($htt_route) {
-            $name = $htt_route;
-        } elseif ($url_path) {
+        $this->logDebug('Name from url.path: ' . ($url_path !== null ? $url_path : 'null'));
+        $span_name = $span->getName();
+        $this->logDebug('Name from span: ' . $span_name);
+        if ($http_route !== null) {
+            $name = $http_route;
+        } elseif ($url_path !== null) {
             $name = TransactionNameUtil::resolveTransactionName($url_path);
         } else {
-            $name = $span->getName();
+            $name = $span_name;
         }
         $name = $this->pool->register($name);
         $this->logDebug('Final transaction name ' . $name);

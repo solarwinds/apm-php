@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Tests\Unit\Trace\SpanProcessor;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\TransactionNameUtil;
 
+#[CoversClass(TransactionNameUtil::class)]
 class TransactionNameUtilTest extends TestCase
 {
     public function test_resolve_transaction_name_unknown(): void
