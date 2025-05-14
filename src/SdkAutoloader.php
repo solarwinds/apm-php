@@ -96,8 +96,8 @@ class SdkAutoloader
         $meterProvider = (new MeterProviderFactory())->create($resource);
         $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
         $tracerProvider = (new TracerProviderBuilder())
-            ->addSpanProcessor(new TransactionNameSpanProcessor())      // Transaction Name Span Processor
-            ->addSpanProcessor($spanProcessor)                          // Otel Span Processors
+            ->addSpanProcessor(TransactionNameSpanProcessor::getInstance())      // Transaction Name Span Processor
+            ->addSpanProcessor($spanProcessor)                                   // Otel Span Processors
             ->setResource($resource)
             ->setSampler((new SwoSamplerFactory())->create())
             ->build();

@@ -20,6 +20,7 @@ class TransactionNameSpanProcessor extends NoopSpanProcessor implements SpanProc
     private const TRANSACTION_NAME_MAX_LENGTH = 256;
     private const TRANSACTION_NAME_DEFAULT = 'other';
     private TransactionNamePool $pool;
+    private static ?SpanProcessorInterface $instance = null;
     public function __construct()
     {
         $this->pool = new TransactionNamePool(
@@ -28,6 +29,18 @@ class TransactionNameSpanProcessor extends NoopSpanProcessor implements SpanProc
             self::TRANSACTION_NAME_MAX_LENGTH,
             self::TRANSACTION_NAME_DEFAULT
         );
+    }
+    public static function getInstance(): SpanProcessorInterface
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+    public function getTransactionNamePool(): TransactionNamePool
+    {
+        return $this->pool;
     }
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
