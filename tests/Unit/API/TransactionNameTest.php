@@ -51,6 +51,24 @@ class TransactionNameTest extends TestCase
         $this->assertEquals([TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'custom-name'], $spans[0]->getAttributes()->toArray());
     }
 
+    public function test_api_call_with_valid_local_root_span_empty(): void
+    {
+        $spanExporter = new InMemoryExporter();
+        $tracerProvider = TracerProvider::builder()
+            ->addSpanProcessor(new TransactionNameSpanProcessor())
+            ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
+            ->setSampler(new AlwaysOnSampler())
+            ->build();
+        $span = $tracerProvider->getTracer('test')->spanBuilder('testSpan')->startSpan();
+        $scope = $span->activate();
+        $this->assertTrue(TransactionName::set(''));
+        $scope->detach();
+        $span->end();
+        $spans = $spanExporter->getSpans();
+        $this->assertCount(1, $spans);
+        $this->assertEquals([TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => ''], $spans[0]->getAttributes()->toArray());
+    }
+
     public function test_api_call_out_of_activated_span(): void
     {
         $spanExporter = new InMemoryExporter();

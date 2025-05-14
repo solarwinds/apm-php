@@ -20,10 +20,6 @@ final class TransactionName
     {
         $span = LocalRootSpan::current();
         if ($span instanceof ReadableSpanInterface) {
-            $parentSpanContext = $span->getParentContext();
-            if ($parentSpanContext->isValid() && !$parentSpanContext->isRemote()) {
-                return false;
-            }
             $spanProcessor = TransactionNameSpanProcessor::getInstance();
             if ($spanProcessor instanceof TransactionNameSpanProcessor) {
                 $name = $spanProcessor->getTransactionNamePool()->register($name);
