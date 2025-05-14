@@ -15,7 +15,6 @@ interface Variables
      */
     public const SW_APM_SERVICE_KEY = 'SW_APM_SERVICE_KEY';
     public const SW_APM_COLLECTOR = 'SW_APM_COLLECTOR';
-    public const SW_APM_SETTINGS_JSON_PATH = 'SW_APM_SETTINGS_JSON_PATH';
     /**
      * k8s resource attributes configuration
      */
