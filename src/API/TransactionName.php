@@ -18,6 +18,11 @@ final class TransactionName
      */
     public static function set(string $name): bool
     {
+        if (empty($name)) {
+            self::logDebug('Transaction name cannot be empty');
+
+            return false;
+        }
         $span = LocalRootSpan::current();
         if ($span instanceof ReadableSpanInterface) {
             $spanProcessor = TransactionNameSpanProcessor::getInstance();
@@ -28,6 +33,7 @@ final class TransactionName
                 return true;
             }
         }
+        self::logDebug('Unable to get local root span or transaction name span processor');
 
         return false;
     }

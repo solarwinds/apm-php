@@ -61,12 +61,12 @@ class TransactionNameTest extends TestCase
             ->build();
         $span = $tracerProvider->getTracer('test')->spanBuilder('testSpan')->startSpan();
         $scope = $span->activate();
-        $this->assertTrue(TransactionName::set(''));
+        $this->assertFalse(TransactionName::set(''));
         $scope->detach();
         $span->end();
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
-        $this->assertEquals([TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => ''], $spans[0]->getAttributes()->toArray());
+        $this->assertEquals([TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'testSpan'], $spans[0]->getAttributes()->toArray());
     }
 
     public function test_api_call_out_of_activated_span(): void
