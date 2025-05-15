@@ -24,12 +24,13 @@ class Counters
     ) {
         $provider = $meterProvider ?? Globals::meterProvider();
         $this->meter = $provider->getMeter('sw.apm.sampling.metrics');
-        $this->request_count = $this->meter->createCounter('trace.service.request_count', '{request}', 'Count of all requests to the service');
-        $this->sample_count = $this->meter->createCounter('trace.service.samplecount', '{request}', 'Count of sampled requests');
-        $this->trace_count = $this->meter->createCounter('trace.service.tracecount', '{trace}', 'Count of traces generated from requests');
-        $this->through_trace_count = $this->meter->createCounter('trace.service.through_trace_count', '{request}', 'Count of requests that carried valid upstream sampling decision');
-        $this->triggered_trace_count = $this->meter->createCounter('trace.service.triggered_trace_count', '{trace}', 'Count of trigger traces');
-        $this->token_bucket_exhaustion_count = $this->meter->createCounter('trace.service.tokenbucket_exhaustion_count', '{request}', 'Count of requests that were not traced due to token bucket exhaustion');
+        $this->request_count = $this->meter->createCounter('trace.service.request_count', '{request}', 'Count of all requests.');
+        $this->sample_count = $this->meter->createCounter('trace.service.samplecount', '{request}', 'Count of requests that went through sampling, which excludes those with a valid upstream decision or trigger traced.');
+        $this->through_trace_count = $this->meter->createCounter('trace.service.through_trace_count', '{request}', 'Count of requests with a valid upstream decision, thus passed through sampling.');
+        $this->token_bucket_exhaustion_count = $this->meter->createCounter('trace.service.tokenbucket_exhaustion_count', '{request}', 'Count of requests that were not traced due to token bucket rate limiting.');
+        $this->trace_count = $this->meter->createCounter('trace.service.tracecount', '{trace}', 'Count of all traces.');
+        $this->triggered_trace_count = $this->meter->createCounter('trace.service.triggered_trace_count', '{trace}', 'Count of triggered traces.');
+
     }
 
     public function getRequestCount(): CounterInterface

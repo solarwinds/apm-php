@@ -27,7 +27,7 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
         $this->histogram = $meter->createHistogram(
             'trace.service.response_time',
             'ms',
-            'measures the duration inbound HTTP requests');
+            'Duration of each entry span for the service, typically meaning the time taken to process an inbound request.');
     }
     public function onEnd(ReadableSpanInterface $span): void
     {
