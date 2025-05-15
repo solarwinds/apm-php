@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
+use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
@@ -25,7 +26,7 @@ class SwoSamplerFactory
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
     private const DUMMY_SERVICE_KEY = 'your-token:default-service';
 
-    public function create(): SamplerInterface
+    public function create(?MeterProviderInterface $meterProvider = null): SamplerInterface
     {
         $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
 
@@ -43,7 +44,7 @@ class SwoSamplerFactory
                     $collector = Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR, self::DEFAULT_APM_COLLECTOR);
                     $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY, self::DUMMY_SERVICE_KEY);
                     [$token, $service] = explode(':', $serviceKey);
-                    $http = new HttpSampler(null, new SolarwindsConfiguration(true, $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
+                    $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
 
                     return new ParentBased($http, $http, $http);
             }
