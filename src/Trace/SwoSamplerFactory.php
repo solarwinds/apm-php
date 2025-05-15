@@ -16,17 +16,14 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
-use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 
 class SwoSamplerFactory
 {
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
     private const SOLARWINDS_PREFIX = 'solarwinds';
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
-    private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
     private const DUMMY_SERVICE_KEY = 'your-token:default-service';
-    private const DEFAULT_APM_SETTINGS_JSON_FILE = 'solarwinds-apm-settings.json';
 
     public function create(): SamplerInterface
     {
@@ -49,13 +46,6 @@ class SwoSamplerFactory
                     $http = new HttpSampler(null, new SolarwindsConfiguration(true, $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
 
                     return new ParentBased($http, $http, $http);
-                case self::VALUE_SOLARWINDS_JSON:
-                    $path = Configuration::getString(SolarwindsEnv::SW_APM_SETTINGS_JSON_PATH, sys_get_temp_dir() . self::DEFAULT_APM_SETTINGS_JSON_FILE);
-                    $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY, self::DUMMY_SERVICE_KEY);
-                    [, $service] = explode(':', $serviceKey);
-                    $json = new JsonSampler(null, new SolarwindsConfiguration(true, $service, '', [], true, true, null, []), $path);
-
-                    return new ParentBased($json, $json, $json);
             }
         }
 
