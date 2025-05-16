@@ -27,8 +27,14 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
         $this->histogram = $meter->createHistogram(
             'trace.service.response_time',
             'ms',
-            'Duration of each entry span for the service, typically meaning the time taken to process an inbound request.');
+            'Duration of each entry span for the service, typically meaning the time taken to process an inbound request.'
+        );
     }
+
+    /**
+     * Still need the deprecated class constant
+     * @phan-suppress PhanDeprecatedClassConstant
+     */
     public function onEnd(ReadableSpanInterface $span): void
     {
         $parentSpanContext = $span->getParentContext();
@@ -51,7 +57,7 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
         }
         foreach ($copy as $attribute) {
             if ($span->getAttribute($attribute) !== null) {
-                $attributes[$attribute] = $span->getAttribute($attribute);
+                $attributes[$attribute] = (string) ($span->getAttribute($attribute));
             }
         }
         $this->logDebug('Recording response time: ' . $durationMs . 'ms, ' . json_encode($attributes));

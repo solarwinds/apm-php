@@ -32,6 +32,7 @@
         <DeprecatedConstant>
             <errorLevel type="suppress">
                 <file name="./src/Trace/Sampler/Sampler.php" />
+                <file name="./src/Trace/SpanProcessor/ResponseTimeSpanProcessor.php" />
             </errorLevel>
         </DeprecatedConstant>
     </issueHandlers>
