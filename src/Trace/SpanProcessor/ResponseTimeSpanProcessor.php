@@ -34,7 +34,6 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
     /**
      * Still need the deprecated class constant
      * @phan-suppress PhanDeprecatedClassConstant
-     * @psalm-suppress PossiblyInvalidArgument
      */
     public function onEnd(ReadableSpanInterface $span): void
     {
