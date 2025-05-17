@@ -34,6 +34,7 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
     /**
      * Still need the deprecated class constant
      * @phan-suppress PhanDeprecatedClassConstant
+     * @psalm-suppress PossiblyInvalidArgument
      */
     public function onEnd(ReadableSpanInterface $span): void
     {
@@ -55,9 +56,10 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
                 TraceAttributes::HTTP_STATUS_CODE,
             ]);
         }
-        foreach ($copy as $attribute) {
-            if ($span->getAttribute($attribute) !== null) {
-                $attributes[$attribute] = (string) ($span->getAttribute($attribute));
+        foreach ($copy as $key) {
+            $value = $span->getAttribute($key);
+            if ($value !== null) {
+                $attributes[$key] = $value;
             }
         }
         $this->logDebug('Recording response time: ' . $durationMs . 'ms, ' . json_encode($attributes));

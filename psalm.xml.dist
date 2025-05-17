@@ -33,6 +33,7 @@
             <errorLevel type="suppress">
                 <file name="./src/Trace/Sampler/Sampler.php" />
                 <file name="./src/Trace/SpanProcessor/ResponseTimeSpanProcessor.php" />
+                <directory name="./tests/" />
             </errorLevel>
         </DeprecatedConstant>
     </issueHandlers>
