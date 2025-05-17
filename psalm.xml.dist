@@ -32,7 +32,14 @@
         <DeprecatedConstant>
             <errorLevel type="suppress">
                 <file name="./src/Trace/Sampler/Sampler.php" />
+                <file name="./src/Trace/SpanProcessor/ResponseTimeSpanProcessor.php" />
+                <directory name="./tests/" />
             </errorLevel>
         </DeprecatedConstant>
+        <PossiblyInvalidArgument>
+            <errorLevel type="suppress">
+                <file name="./src/Trace/SpanProcessor/ResponseTimeSpanProcessor.php" />
+            </errorLevel>
+        </PossiblyInvalidArgument>
     </issueHandlers>
 </psalm>

@@ -24,12 +24,13 @@ class Counters
     ) {
         $provider = $meterProvider ?? Globals::meterProvider();
         $this->meter = $provider->getMeter('sw.apm.sampling.metrics');
-        $this->request_count = $this->meter->createCounter('trace.service.request_count');
-        $this->sample_count = $this->meter->createCounter('trace.service.samplecount');
-        $this->trace_count = $this->meter->createCounter('trace.service.tracecount');
-        $this->through_trace_count = $this->meter->createCounter('trace.service.through_trace_count');
-        $this->triggered_trace_count = $this->meter->createCounter('trace.service.triggered_trace_count');
-        $this->token_bucket_exhaustion_count = $this->meter->createCounter('trace.service.tokenbucket_exhaustion_count');
+        $this->request_count = $this->meter->createCounter('trace.service.request_count', '{request}', 'Count of all requests.');
+        $this->sample_count = $this->meter->createCounter('trace.service.samplecount', '{request}', 'Count of requests that went through sampling, which excludes those with a valid upstream decision or trigger traced.');
+        $this->through_trace_count = $this->meter->createCounter('trace.service.through_trace_count', '{request}', 'Count of requests with a valid upstream decision, thus passed through sampling.');
+        $this->token_bucket_exhaustion_count = $this->meter->createCounter('trace.service.tokenbucket_exhaustion_count', '{request}', 'Count of requests that were not traced due to token bucket rate limiting.');
+        $this->trace_count = $this->meter->createCounter('trace.service.tracecount', '{trace}', 'Count of all traces.');
+        $this->triggered_trace_count = $this->meter->createCounter('trace.service.triggered_trace_count', '{trace}', 'Count of triggered traces.');
+
     }
 
     public function getRequestCount(): CounterInterface

@@ -39,6 +39,7 @@ use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 use RuntimeException;
+use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\TransactionNameSpanProcessor;
 use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 use Throwable;
@@ -96,10 +97,11 @@ class SdkAutoloader
         $meterProvider = (new MeterProviderFactory())->create($resource);
         $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
         $tracerProvider = (new TracerProviderBuilder())
-            ->addSpanProcessor(TransactionNameSpanProcessor::getInstance())      // Transaction Name Span Processor
+            ->addSpanProcessor(TransactionNameSpanProcessor::getInstance())      // Transaction Name Span Processor (Used singleton due to the transaction name pool)
+            ->addSpanProcessor(new ResponseTimeSpanProcessor($meterProvider))    // Response Time Span Processor
             ->addSpanProcessor($spanProcessor)                                   // Otel Span Processors
             ->setResource($resource)
-            ->setSampler((new SwoSamplerFactory())->create())
+            ->setSampler((new SwoSamplerFactory())->create($meterProvider))
             ->build();
 
         $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
