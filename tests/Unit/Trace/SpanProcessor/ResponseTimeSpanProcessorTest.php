@@ -279,9 +279,9 @@ class ResponseTimeSpanProcessorTest extends MockeryTestCase
         $spanData->expects('getStatus')->andReturn(StatusData::create(StatusCode::STATUS_UNSET, 'unset'));
         $this->readableSpan->expects('toSpanData')->andReturn($spanData);
         $this->readableSpan->expects('getKind')->andReturn(SpanKind::KIND_SERVER);
-        $this->readableSpan->expects('getAttribute')->with(TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE)->andReturn('transaction');
-        $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_REQUEST_METHOD)->andReturn('GET');
-        $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_RESPONSE_STATUS_CODE)->andReturn(200);
+        $this->readableSpan->expects('getAttribute')->with(TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE)->andReturnNull();
+        $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_REQUEST_METHOD)->andReturnNull();
+        $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_RESPONSE_STATUS_CODE)->andReturnNull();
         $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_METHOD)->andReturnNull();
         $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_STATUS_CODE)->andReturnNull();
         $this->responseTimeSpanProcessor->onEnd($this->readableSpan);
@@ -302,9 +302,9 @@ class ResponseTimeSpanProcessorTest extends MockeryTestCase
                         $attributes[$key] = $value;
                     }
                     $this->assertFalse($attributes['sw.is_error'] ?? true);
-                    $this->assertEquals('transaction', $attributes[TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE] ?? '');
-                    $this->assertEquals('GET', $attributes[TraceAttributes::HTTP_REQUEST_METHOD] ?? '');
-                    $this->assertEquals(200, $attributes[TraceAttributes::HTTP_RESPONSE_STATUS_CODE] ?? '');
+                    $this->assertArrayNotHasKey(TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE, $attributes);
+                    $this->assertArrayNotHasKey(TraceAttributes::HTTP_REQUEST_METHOD, $attributes);
+                    $this->assertArrayNotHasKey(TraceAttributes::HTTP_RESPONSE_STATUS_CODE, $attributes);
                     $this->assertArrayNotHasKey(TraceAttributes::HTTP_METHOD, $attributes);
                     $this->assertArrayNotHasKey(TraceAttributes::HTTP_STATUS_CODE, $attributes);
                 }
