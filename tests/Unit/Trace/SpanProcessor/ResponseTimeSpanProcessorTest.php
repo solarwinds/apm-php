@@ -271,4 +271,44 @@ class ResponseTimeSpanProcessorTest extends MockeryTestCase
             }
         }
     }
+    public function test_span_unset(): void
+    {
+        $this->readableSpan->expects('getParentContext')->andReturn(SpanContext::getInvalid());
+        $this->readableSpan->expects('getDuration')->andReturn(123456789);
+        $spanData = Mockery::mock(SpanDataInterface::class);
+        $spanData->expects('getStatus')->andReturn(StatusData::create(StatusCode::STATUS_UNSET, 'unset'));
+        $this->readableSpan->expects('toSpanData')->andReturn($spanData);
+        $this->readableSpan->expects('getKind')->andReturn(SpanKind::KIND_SERVER);
+        $this->readableSpan->expects('getAttribute')->with(TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE)->andReturn('transaction');
+        $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_REQUEST_METHOD)->andReturn('GET');
+        $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_RESPONSE_STATUS_CODE)->andReturn(200);
+        $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_METHOD)->andReturnNull();
+        $this->readableSpan->expects('getAttribute')->with(TraceAttributes::HTTP_STATUS_CODE)->andReturnNull();
+        $this->responseTimeSpanProcessor->onEnd($this->readableSpan);
+        $this->reader->collect();
+        $metrics = $this->exporter->Collect();
+        // Check histogram
+        $this->assertCount(1, $metrics);
+        foreach ($metrics as $metric) {
+            $this->assertEquals('trace.service.response_time', $metric->name);
+            $this->assertEquals('ms', $metric->unit);
+            if ($metric->data instanceof Histogram) {
+                $this->assertEquals('Delta', $metric->data->temporality);
+                $this->assertCount(1, $metric->data->dataPoints);
+                foreach ($metric->data->dataPoints as $dataPoint) {
+                    $this->assertEquals(123.456789, $dataPoint->sum);
+                    $attributes = [];
+                    foreach ($dataPoint->attributes as $key => $value) {
+                        $attributes[$key] = $value;
+                    }
+                    $this->assertFalse($attributes['sw.is_error'] ?? true);
+                    $this->assertEquals('transaction', $attributes[TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE] ?? '');
+                    $this->assertEquals('GET', $attributes[TraceAttributes::HTTP_REQUEST_METHOD] ?? '');
+                    $this->assertEquals(200, $attributes[TraceAttributes::HTTP_RESPONSE_STATUS_CODE] ?? '');
+                    $this->assertArrayNotHasKey(TraceAttributes::HTTP_METHOD, $attributes);
+                    $this->assertArrayNotHasKey(TraceAttributes::HTTP_STATUS_CODE, $attributes);
+                }
+            }
+        }
+    }
 }
