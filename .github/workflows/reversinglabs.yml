@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Package
-        run: zip -r scan.zip .
+        run: zip -r scan.zip ./examples ./src ./tests ./composer.json Makefile
       - name: Scan artifacts on the Portal
         id: rl-scan
         env:
