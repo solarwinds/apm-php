@@ -1,0 +1,45 @@
+name: Reversinglabs scanner
+
+on:
+  push:
+    tags:
+      - '**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Construct Version
+        id: construct_version
+        shell: bash
+        run: |
+          VERSION=$(echo "$GITHUB_REF_NAME" | sed -r 's/.*\/[^0-9\.]*//g')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Print version (in case some debugging is needed)
+        run: |
+          echo "Version:       ${{ steps.construct_version.outputs.version }}"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Package
+        run: zip -r scan.zip .
+      - name: Scan artifacts on the Portal
+        id: rl-scan
+        env:
+          RLPORTAL_ACCESS_TOKEN: ${{ secrets.RLPORTAL_ACCESS_TOKEN }}
+        uses: reversinglabs/gh-action-rl-scanner-cloud-only@v1
+        with:
+          artifact-to-scan: scan.zip
+          rl-verbose: true
+          rl-portal-server: solarwinds
+          rl-portal-org: SolarWinds
+          rl-portal-group: "SaaS-Agents-SWO"
+          rl-package-url: apm-php@${{ steps.construct_version.outputs.version }}
+      - name: report the scan status
+        if: success() || failure()
+        run: |
+          echo "The status is: '${{ steps.rl-scan.outputs.status }}'"
+          echo "The description is: '${{ steps.rl-scan.outputs.description }}'"
