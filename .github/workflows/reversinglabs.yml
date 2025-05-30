@@ -37,7 +37,7 @@ jobs:
           rl-portal-server: solarwinds
           rl-portal-org: SolarWinds
           rl-portal-group: "SaaS-Agents-SWO"
-          rl-package-url: apm-php@${{ steps.construct_version.outputs.version }}
+          rl-package-url: apm-php/apm-php@${{ steps.construct_version.outputs.version }}
       - name: report the scan status
         if: success() || failure()
         run: |
