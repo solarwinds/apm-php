@@ -45,7 +45,7 @@ $child1Scope->detach();
 $child1->end();
 
 $child2 = $tracer->spanBuilder('child2-of-main')->startSpan();
-$child2Scope = $child1->activate();
+$child2Scope = $child2->activate();
 $child2->setAttributes([
     'db.system' => 'mysql',
     'db.statement' => 'SELECT * FROM posts LIMIT 100',
