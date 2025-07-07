@@ -56,7 +56,7 @@
     "open-telemetry/sem-conv": "^1.30",
     "open-telemetry/api": "^1.2",
     "open-telemetry/exporter-otlp": "^1.2",
-    "open-telemetry/opentelemetry-auto-mysqli": "dev-test-fork",
+    "open-telemetry/opentelemetry-auto-mysqli": "dev-test-fork as 0.0.3",
     "php-http/discovery": "^1.14",
     "psr/http-client": "^1.0",
     "psr/http-client-implementation": "^1.0",
