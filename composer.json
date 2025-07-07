@@ -30,6 +30,12 @@
       "Solarwinds\\ApmPhp\\Tests\\Benchmark\\": "tests/Benchmark/"
     }
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/jerrytfleung/contrib-auto-mysqli"
+    }
+  ],
   "require-dev": {
     "bamarni/composer-bin-plugin": "^1.8",
     "mockery/mockery": "^1.6.12",
@@ -50,6 +56,7 @@
     "open-telemetry/sem-conv": "^1.30",
     "open-telemetry/api": "^1.2",
     "open-telemetry/exporter-otlp": "^1.2",
+    "open-telemetry/opentelemetry-auto-mysqli": "dev-test-fork",
     "php-http/discovery": "^1.14",
     "psr/http-client": "^1.0",
     "psr/http-client-implementation": "^1.0",
