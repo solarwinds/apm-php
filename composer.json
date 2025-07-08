@@ -63,9 +63,7 @@
     "allow-plugins": {
       "bamarni/composer-bin-plugin": true,
       "composer/package-versions-deprecated": true,
-      "php-http/discovery": true,
-      "symfony/runtime": false,
-      "tbachert/spi": false
+      "php-http/discovery": true
     }
   },
   "extra": {
