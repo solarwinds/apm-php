@@ -111,7 +111,7 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
 ```
 Open http://localhost:8080/rolldice in your web browser and reload the page a few times. After a while you should see the trace in SWO platform:
 
-![trace.png](../png/trace.png)
+![trace.png](./../png/trace.png)
 
 ## Contributing
 Contributions are welcome!
