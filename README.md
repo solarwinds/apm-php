@@ -88,6 +88,7 @@ Add additional dependencies to your application, which are required for the auto
 ```bash
 composer config allow-plugins.php-http/discovery false
 composer require \
+  guzzlehttp/guzzle \
   solarwinds/apm \
   open-telemetry/opentelemetry-auto-slim \
   open-telemetry/exporter-otlp
