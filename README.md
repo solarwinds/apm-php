@@ -1,4 +1,4 @@
-# PHP solarwinds-apm (In development)
+# solarwinds/apm
 
 ![Packagist Version](https://img.shields.io/packagist/v/solarwinds/apm)
 ![Packagist Downloads](https://img.shields.io/packagist/dm/solarwinds/apm)
