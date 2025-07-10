@@ -14,7 +14,7 @@ This repo holds the source code for the OpenTelemetry-based SolarWinds APM PHP l
 Solarwinds APM PHP library is built on top of the OpenTelemetry PHP SDK and has the same [prerequisites](https://opentelemetry.io/docs/languages/php/getting-started/#prerequisites) as opentelemetry-php.
 
 Ensure that you have the following installed:
-- [PHP 8.0+](https://www.php.net/)
+- [PHP 8.1+](https://www.php.net/)
 - [PECL](https://pecl.php.net/)
 - [composer](https://getcomposer.org/)
 
