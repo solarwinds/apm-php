@@ -111,6 +111,9 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
 ```
 Open http://localhost:8080/rolldice in your web browser and reload the page a few times. After a while you should see the trace in SWO platform:
 
+<img width="616" alt="SWO" src="https://github.com/user-attachments/assets/ed312cc8-ebd7-4c4e-bce3-bac882843200" />
+
+e.g.
 ```json
 [
     {
