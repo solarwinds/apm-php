@@ -111,7 +111,75 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
 ```
 Open http://localhost:8080/rolldice in your web browser and reload the page a few times. After a while you should see the trace in SWO platform:
 
-![trace.png](./../png/trace.png)
+```json
+[
+    {
+        "name": "GET \/rolldice",
+        "context": {
+            "trace_id": "15b8bf8678262defaaf1df3afe7a53c8",
+            "span_id": "a8af2cd95e9c82a3",
+            "trace_state": "",
+            "trace_flags": 1
+        },
+        "resource": {
+            "service.name": "php-example",
+            "host.name": "otel-VMware20-1",
+            "host.arch": "aarch64",
+            "host.id": "a6046f12d335446a880c0d1f7366f46a",
+            "os.type": "linux",
+            "os.description": "6.11.0-29-generic",
+            "os.name": "Linux",
+            "os.version": "#29~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Jun 26 13:59:03 UTC 2",
+            "process.runtime.name": "cli-server",
+            "process.runtime.version": "8.3.6",
+            "process.pid": 6691,
+            "process.executable.path": "\/usr\/bin\/php8.3",
+            "process.owner": "otel",
+            "sw.data.module": "apm",
+            "sw.apm.version": "1.0.0+no-version-set",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "1.6.0",
+            "telemetry.distro.name": "opentelemetry-php-instrumentation",
+            "telemetry.distro.version": "1.1.3",
+            "service.instance.id": "8541aea1-592a-4e4c-bb33-7266cb79b893"
+        },
+        "parent_span_id": "",
+        "kind": "KIND_SERVER",
+        "start": 1752110341038171315,
+        "end": 1752110341040636624,
+        "attributes": {
+            "code.function.name": "Slim\\App::handle",
+            "code.file.path": "\/home\/otel\/workspace\/test\/vendor\/slim\/slim\/Slim\/App.php",
+            "code.line.number": 207,
+            "url.full": "http:\/\/localhost:8080\/rolldice",
+            "http.request.method": "GET",
+            "http.request.body.size": "",
+            "user_agent.original": "Mozilla\/5.0 (X11; Ubuntu; Linux x86_64; rv:139.0) Gecko\/20100101 Firefox\/139.0",
+            "server.address": "localhost",
+            "server.port": 8080,
+            "url.scheme": "http",
+            "url.path": "\/rolldice",
+            "SampleRate": 1000000,
+            "SampleSource": 6,
+            "BucketCapacity": 6.800000000000001,
+            "BucketRate": 0.37400000000000005,
+            "sw.transaction": "\/rolldice",
+            "http.route": "\/rolldice",
+            "http.response.status_code": 200,
+            "network.protocol.version": "1.1",
+            "http.response.body.size": ""
+        },
+        "status": {
+            "code": "Unset",
+            "description": ""
+        },
+        "events": [],
+        "links": [],
+        "schema_url": "https:\/\/opentelemetry.io\/schemas\/1.32.0"
+    }
+]
+```
 
 ## Contributing
 Contributions are welcome!
