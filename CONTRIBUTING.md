@@ -34,7 +34,7 @@ PHP_VERSION=8.3 make all
 ```
 For repeatability and consistency across different operating systems, we use the [3 Musketeers pattern](https://3musketeers.pages.dev/). If you're on Windows, it might be a good idea to use Git bash for following the steps below.
 
-**Note: After cloning the repository, copy `.env.dist` to `.env`, and update a valid SWO API key (can get it from [Solarwinds SaaS Free Trial](https://www.solarwinds.com/solarwinds-observability/registration)) to `SW_APM_SERVICE_KEY`.**
+**Note: After cloning the repository, copy `.env.dist` to `.env`, and set a valid SWO API token (available from [Solarwinds SaaS Free Trial](https://www.solarwinds.com/solarwinds-observability/registration)) and service name as the `SW_APM_SERVICE_KEY` value.**
 
 Skipping the step above would result in a "`The "PHP_USER" variable is not set. Defaulting to a blank string`" warning
 
