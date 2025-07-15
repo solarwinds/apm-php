@@ -1,6 +1,6 @@
 # Issues
 
-### Security issues
+## Security issues
 
 Please report any security issues privately to the SolarWinds Product Security Incident Response Team (PSIRT) at [psirt@solarwinds.com](mailto:psirt@solarwinds.com).
 
