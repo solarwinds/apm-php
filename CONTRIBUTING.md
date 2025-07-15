@@ -4,7 +4,7 @@
 
 Please report any security issues privately to the SolarWinds Product Security Incident Response Team (PSIRT) at [psirt@solarwinds.com](mailto:psirt@solarwinds.com).
 
-### All other issues
+## All other issues
 
 For non-security issues, please submit your ideas, questions, or problems as [GitHub issues](https://github.com/solarwinds/apm-php/issues). Please add as much information as you can, such as: PHP version, platform, installed dependencies and their version numbers, hosting, code examples or gists, steps to reproduce, stack traces, and logs. SolarWinds project maintainers may ask for clarification or more context after submission.
 
