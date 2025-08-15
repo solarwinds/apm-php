@@ -19,7 +19,7 @@ jobs:
       # Needed for GitHub OIDC token if publish_results is true
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
 
