@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
+use OpenTelemetry\Contrib\Propagation\ResponseBaggage\ResponseBaggage;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
@@ -17,7 +18,6 @@ use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Common\Configuration\TracingMode;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsPropagator;
-use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsResponseBaggage;
 
 /**
  * Still need the deprecated class constant
@@ -269,8 +269,11 @@ abstract class Sampler extends OboeSampler
         array $links,
     ): ?TraceState {
         // To do: check if the header is set in context
-        $xTraceOptionsResponseBaggageBuilder = XTraceOptionsResponseBaggage::getBuilder();
-        $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set(XTraceOptionsPropagator::XTRACEOPTIONSRESPONSE, $headers->XTraceOptionsResponse)->build();
+        //        $xTraceOptionsResponseBaggageBuilder = XTraceOptionsResponseBaggage::getBuilder();
+        //        $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set(XTraceOptionsPropagator::XTRACEOPTIONSRESPONSE, $headers->XTraceOptionsResponse)->build();
+        //        $xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent());
+        $xTraceOptionsResponseBaggageBuilder = ResponseBaggage::getBuilder();
+        $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set('x-trace-options-response', $headers->XTraceOptionsResponse)->build();
         $xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent());
 
         return null;
