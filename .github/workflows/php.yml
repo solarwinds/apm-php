@@ -31,9 +31,9 @@ jobs:
       run: |
         echo "key=$(date +'%Y-%U')" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-    - uses: gacts/run-and-post-run@v1
+    - uses: gacts/run-and-post-run@d803f6920adc9a47eeac4cb6c93dbc2e2890c684 # v1.4.2
       id: post-run-command
       with:
         post: |
@@ -53,21 +53,21 @@ jobs:
 
     - name: Setup cache environment
       id: extcache
-      uses: shivammathur/cache-extensions@v1
+      uses: shivammathur/cache-extensions@ed47a55c463bf49c0de08e5290a3d55208e2c287 # v1
       with:
         php-version: ${{ matrix.php-version }}
         extensions: ${{ env.extensions }}
         key: ${{ env.key }}
 
     - name: Cache extensions
-      uses: actions/cache@v4
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       with:
         path: ${{ steps.extcache.outputs.dir }}
         key: ${{ steps.extcache.outputs.key }}
         restore-keys: ${{ steps.extcache.outputs.key }}
 
     - name: Setup PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@20529878ed81ef8e78ddf08b480401e6101a850f # v2
       with:
         php-version: ${{ matrix.php-version }}
         coverage: xdebug
@@ -79,7 +79,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v4
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       with:
         path: vendor
         key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
@@ -88,7 +88,7 @@ jobs:
 
     - name: Cache test tools
       id: test-tools-cache
-      uses: actions/cache@v4
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       with:
         path: vendor-bin
         key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
@@ -144,7 +144,7 @@ jobs:
       run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit
 
     - name: Code Coverage
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.clover
