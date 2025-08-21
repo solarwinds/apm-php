@@ -7,7 +7,7 @@ namespace Solarwinds\ApmPhp\Trace\Sampler;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TraceFlags;
-use OpenTelemetry\API\Trace\TraceState;
+use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
@@ -190,7 +190,7 @@ abstract class OboeSampler implements SamplerInterface
         int $spanKind,
         AttributesInterface $attributes,
         array $links,
-    ): ?TraceState {
+    ): ?TraceStateInterface {
         $headers = new ResponseHeaders();
         if ($s->traceOptions) {
             $headers->XTraceOptionsResponse = (string) $s->traceOptions->response;
@@ -207,7 +207,7 @@ abstract class OboeSampler implements SamplerInterface
         int $spanKind,
         AttributesInterface $attributes,
         array $links,
-    ): ?TraceState;
+    ): ?TraceStateInterface;
 
     private function parentBasedAlgo(SampleState $s, ContextInterface $parentContext): void
     {

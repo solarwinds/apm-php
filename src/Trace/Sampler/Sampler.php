@@ -6,8 +6,10 @@ namespace Solarwinds\ApmPhp\Trace\Sampler;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceState;
+use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -265,18 +267,25 @@ abstract class Sampler extends OboeSampler
         int $spanKind,
         AttributesInterface $attributes,
         array $links,
-    ): ?TraceState {
-        // To do: check if the header is set in context
-        //        $xTraceOptionsResponseBaggageBuilder = XTraceOptionsResponseBaggage::getBuilder();
-        //        $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set(XTraceOptionsPropagator::XTRACEOPTIONSRESPONSE, $headers->XTraceOptionsResponse)->build();
-        //        $xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent());
-        $this->logDebug('setResponseHeaders: ' . $headers->XTraceOptionsResponse);
-        //        $xTraceOptionsResponseBaggageBuilder = ResponseBaggage::getBuilder();
-        //        $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set('x-trace-options-response', $headers->XTraceOptionsResponse)->build();
-        //        Context::storage()->attach($xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent()));
-        //        $baggage = ResponseBaggage::fromContext(Context::getCurrent());
-        //        $this->logDebug('fromContext: ' . $baggage->getValue('x-trace-options-response')); // This will ensure the baggage is stored in context
-        // Context::getCurrent()->withContextValue()
+    ): ?TraceStateInterface {
+        if ($headers->XTraceOptionsResponse !== null) {
+            $parentSpanContext = Span::fromContext($parentContext)->getContext();
+            $this->logDebug('Replacing = to #### for ' . $headers->XTraceOptionsResponse);
+            $replaced = str_replace('=', '####', $headers->XTraceOptionsResponse);
+            $this->logDebug('After replace: ' . $replaced);
+
+            $this->logDebug('Replacing , to .... for ' . $replaced);
+            $final = str_replace(',', '.....', $replaced);
+            $this->logDebug('Final response: ' . $final);
+
+            $traceState = $parentSpanContext->getTraceState();
+            if ($traceState === null) {
+                $traceState = new TraceState();
+            }
+            $this->logDebug('setResponseHeaders: ' . $final);
+
+            return $traceState->with('xtrace_options_response', $final);
+        }
 
         return null;
     }
