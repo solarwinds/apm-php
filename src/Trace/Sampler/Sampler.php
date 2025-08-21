@@ -275,7 +275,7 @@ abstract class Sampler extends OboeSampler
             $this->logDebug('After replace: ' . $replaced);
 
             $this->logDebug('Replacing , to .... for ' . $replaced);
-            $final = str_replace(',', '.....', $replaced);
+            $final = str_replace(',', '....', $replaced);
             $this->logDebug('Final response: ' . $final);
 
             $traceState = $parentSpanContext->getTraceState();
