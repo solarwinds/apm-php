@@ -8,9 +8,7 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceState;
-use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
-use OpenTelemetry\Contrib\Propagation\ResponseBaggage\ResponseBaggage;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
@@ -273,11 +271,11 @@ abstract class Sampler extends OboeSampler
         //        $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set(XTraceOptionsPropagator::XTRACEOPTIONSRESPONSE, $headers->XTraceOptionsResponse)->build();
         //        $xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent());
         $this->logDebug('setResponseHeaders: ' . $headers->XTraceOptionsResponse);
-        $xTraceOptionsResponseBaggageBuilder = ResponseBaggage::getBuilder();
-        $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set('x-trace-options-response', $headers->XTraceOptionsResponse)->build();
-        Context::storage()->attach($xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent()));
-        $baggage = ResponseBaggage::fromContext(Context::getCurrent());
-        $this->logDebug('fromContext: ' . $baggage->getValue('x-trace-options-response')); // This will ensure the baggage is stored in context
+        //        $xTraceOptionsResponseBaggageBuilder = ResponseBaggage::getBuilder();
+        //        $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set('x-trace-options-response', $headers->XTraceOptionsResponse)->build();
+        //        Context::storage()->attach($xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent()));
+        //        $baggage = ResponseBaggage::fromContext(Context::getCurrent());
+        //        $this->logDebug('fromContext: ' . $baggage->getValue('x-trace-options-response')); // This will ensure the baggage is stored in context
         // Context::getCurrent()->withContextValue()
 
         return null;

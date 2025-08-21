@@ -45,7 +45,6 @@
   "require": {
     "php": "^8.1",
     "google/protobuf": "^3.22 || ^4.0",
-    "jerrytfleung/opentelemetry-propagator-response-baggage": "^0.0.1",
     "nyholm/psr7-server": "^1.1",
     "open-telemetry/api": "^1.2",
     "open-telemetry/exporter-otlp": "^1.2",

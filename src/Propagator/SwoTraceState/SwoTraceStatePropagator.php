@@ -42,6 +42,8 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
             $traceState = new TraceState();
         }
         $updatedTraceState = $traceState->without('sw')->with('sw', $swTraceState);
+        // Remove xtrace_options_response if present
+        $updatedTraceState = $updatedTraceState->without('xtrace_options_response');
         $setter->set($carrier, self::TRACESTATE, (string) $updatedTraceState);
     }
 
