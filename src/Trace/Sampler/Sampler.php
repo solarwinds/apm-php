@@ -276,6 +276,8 @@ abstract class Sampler extends OboeSampler
         $xTraceOptionsResponseBaggageBuilder = ResponseBaggage::getBuilder();
         $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set('x-trace-options-response', $headers->XTraceOptionsResponse)->build();
         Context::storage()->attach($xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent()));
+        $baggage = ResponseBaggage::fromContext(Context::getCurrent());
+        $this->logDebug('fromContext: ' . $baggage->getValue('x-trace-options-response')); // This will ensure the baggage is stored in context
         // Context::getCurrent()->withContextValue()
 
         return null;
