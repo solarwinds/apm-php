@@ -16,6 +16,7 @@ use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Common\Configuration\TracingMode;
+use Solarwinds\ApmPhp\Propagator\SwoTraceState\SwoTraceStatePropagator;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsPropagator;
 
@@ -148,6 +149,10 @@ abstract class Sampler extends OboeSampler
 {
     use LogsMessagesTrait;
 
+    const INTL_SWO_EQUALS = '=';
+    const INTL_SWO_EQUALS_W3C_SANITIZED = '####';
+    const INTL_SWO_COMMA = ',';
+    const INTL_SWO_COMMA_W3C_SANITIZED = '....';
     private ?TracingMode $tracingMode;
     private bool $triggerMode;
     private array $transactionSettings = [];
@@ -270,21 +275,14 @@ abstract class Sampler extends OboeSampler
     ): ?TraceStateInterface {
         if ($headers->XTraceOptionsResponse !== null) {
             $parentSpanContext = Span::fromContext($parentContext)->getContext();
-            $this->logDebug('Replacing = to #### for ' . $headers->XTraceOptionsResponse);
-            $replaced = str_replace('=', '####', $headers->XTraceOptionsResponse);
-            $this->logDebug('After replace: ' . $replaced);
-
-            $this->logDebug('Replacing , to .... for ' . $replaced);
-            $final = str_replace(',', '....', $replaced);
-            $this->logDebug('Final response: ' . $final);
-
+            $replaced = str_replace(self::INTL_SWO_EQUALS, self::INTL_SWO_EQUALS_W3C_SANITIZED, $headers->XTraceOptionsResponse);
+            $final = str_replace(self::INTL_SWO_COMMA, self::INTL_SWO_COMMA_W3C_SANITIZED, $replaced);
             $traceState = $parentSpanContext->getTraceState();
             if ($traceState === null) {
                 $traceState = new TraceState();
             }
-            $this->logDebug('setResponseHeaders: ' . $final);
 
-            return $traceState->with('xtrace_options_response', $final);
+            return $traceState->with(SwoTraceStatePropagator::XTRACE_OPTIONS_RESPONSE, $final);
         }
 
         return null;
