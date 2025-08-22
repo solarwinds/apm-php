@@ -28,13 +28,6 @@ class XTraceOptionsPropagatorTest extends TestCase
         $this->assertEmpty($carrier);
     }
 
-    //    public function test_inject_x_trace_options_response_baggage(): void
-    //    {
-    //        $carrier = [];
-    //        $this->propagator->inject($carrier, null, Context::getCurrent()->withContextValue(XTraceOptionsResponseBaggage::getBuilder()->set('trigger-trace', 'ok')->set('foo', 'bar')->build()));
-    //        $this->assertSame(['x-trace-options-response' => 'trigger-trace=ok;foo=bar'], $carrier);
-    //    }
-
     public function test_extract_empty_baggage(): void
     {
         $this->assertEquals(Context::getCurrent(), $this->propagator->extract([]));
