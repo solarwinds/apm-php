@@ -465,7 +465,7 @@ class SamplerTest extends TestCase
         $this->assertCount(1, $spans);
         $this->assertEquals(['BucketCapacity' => 1, 'BucketRate' => 0.1, 'TriggeredTrace' => true], $spans[0]->getAttributes()->toArray());
         $traceState = $spans[0]->getContext()->getTraceState();
-        $this->assertEquals("trigger-trace####ok", $traceState->get('xtrace_options_response'));
+        $this->assertEquals('trigger-trace####ok', $traceState->get('xtrace_options_response'));
     }
 
     public function test_picks_up_trigger_trace_ignored_fields(): void
@@ -494,6 +494,6 @@ class SamplerTest extends TestCase
         $this->assertCount(1, $spans);
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10.0, 'BucketRate' => 1.0], $spans[0]->getAttributes()->toArray());
         $traceState = $spans[0]->getContext()->getTraceState();
-        $this->assertEquals("trigger-trace####not-requested;ignored####abc....bcd", $traceState->get('xtrace_options_response'));
+        $this->assertEquals('trigger-trace####not-requested;ignored####abc....bcd', $traceState->get('xtrace_options_response'));
     }
 }
