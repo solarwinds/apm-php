@@ -467,4 +467,33 @@ class SamplerTest extends TestCase
         $traceState = $spans[0]->getContext()->getTraceState();
         $this->assertEquals("trigger-trace####ok", $traceState->get('xtrace_options_response'));
     }
+
+    public function test_picks_up_trigger_trace_ignored_fields(): void
+    {
+        $sampler = new TestSampler(
+            null,
+            $this->createConfig(['triggerTrace' => true]),
+            $this->createSettings(true, null)
+        );
+        $spanExporter = new InMemoryExporter();
+        $tracerProvider = TracerProvider::builder()
+            ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
+            ->setSampler($sampler)
+            ->build();
+        $baggage = XTraceOptionsBaggage::getBuilder()->set('x-trace-options', 'abc,bcd')->build();
+        $context = Context::getCurrent()->withContextValue($baggage);
+        $tracer = $tracerProvider->getTracer('testPicksUpTriggerTrace');
+        $main = $tracer->spanBuilder('test')
+            ->setParent($context)
+            ->startSpan();
+        $mainScope = $main->activate();
+        $this->assertTrue($main->isRecording());
+        $mainScope->detach();
+        $main->end();
+        $spans = $spanExporter->getSpans();
+        $this->assertCount(1, $spans);
+        $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10.0, 'BucketRate' => 1.0], $spans[0]->getAttributes()->toArray());
+        $traceState = $spans[0]->getContext()->getTraceState();
+        $this->assertEquals("trigger-trace####not-requested;ignored####abc....bcd", $traceState->get('xtrace_options_response'));
+    }
 }
