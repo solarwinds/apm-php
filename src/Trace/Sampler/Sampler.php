@@ -273,9 +273,10 @@ abstract class Sampler extends OboeSampler
         AttributesInterface $attributes,
         array $links,
     ): ?TraceStateInterface {
-        if ($headers->XTraceOptionsResponse !== null) {
+        $response = $headers->XTraceOptionsResponse ?? '';
+        if ($response !== '') {
             $parentSpanContext = Span::fromContext($parentContext)->getContext();
-            $replaced = str_replace(self::INTL_SWO_EQUALS, self::INTL_SWO_EQUALS_W3C_SANITIZED, $headers->XTraceOptionsResponse);
+            $replaced = str_replace(self::INTL_SWO_EQUALS, self::INTL_SWO_EQUALS_W3C_SANITIZED, $response);
             $final = str_replace(self::INTL_SWO_COMMA, self::INTL_SWO_COMMA_W3C_SANITIZED, $replaced);
             $traceState = $parentSpanContext->getTraceState();
             if ($traceState === null) {
