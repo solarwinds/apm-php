@@ -15,11 +15,4 @@ final class SwoContextKeys
 
         return $instance ??= Context::createKey('solarwinds-x-trace-options');
     }
-
-    public static function xtraceoptionsresponse(): ContextKeyInterface
-    {
-        static $instance;
-
-        return $instance ??= Context::createKey('solarwinds-x-trace-options-response');
-    }
 }

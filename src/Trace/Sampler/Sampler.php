@@ -6,18 +6,19 @@ namespace Solarwinds\ApmPhp\Trace\Sampler;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceState;
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Common\Configuration\TracingMode;
+use Solarwinds\ApmPhp\Propagator\SwoTraceState\SwoTraceStatePropagator;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsPropagator;
-use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsResponseBaggage;
 
 /**
  * Still need the deprecated class constant
@@ -148,6 +149,10 @@ abstract class Sampler extends OboeSampler
 {
     use LogsMessagesTrait;
 
+    const INTL_SWO_EQUALS = '=';
+    const INTL_SWO_EQUALS_W3C_SANITIZED = '####';
+    const INTL_SWO_COMMA = ',';
+    const INTL_SWO_COMMA_W3C_SANITIZED = '....';
     private ?TracingMode $tracingMode;
     private bool $triggerMode;
     private array $transactionSettings = [];
@@ -267,11 +272,19 @@ abstract class Sampler extends OboeSampler
         int $spanKind,
         AttributesInterface $attributes,
         array $links,
-    ): ?TraceState {
-        // To do: check if the header is set in context
-        $xTraceOptionsResponseBaggageBuilder = XTraceOptionsResponseBaggage::getBuilder();
-        $xTraceOptionsResponseBaggage = $xTraceOptionsResponseBaggageBuilder->set(XTraceOptionsPropagator::XTRACEOPTIONSRESPONSE, $headers->XTraceOptionsResponse)->build();
-        $xTraceOptionsResponseBaggage->storeInContext(Context::getCurrent());
+    ): ?TraceStateInterface {
+        $response = $headers->XTraceOptionsResponse ?? '';
+        if ($response !== '') {
+            $parentSpanContext = Span::fromContext($parentContext)->getContext();
+            $replaced = str_replace(self::INTL_SWO_EQUALS, self::INTL_SWO_EQUALS_W3C_SANITIZED, $response);
+            $final = str_replace(self::INTL_SWO_COMMA, self::INTL_SWO_COMMA_W3C_SANITIZED, $replaced);
+            $traceState = $parentSpanContext->getTraceState();
+            if ($traceState === null) {
+                $traceState = new TraceState();
+            }
+
+            return $traceState->with(SwoTraceStatePropagator::XTRACE_OPTIONS_RESPONSE, $final);
+        }
 
         return null;
     }

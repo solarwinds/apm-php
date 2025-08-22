@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsPropagator;
-use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsResponseBaggage;
 
 #[CoversClass(XTraceOptionsPropagator::class)]
 class XTraceOptionsPropagatorTest extends TestCase
@@ -27,13 +26,6 @@ class XTraceOptionsPropagatorTest extends TestCase
         $carrier = [];
         $this->propagator->inject($carrier);
         $this->assertEmpty($carrier);
-    }
-
-    public function test_inject_x_trace_options_response_baggage(): void
-    {
-        $carrier = [];
-        $this->propagator->inject($carrier, null, Context::getCurrent()->withContextValue(XTraceOptionsResponseBaggage::getBuilder()->set('trigger-trace', 'ok')->set('foo', 'bar')->build()));
-        $this->assertSame(['x-trace-options-response' => 'trigger-trace=ok;foo=bar'], $carrier);
     }
 
     public function test_extract_empty_baggage(): void

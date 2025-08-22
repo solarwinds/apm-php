@@ -15,12 +15,10 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
 {
     public const XTRACEOPTIONS = 'x-trace-options';
     public const XTRACEOPTIONSSIGNATURE = 'x-trace-options-signature';
-    public const XTRACEOPTIONSRESPONSE = 'x-trace-options-response';
 
     public const FIELDS = [
         self::XTRACEOPTIONS,
         self::XTRACEOPTIONSSIGNATURE,
-        self::XTRACEOPTIONSRESPONSE,
     ];
 
     private static ?self $instance = null;
@@ -32,21 +30,6 @@ class XTraceOptionsPropagator implements TextMapPropagatorInterface
 
     public function inject(mixed &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
-        $setter ??= ArrayAccessGetterSetter::getInstance();
-        $context ??= Context::getCurrent();
-        $xTraceOptionsResponseBaggage = XTraceOptionsResponseBaggage::fromContext($context);
-        if ($xTraceOptionsResponseBaggage->isEmpty()) {
-            return;
-        }
-        $response = '';
-        foreach ($xTraceOptionsResponseBaggage->getAll() as $key => $entry) {
-            $value = urlencode((string) $entry->getValue());
-            $response .= "{$key}={$value};";
-        }
-        $response = rtrim($response, ';');
-        if (!empty($response)) {
-            $setter->set($carrier, self::XTRACEOPTIONSRESPONSE, $response);
-        }
     }
 
     public static function getInstance(): self
