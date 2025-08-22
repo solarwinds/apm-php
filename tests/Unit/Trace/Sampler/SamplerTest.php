@@ -464,7 +464,7 @@ class SamplerTest extends TestCase
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
         $this->assertEquals(['BucketCapacity' => 1, 'BucketRate' => 0.1, 'TriggeredTrace' => true], $spans[0]->getAttributes()->toArray());
-        // To do: check if the trigger trace is set in the context
-        // expect(HEADERS_STORAGE.get(ctx)?.response).to.include.keys("X-Trace-Options-Response",)
+        $traceState = $spans[0]->getContext()->getTraceState();
+        $this->assertEquals("trigger-trace####ok", $traceState->get('xtrace_options_response'));
     }
 }
