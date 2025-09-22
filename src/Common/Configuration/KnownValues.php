@@ -11,4 +11,5 @@ interface KnownValues
     public const VALUE_SWO = 'swo';
     public const VALUE_K8S = 'k8s';
     public const VALUE_UAMS = 'uams';
+    public const VALUE_XTRACE = 'xtrace';
 }
