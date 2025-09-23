@@ -15,8 +15,8 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
+use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 use Solarwinds\ApmPhp\Common\Configuration\TracingMode;
-use Solarwinds\ApmPhp\Propagator\SwoTraceState\SwoTraceStatePropagator;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage;
 use Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsPropagator;
 
@@ -283,7 +283,7 @@ abstract class Sampler extends OboeSampler
                 $traceState = new TraceState();
             }
 
-            return $traceState->with(SwoTraceStatePropagator::XTRACE_OPTIONS_RESPONSE, $final);
+            return $traceState->with(KnownValues::VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE, $final);
         }
 
         return null;

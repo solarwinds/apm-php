@@ -11,4 +11,7 @@ interface KnownValues
     public const VALUE_SWO = 'swo';
     public const VALUE_K8S = 'k8s';
     public const VALUE_UAMS = 'uams';
+    public const VALUE_XTRACE = 'xtrace';
+    public const VALUE_XTRACEOPTIONSRESPONSE = 'xtraceoptionsresponse';
+    public const VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE = 'xtrace_options_response';
 }
