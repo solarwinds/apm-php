@@ -12,4 +12,5 @@ interface KnownValues
     public const VALUE_K8S = 'k8s';
     public const VALUE_UAMS = 'uams';
     public const VALUE_XTRACE = 'xtrace';
+    public const VALUE_XTRACEOPTIONSRESPONSE = 'xtraceoptionsresponse';
 }

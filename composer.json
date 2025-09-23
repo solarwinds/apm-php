@@ -14,7 +14,8 @@
       "src/Propagator/SwoTraceState/_register.php",
       "src/Propagator/XTraceOptions/_register.php",
       "src/Resource/_register.php",
-      "src/ResponsePropagator/XTrace/_register.php"
+      "src/ResponsePropagator/XTrace/_register.php",
+      "src/ResponsePropagator/XTraceOptionsResponse/_register.php"
     ]
   },
   "authors": [
