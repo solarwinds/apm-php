@@ -19,10 +19,13 @@ use Solarwinds\ApmPhp\ResponsePropagator\XTrace\XTraceResponsePropagator;
 #[CoversClass(XTraceResponsePropagator::class)]
 class XTraceResponsePropagatorTest extends TestCase
 {
+    private const VERSION = '00';
     private const TRACE_ID = '5759e988bd862e3fe1be46a994272793';
     private const SPAN_ID = '53995c3f42cd8ad8';
-    private const XTRACE_HEADER_SAMPLED = '00-5759e988bd862e3fe1be46a994272793-53995c3f42cd8ad8-01';
-    private const XTRACE_HEADER_NOT_SAMPLED = '00-5759e988bd862e3fe1be46a994272793-53995c3f42cd8ad8-00';
+    private const IS_SAMPLED = '01';
+    private const NOT_SAMPLED = '00';
+    private const XTRACE_HEADER_SAMPLED = self::VERSION . '-' . self::TRACE_ID . '-' . self::SPAN_ID . '-' . self::IS_SAMPLED;
+    private const XTRACE_HEADER_NOT_SAMPLED = self::VERSION . '-' . self::TRACE_ID . '-' . self::SPAN_ID . '-' . self::NOT_SAMPLED;
     private XTraceResponsePropagator $xTraceResponsePropagator;
 
     #[\Override]
