@@ -12,11 +12,11 @@ use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 
 class SwoTraceStatePropagator implements TextMapPropagatorInterface
 {
     public const TRACESTATE = 'tracestate';
-    public const XTRACE_OPTIONS_RESPONSE = 'xtrace_options_response';
     const SW = 'sw';
     const IS_SAMPLED = '01';
     const NOT_SAMPLED = '00';
@@ -47,7 +47,7 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
         }
         $updatedTraceState = $traceState->without(self::SW)->with(self::SW, $swTraceState);
         // Remove XTRACE_OPTIONS_RESPONSE if present
-        $updatedTraceState = $updatedTraceState->without(self::XTRACE_OPTIONS_RESPONSE);
+        $updatedTraceState = $updatedTraceState->without(KnownValues::VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE);
         $setter->set($carrier, self::TRACESTATE, (string) $updatedTraceState);
     }
 

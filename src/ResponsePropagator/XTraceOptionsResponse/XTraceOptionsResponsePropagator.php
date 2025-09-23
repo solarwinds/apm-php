@@ -10,6 +10,7 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
+use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 
 /**
  * Provides a ResponsePropagator for X-Trace-Options-Response headers
@@ -51,7 +52,7 @@ class XTraceOptionsResponsePropagator implements ResponsePropagatorInterface
 
         $traceState = $spanContext->getTraceState();
         if ($traceState !== null) {
-            $xtrace_options_response = $traceState->get('xtrace_options_response');
+            $xtrace_options_response = $traceState->get(KnownValues::VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE);
             if ($xtrace_options_response !== null) {
                 $replaced = str_replace('....', ',', $xtrace_options_response);
                 $final = str_replace('####', '=', $replaced);

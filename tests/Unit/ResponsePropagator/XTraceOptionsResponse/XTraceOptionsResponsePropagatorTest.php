@@ -14,6 +14,7 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 use Solarwinds\ApmPhp\ResponsePropagator\XTraceOptionsResponse\XTraceOptionsResponsePropagator;
 
 #[CoversClass(XTraceOptionsResponsePropagator::class)]
@@ -43,7 +44,7 @@ class XTraceOptionsResponsePropagatorTest extends TestCase
             $carrier,
             null,
             $this->withSpanContext(
-                SpanContext::create(self::TRACE_ID, self::SPAN_ID, TraceFlags::SAMPLED, new TraceState('xtrace_options_response=' . self::TRACESTATE_XTRACEOPTIONSRESPONSE)),
+                SpanContext::create(self::TRACE_ID, self::SPAN_ID, TraceFlags::SAMPLED, new TraceState(KnownValues::VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE . '=' . self::TRACESTATE_XTRACEOPTIONSRESPONSE)),
                 Context::getCurrent()
             )
         );
@@ -61,7 +62,7 @@ class XTraceOptionsResponsePropagatorTest extends TestCase
             $carrier,
             null,
             $this->withSpanContext(
-                SpanContext::create(self::TRACE_ID, self::SPAN_ID, TraceFlags::DEFAULT, new TraceState('xtrace_options_response=' . self::TRACESTATE_XTRACEOPTIONSRESPONSE)),
+                SpanContext::create(self::TRACE_ID, self::SPAN_ID, TraceFlags::DEFAULT, new TraceState(KnownValues::VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE . '=' . self::TRACESTATE_XTRACEOPTIONSRESPONSE)),
                 Context::getCurrent()
             )
         );
@@ -79,7 +80,7 @@ class XTraceOptionsResponsePropagatorTest extends TestCase
             $carrier,
             null,
             $this->withSpanContext(
-                SpanContext::create(SpanContextValidator::INVALID_TRACE, SpanContextValidator::INVALID_SPAN, TraceFlags::SAMPLED, new TraceState('xtrace_options_response=' . self::TRACESTATE_XTRACEOPTIONSRESPONSE)),
+                SpanContext::create(SpanContextValidator::INVALID_TRACE, SpanContextValidator::INVALID_SPAN, TraceFlags::SAMPLED, new TraceState(KnownValues::VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE . '=' . self::TRACESTATE_XTRACEOPTIONSRESPONSE)),
                 Context::getCurrent()
             )
         );
