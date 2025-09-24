@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Tests\Unit\Common\Configuration;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Solarwinds\ApmPhp\Common\Configuration\Variables;
 
-#[CoversClass(Variables::class)]
 class VariablesTest extends TestCase
 {
     public function test_constants()
