@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp\Tests\Unit\Configuration;
+namespace Solarwinds\ApmPhp\Tests\Unit\Common\Configuration;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
