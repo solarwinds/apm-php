@@ -80,7 +80,7 @@ class ConfigurationTest extends TestCase
     {
         $closure = function () { return 'txn'; };
         $config = new Configuration(true, 'svc', 'coll', ['h' => 'v'], false, true, $closure, ['s' => 'v']);
-        $str = (string)$config;
+        $str = (string) $config;
         $this->assertStringContainsString('Configuration(enabled=true, service=svc, collector=coll', $str);
         $this->assertStringContainsString('headers={"h":"v"}', $str);
         $this->assertStringContainsString('tracingMode=false', $str);
@@ -92,7 +92,7 @@ class ConfigurationTest extends TestCase
     public function test_to_string_with_nulls()
     {
         $config = new Configuration(false, '', '', [], null, false, null, []);
-        $str = (string)$config;
+        $str = (string) $config;
         $this->assertStringContainsString('enabled=false', $str);
         $this->assertStringContainsString('tracingMode=null', $str);
         $this->assertStringContainsString('transactionName=null', $str);
