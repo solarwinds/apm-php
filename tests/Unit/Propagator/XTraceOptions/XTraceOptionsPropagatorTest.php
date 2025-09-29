@@ -72,4 +72,31 @@ class XTraceOptionsPropagatorTest extends TestCase
     {
         $this->propagator = XTraceOptionsPropagator::getInstance();
     }
+
+    public function test_get_instance_returns_singleton(): void
+    {
+        $instance1 = XTraceOptionsPropagator::getInstance();
+        $instance2 = XTraceOptionsPropagator::getInstance();
+        $this->assertSame($instance1, $instance2);
+    }
+
+    public function test_extract_with_unrelated_headers(): void
+    {
+        $carrier = [
+            'unrelated-header' => 'value',
+        ];
+        $context = $this->propagator->extract($carrier);
+        $bag = XTraceOptionsBaggage::fromContext($context);
+        $this->assertTrue($bag->isEmpty());
+    }
+
+    public function test_extract_with_signature_but_no_options(): void
+    {
+        $carrier = [
+            'x-trace-options-signature' => 'bar',
+        ];
+        $context = $this->propagator->extract($carrier);
+        $bag = XTraceOptionsBaggage::fromContext($context);
+        $this->assertTrue($bag->isEmpty());
+    }
 }
