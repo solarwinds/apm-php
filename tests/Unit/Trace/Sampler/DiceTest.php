@@ -67,8 +67,41 @@ class DiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dice = new Dice(100, 50);
-        $this->diceFullRate = new Dice(100, 100);
-        $this->diceZeroRate = new Dice(100, 0);
+        $this->dice = new Dice(10, 5);
+        $this->diceFullRate = new Dice(10, 10);
+        $this->diceZeroRate = new Dice(10, 0);
+    }
+
+    public function test_update_scale_and_rate(): void
+    {
+        $dice = new Dice(10, 5);
+        $dice->update(20, 15);
+        $this->assertEquals(15, $dice->getRate());
+        // Should be able to roll true with higher probability now
+        $results = [0, 0];
+        for ($i = 0; $i < 1000; $i++) {
+            $results[$dice->roll() ? 1 : 0]++;
+        }
+        $this->assertGreaterThan($results[0], $results[1]);
+    }
+
+    public function test_update_scale_only(): void
+    {
+        $dice = new Dice(10, 5);
+        $dice->update(20);
+        $this->assertEquals(5, $dice->getRate());
+    }
+
+    public function test_roll_with_zero_scale(): void
+    {
+        $dice = new Dice(0, 0);
+        $this->assertFalse($dice->roll());
+    }
+
+    public function test_set_rate_above_scale(): void
+    {
+        $dice = new Dice(10, 5);
+        $dice->setRate(20);
+        $this->assertEquals(10, $dice->getRate());
     }
 }
