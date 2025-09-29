@@ -69,7 +69,7 @@ class DiceTest extends TestCase
     {
         $this->dice = new Dice(100, 50);
         $this->diceFullRate = new Dice(100, 100);
-        $this->diceZeroRate = new Dice(10, 0);
+        $this->diceZeroRate = new Dice(100, 0);
     }
 
     public function test_update_scale_and_rate(): void
