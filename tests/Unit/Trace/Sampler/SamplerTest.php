@@ -146,6 +146,52 @@ class SamplerTest extends TestCase
         $this->assertEquals('warning', $pair['warning']);
     }
 
+    public function test_parse_settings_with_non_array_returns_null(): void
+    {
+        $this->assertNull(parseSettings(null));
+        $this->assertNull(parseSettings('string'));
+        $this->assertNull(parseSettings(123));
+    }
+
+    public function test_parse_settings_with_missing_fields_returns_null(): void
+    {
+        $this->assertNull(parseSettings(['value' => 1, 'timestamp' => 2])); // missing ttl
+        $this->assertNull(parseSettings(['timestamp' => 2, 'ttl' => 3])); // missing value
+        $this->assertNull(parseSettings(['value' => 1, 'ttl' => 3])); // missing timestamp
+    }
+
+    public function test_parse_settings_with_wrong_types_returns_null(): void
+    {
+        $this->assertNull(parseSettings(['value' => 'not-a-number', 'timestamp' => 2, 'ttl' => 3, 'flags' => 'OVERRIDE']));
+        $this->assertNull(parseSettings(['value' => 1, 'timestamp' => 'not-a-number', 'ttl' => 3, 'flags' => 'OVERRIDE']));
+        $this->assertNull(parseSettings(['value' => 1, 'timestamp' => 2, 'ttl' => 'not-a-number', 'flags' => 'OVERRIDE']));
+    }
+
+    public function test_parse_settings_with_missing_flags_returns_null(): void
+    {
+        $this->assertNull(parseSettings(['value' => 1, 'timestamp' => 2, 'ttl' => 3]));
+    }
+
+    public function test_parse_settings_with_non_string_flags_returns_null(): void
+    {
+        $this->assertNull(parseSettings(['value' => 1, 'timestamp' => 2, 'ttl' => 3, 'flags' => 123]));
+    }
+
+    public function test_parse_settings_with_missing_arguments_is_valid(): void
+    {
+        $result = parseSettings([
+            'value' => 1,
+            'timestamp' => 2,
+            'ttl' => 3,
+            'flags' => 'OVERRIDE',
+        ]);
+        $this->AssertNotNull($result);
+        if ($result !== null) {
+            $this->assertArrayHasKey('settings', $result);
+            $this->assertInstanceOf(Settings::class, $result['settings']);
+        }
+    }
+
     public function test_respects_enabled_settings_when_no_config_or_transaction_settings(): void
     {
         $sampler = new TestSampler(
@@ -496,5 +542,26 @@ class SamplerTest extends TestCase
         $this->assertEquals(['SampleRate' => 1000000, 'SampleSource' => 6, 'BucketCapacity' => 10.0, 'BucketRate' => 1.0], $spans[0]->getAttributes()->toArray());
         $traceState = $spans[0]->getContext()->getTraceState();
         $this->assertEquals('trigger-trace####not-requested;ignored####abc....bcd', $traceState->get(KnownValues::VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE));
+    }
+
+    public function test_sampler_construction_with_various_configs(): void
+    {
+        $config = $this->createConfig([
+            'tracing' => true,
+            'triggerTrace' => true,
+            'transactionSettings' => [
+                ['tracing' => true, 'matcher' => fn ($x) => $x === 'foo'],
+                ['tracing' => false, 'matcher' => fn ($x) => $x === 'bar'],
+            ],
+        ]);
+        $sampler = new TestSampler(null, $config, null);
+        $this->assertInstanceOf(TestSampler::class, $sampler);
+    }
+
+    public function test_sampler_handles_invalid_initial_settings(): void
+    {
+        $config = $this->createConfig([]);
+        $sampler = new TestSampler(null, $config, 'invalid');
+        $this->assertInstanceOf(TestSampler::class, $sampler);
     }
 }
