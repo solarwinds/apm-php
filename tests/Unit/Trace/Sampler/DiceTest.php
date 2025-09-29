@@ -67,8 +67,8 @@ class DiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dice = new Dice(10, 5);
-        $this->diceFullRate = new Dice(10, 10);
+        $this->dice = new Dice(100, 50);
+        $this->diceFullRate = new Dice(100, 100);
         $this->diceZeroRate = new Dice(10, 0);
     }
 
