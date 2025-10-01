@@ -27,4 +27,31 @@ class RequestHeadersTest extends TestCase
         $this->assertEquals('trace-options', $headers->XTraceOptions);
         $this->assertEquals('trace-options-signature', $headers->XTraceOptionsSignature);
     }
+
+    public function test_to_string(): void
+    {
+        $headers = new RequestHeaders();
+        $this->assertEquals(
+            'RequestHeaders(XTraceOptions=null, XTraceOptionsSignature=null)',
+            (string) $headers
+        );
+
+        $headers = new RequestHeaders('foo', null);
+        $this->assertEquals(
+            'RequestHeaders(XTraceOptions=foo, XTraceOptionsSignature=null)',
+            (string) $headers
+        );
+
+        $headers = new RequestHeaders(null, 'bar');
+        $this->assertEquals(
+            'RequestHeaders(XTraceOptions=null, XTraceOptionsSignature=bar)',
+            (string) $headers
+        );
+
+        $headers = new RequestHeaders('foo', 'bar');
+        $this->assertEquals(
+            'RequestHeaders(XTraceOptions=foo, XTraceOptionsSignature=bar)',
+            (string) $headers
+        );
+    }
 }
