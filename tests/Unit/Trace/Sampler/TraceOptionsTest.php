@@ -306,4 +306,68 @@ class TraceOptionsTest extends TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function test_constructor_assigns_properties_correctly(): void
+    {
+        $obj = new TraceOptions(true, 123, 'sw', ['custom-key' => 'val'], [['ignored', 'x']]);
+        $this->assertTrue($obj->triggerTrace);
+        $this->assertSame(123, $obj->timestamp);
+        $this->assertSame('sw', $obj->swKeys);
+        $this->assertSame(['custom-key' => 'val'], $obj->custom);
+        $this->assertSame([['ignored', 'x']], $obj->ignored);
+    }
+
+    public function test_constructor_defaults(): void
+    {
+        $obj = new TraceOptions();
+        $this->assertNull($obj->triggerTrace);
+        $this->assertNull($obj->timestamp);
+        $this->assertNull($obj->swKeys);
+        $this->assertSame([], $obj->custom);
+        $this->assertSame([], $obj->ignored);
+    }
+
+    public function test_to_string_all_unset(): void
+    {
+        $obj = new TraceOptions();
+        $str = (string) $obj;
+        $this->assertStringNotContainsString('trigger-trace=true', $str);
+        $this->assertStringNotContainsString('ts=42', $str);
+        $this->assertStringNotContainsString('sw-keys=sw', $str);
+        $this->assertStringContainsString('custom=', $str);
+        $this->assertStringContainsString('ignored=', $str);
+    }
+
+    public function test_to_string_all_set(): void
+    {
+        $obj = new TraceOptions(true, 42, 'sw', ['custom-key' => 'val'], [['foo', 'bar']]);
+        $str = (string) $obj;
+        $this->assertStringContainsString('trigger-trace=true', $str);
+        $this->assertStringContainsString('ts=42', $str);
+        $this->assertStringContainsString('sw-keys=sw', $str);
+        $this->assertStringContainsString('custom=custom-key=val', $str);
+        $this->assertStringContainsString('ignored=foo=bar', $str);
+    }
+
+    public function test_to_string_custom_and_ignored(): void
+    {
+        $obj = new TraceOptions(null, null, null, ['custom1' => 'v1', 'custom2' => 'v2'], [['a', 'b'], 'str']);
+        $str = (string) $obj;
+        $this->assertStringContainsString('custom=custom1=v1;custom2=v2', $str);
+        $this->assertStringContainsString('ignored=a=b;str', $str);
+    }
+
+    public function test_to_string_each_property(): void
+    {
+        $obj = new TraceOptions(true);
+        $this->assertStringContainsString('trigger-trace=true', (string) $obj);
+        $obj = new TraceOptions(null, 99);
+        $this->assertStringContainsString('ts=99', (string) $obj);
+        $obj = new TraceOptions(null, null, 'swk');
+        $this->assertStringContainsString('sw-keys=swk', (string) $obj);
+        $obj = new TraceOptions(null, null, null, ['c' => 'v']);
+        $this->assertStringContainsString('custom=c=v', (string) $obj);
+        $obj = new TraceOptions(null, null, null, [], [['x', 'y']]);
+        $this->assertStringContainsString('ignored=x=y', (string) $obj);
+    }
 }
