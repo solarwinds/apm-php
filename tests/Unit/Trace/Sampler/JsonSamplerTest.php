@@ -140,6 +140,69 @@ class JsonSamplerTest extends TestCase
         $this->assertEquals(['BucketCapacity' => 100, 'BucketRate' => 10, 'SampleRate' => 1000000, 'SampleSource' => 6], $spans[0]->getAttributes()->toArray());
     }
 
+    public function test_corrupt_json_file_does_not_sample(): void
+    {
+        file_put_contents($this->path, '{not valid json');
+        $spanExporter = new InMemoryExporter();
+        $sampler = new JsonSampler(null, new Configuration(true, 'test', '', [], true, true, null, []), $this->path);
+        $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
+        $tracer = $tracerProvider->getTracer('test');
+        $span = $tracer->spanBuilder('test')->startSpan();
+        $this->assertFalse($span->isRecording());
+        $span->end();
+        $this->assertCount(0, $spanExporter->getSpans());
+    }
+
+    public function test_file_with_missing_fields_does_not_sample(): void
+    {
+        file_put_contents($this->path, json_encode([['value' => 1000000]])); // missing flags, timestamp, ttl
+        $spanExporter = new InMemoryExporter();
+        $sampler = new JsonSampler(null, new Configuration(true, 'test', '', [], true, true, null, []), $this->path);
+        $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
+        $tracer = $tracerProvider->getTracer('test');
+        $span = $tracer->spanBuilder('test')->startSpan();
+        $this->assertFalse($span->isRecording());
+        $span->end();
+        $this->assertCount(0, $spanExporter->getSpans());
+    }
+
+    public function test_file_with_extra_fields_samples(): void
+    {
+        file_put_contents($this->path, json_encode([
+            [
+                'flags' => 'SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE,OVERRIDE',
+                'value' => 1000000,
+                'arguments' => [
+                    'BucketCapacity' => 100,
+                    'BucketRate' => 10,
+                ],
+                'timestamp' => time(),
+                'ttl' => 60,
+                'extra' => 'should be ignored',
+            ],
+        ]));
+        $spanExporter = new InMemoryExporter();
+        $sampler = new JsonSampler(null, new Configuration(true, 'test', '', [], true, true, null, []), $this->path);
+        $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
+        $tracer = $tracerProvider->getTracer('test');
+        $span = $tracer->spanBuilder('test')->startSpan();
+        $this->assertTrue($span->isRecording());
+        $span->end();
+        $this->assertCount(1, $spanExporter->getSpans());
+    }
+
+    public function test_sampler_with_invalid_path_does_not_sample(): void
+    {
+        $spanExporter = new InMemoryExporter();
+        $sampler = new JsonSampler(null, new Configuration(true, 'test', '', [], true, true, null, []), 'invalid');
+        $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
+        $tracer = $tracerProvider->getTracer('test');
+        $span = $tracer->spanBuilder('test')->startSpan();
+        $this->assertFalse($span->isRecording());
+        $span->end();
+        $this->assertCount(0, $spanExporter->getSpans());
+    }
+
     protected function setUp(): void
     {
         $this->path = sys_get_temp_dir() . '/solarwinds-apm-settings.json';
