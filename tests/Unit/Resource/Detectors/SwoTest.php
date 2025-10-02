@@ -32,4 +32,5 @@ class SwoTest extends TestCase
         $this->assertNotNull($resource->getAttributes()->get(Swo::SW_DATA_MODULE));
         $this->assertNotNull($resource->getAttributes()->get(Swo::SW_APM_VERSION));
     }
+
 }
