@@ -203,6 +203,12 @@ class JsonSamplerTest extends TestCase
         $this->assertCount(0, $spanExporter->getSpans());
     }
 
+    public function test_description(): void
+    {
+        $sampler = new JsonSampler(null, new Configuration(true, 'test', '', [], true, true, null, []), $this->path);
+        $this->assertStringContainsString('JSON Sampler (' . sys_get_temp_dir() . '/solarwinds-apm-settings.json', $sampler->getDescription());
+    }
+
     protected function setUp(): void
     {
         $this->path = sys_get_temp_dir() . '/solarwinds-apm-settings.json';
