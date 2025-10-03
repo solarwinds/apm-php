@@ -24,6 +24,14 @@ class SwoSamplerFactoryTest extends TestCase
         \putenv('SW_APM_COLLECTOR=');
         \putenv('SW_APM_SERVICE_KEY=');
     }
+    protected function tearDown(): void
+    {
+        // Reset environment variables after each test
+        \putenv(Env::OTEL_TRACES_SAMPLER . '=');
+        \putenv(Env::OTEL_TRACES_SAMPLER_ARG . '=');
+        \putenv('SW_APM_COLLECTOR=');
+        \putenv('SW_APM_SERVICE_KEY=');
+    }
 
     public function test_always_on_sampler(): void
     {
