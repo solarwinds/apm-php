@@ -56,4 +56,69 @@ class XTraceOptionsBaggageTest extends TestCase
         $baggage = $builder->build();
         $this->assertFalse($baggage->isEmpty());
     }
+
+    public function test_activate_sets_baggage_in_context(): void
+    {
+        $builder = XTraceOptionsBaggage::getBuilder();
+        $builder->set('foo', 'bar');
+        $baggage = $builder->build();
+        $scope = $baggage->activate();
+        $this->assertInstanceOf(\OpenTelemetry\Context\ScopeInterface::class, $scope);
+        $current = XTraceOptionsBaggage::getCurrent();
+        $this->assertEquals('bar', $current->getValue('foo'));
+        $scope->detach(); // Clean up
+    }
+
+    public function test_get_all_yields_all_entries(): void
+    {
+        $builder = XTraceOptionsBaggage::getBuilder();
+        $builder->set('foo', 'bar');
+        $builder->set('baz', 'qux');
+        $baggage = $builder->build();
+        $count = 0;
+        $all = [];
+        foreach ($baggage->getAll() as $key => $value) {
+            $all[$key] = $value;
+        }
+        $this->assertCount(2, $all);
+        $this->assertArrayHasKey('foo', $all);
+        $this->assertArrayHasKey('baz', $all);
+        $this->assertEquals('bar', $all['foo']->getValue());
+        $this->assertEquals('qux', $all['baz']->getValue());
+    }
+
+    public function test_get_entry_and_get_value_missing_key(): void
+    {
+        $baggage = XTraceOptionsBaggage::getEmpty();
+        $this->assertNull($baggage->getEntry('notfound'));
+        $this->assertNull($baggage->getValue('notfound'));
+    }
+
+    public function test_to_builder_returns_builder_with_same_entries(): void
+    {
+        $builder = XTraceOptionsBaggage::getBuilder();
+        $builder->set('foo', 'bar');
+        $baggage = $builder->build();
+        $newBuilder = $baggage->toBuilder();
+        $newBaggage = $newBuilder->build();
+        $this->assertEquals('bar', $newBaggage->getValue('foo'));
+    }
+
+    public function test_store_in_context_and_from_context(): void
+    {
+        $builder = XTraceOptionsBaggage::getBuilder();
+        $builder->set('foo', 'bar');
+        $baggage = $builder->build();
+        $context = Context::getCurrent();
+        $newContext = $baggage->storeInContext($context);
+        $fromContext = XTraceOptionsBaggage::fromContext($newContext);
+        $this->assertEquals('bar', $fromContext->getValue('foo'));
+    }
+
+    public function test_from_context_returns_empty_when_no_baggage(): void
+    {
+        $context = Context::getCurrent();
+        $baggage = XTraceOptionsBaggage::fromContext($context);
+        $this->assertTrue($baggage->isEmpty());
+    }
 }

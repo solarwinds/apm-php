@@ -178,4 +178,63 @@ class UamsTest extends TestCase
         $resource = (new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock))->getResource();
         $this->assertEquals(ResourceInfoFactory::emptyResource(), $resource);
     }
+
+    public function test_detects_id_from_api_when_file_missing(): void
+    {
+        $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testDetectsIdFromApiWhenFileMissing';
+        @unlink($uamsClientIdFile);
+        $requestMock = $this->createMock(RequestInterface::class);
+        $responseMock = $this->createMock(ResponseInterface::class);
+        $this->requestFactoryMock->method('createRequest')->willReturn($requestMock);
+        $responseMock->method('getBody')->willReturn($this->createStreamMock(json_encode(['uamsclient_id' => $this->apiId])));
+        $this->clientMock->method('sendRequest')->willReturn($responseMock);
+        $uams = new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock);
+        $resource = $uams->getResource();
+        $this->assertEquals([
+            'sw.uams.client.id' => $this->apiId,
+            'host.id' => $this->apiId,
+        ], $resource->getAttributes()->toArray());
+    }
+
+    public function test_returns_empty_resource_when_file_and_api_fail(): void
+    {
+        $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testReturnsEmptyResourceWhenFileAndApiFail';
+        @unlink($uamsClientIdFile);
+        $requestMock = $this->createMock(RequestInterface::class);
+        $this->requestFactoryMock->method('createRequest')->willReturn($requestMock);
+        $this->clientMock->method('sendRequest')->willThrowException($this->createMock(\Psr\Http\Client\ClientExceptionInterface::class));
+        $uams = new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock);
+        $resource = $uams->getResource();
+        $this->assertEquals(ResourceInfoFactory::emptyResource()->getAttributes(), $resource->getAttributes());
+    }
+
+    public function test_returns_empty_resource_when_file_unreadable(): void
+    {
+        $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testReturnsEmptyResourceWhenFileUnreadable';
+        file_put_contents($uamsClientIdFile, 'test');
+        chmod($uamsClientIdFile, 0000);
+        $requestMock = $this->createMock(RequestInterface::class);
+        $this->requestFactoryMock->method('createRequest')->willReturn($requestMock);
+        $this->clientMock->method('sendRequest')->willThrowException($this->createMock(\Psr\Http\Client\ClientExceptionInterface::class));
+        $uams = new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock);
+        $resource = $uams->getResource();
+        $this->assertEquals(ResourceInfoFactory::emptyResource(), $resource);
+        chmod($uamsClientIdFile, 0644);
+        unlink($uamsClientIdFile);
+    }
+
+    public function test_returns_empty_resource_when_api_returns_invalid_json(): void
+    {
+        $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testReturnsEmptyResourceWhenApiReturnsInvalidJson';
+        @unlink($uamsClientIdFile);
+        $requestMock = $this->createMock(RequestInterface::class);
+        $responseMock = $this->createMock(ResponseInterface::class);
+        $this->requestFactoryMock->method('createRequest')->willReturn($requestMock);
+        $responseMock->method('getBody')->willReturn($this->createStreamMock('not a json'));
+        $this->clientMock->method('sendRequest')->willReturn($responseMock);
+        $uams = new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock);
+        $resource = $uams->getResource();
+        $this->assertEquals(ResourceInfoFactory::emptyResource()->getAttributes(), $resource->getAttributes());
+    }
+
 }

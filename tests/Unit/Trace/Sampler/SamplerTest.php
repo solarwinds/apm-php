@@ -6,6 +6,7 @@ namespace Solarwinds\ApmPhp\Tests\Unit\Trace\Sampler;
 
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
@@ -30,6 +31,10 @@ class TestSampler extends Sampler
     public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, mixed $settings)
     {
         parent::__construct($meterProvider, $config, $settings);
+    }
+    public function exposeParsedAndUpdateSettings(mixed $settings): ?Settings
+    {
+        return $this->parsedAndUpdateSettings($settings);
     }
 }
 
@@ -546,22 +551,85 @@ class SamplerTest extends TestCase
 
     public function test_sampler_construction_with_various_configs(): void
     {
-        $config = $this->createConfig([
-            'tracing' => true,
-            'triggerTrace' => true,
-            'transactionSettings' => [
-                ['tracing' => true, 'matcher' => fn ($x) => $x === 'foo'],
-                ['tracing' => false, 'matcher' => fn ($x) => $x === 'bar'],
-            ],
-        ]);
-        $sampler = new TestSampler(null, $config, null);
+        $configMock = $this->createMock(Configuration::class);
+        $configMock->method('getTracingMode')->willReturn(true);
+        $configMock->method('isTriggerTraceEnabled')->willReturn(true);
+        $configMock->method('getTransactionSettings')->willReturn([]);
+        $sampler = new TestSampler(null, $configMock, null);
         $this->assertInstanceOf(TestSampler::class, $sampler);
+
+        $configMock->method('getTracingMode')->willReturn(false);
+        $sampler2 = new TestSampler(null, $configMock, null);
+        $this->assertInstanceOf(TestSampler::class, $sampler2);
+
+        $configMock->method('getTracingMode')->willReturn(null);
+        $sampler3 = new TestSampler(null, $configMock, null);
+        $this->assertInstanceOf(TestSampler::class, $sampler3);
     }
 
-    public function test_sampler_handles_invalid_initial_settings(): void
+    public function test_parsed_and_update_settings_valid_and_invalid(): void
     {
-        $config = $this->createConfig([]);
-        $sampler = new TestSampler(null, $config, 'invalid');
-        $this->assertInstanceOf(TestSampler::class, $sampler);
+        $configMock = $this->createMock(Configuration::class);
+        $configMock->method('getTracingMode')->willReturn(true);
+        $configMock->method('isTriggerTraceEnabled')->willReturn(true);
+        $configMock->method('getTransactionSettings')->willReturn([]);
+        $sampler = new TestSampler(null, $configMock, null);
+        $valid = [
+            'flags' => 'OVERRIDE',
+            'value' => 1,
+            'timestamp' => 2,
+            'ttl' => 3,
+        ];
+        $this->assertInstanceOf(Settings::class, $sampler->exposeParsedAndUpdateSettings($valid));
+        $this->assertNull($sampler->exposeParsedAndUpdateSettings('invalid'));
     }
+
+    public function test_local_settings_transaction_settings(): void
+    {
+        $configMock = $this->createMock(Configuration::class);
+        $configMock->method('getTracingMode')->willReturn(true);
+        $configMock->method('isTriggerTraceEnabled')->willReturn(true);
+        $configMock->method('getTransactionSettings')->willReturn([
+            ['tracing' => true, 'matcher' => fn ($id) => $id === 'match'],
+        ]);
+        $sampler = new TestSampler(null, $configMock, null);
+        $settings = $sampler->localSettings(
+            $this->createMock(ContextInterface::class),
+            'traceid',
+            'match',
+            1,
+            Attributes::create([]),
+            []
+        );
+        $this->assertInstanceOf(\Solarwinds\ApmPhp\Trace\Sampler\LocalSettings::class, $settings);
+    }
+
+    public function test_request_headers_with_and_without_baggage(): void
+    {
+        $configMock = $this->createMock(Configuration::class);
+        $configMock->method('getTracingMode')->willReturn(true);
+        $configMock->method('isTriggerTraceEnabled')->willReturn(true);
+        $configMock->method('getTransactionSettings')->willReturn([]);
+        $sampler = new TestSampler(null, $configMock, null);
+        $context = $this->createMock(ContextInterface::class);
+        $headers = $sampler->requestHeaders($context, 'traceid', 'span', 1, Attributes::create([]), []);
+        $this->assertInstanceOf(\Solarwinds\ApmPhp\Trace\Sampler\RequestHeaders::class, $headers);
+    }
+
+    public function test_set_response_headers_various_cases(): void
+    {
+        $configMock = $this->createMock(Configuration::class);
+        $configMock->method('getTracingMode')->willReturn(true);
+        $configMock->method('isTriggerTraceEnabled')->willReturn(true);
+        $configMock->method('getTransactionSettings')->willReturn([]);
+        $sampler = new TestSampler(null, $configMock, null);
+        $headers = $this->getMockBuilder(\Solarwinds\ApmPhp\Trace\Sampler\ResponseHeaders::class)
+            ->disableOriginalConstructor()->getMock();
+        $headers->XTraceOptionsResponse = '';
+        $context = $this->createMock(ContextInterface::class);
+        $this->assertNull($sampler->setResponseHeaders($headers, $context, 'traceid', 'span', 1, Attributes::create([]), []));
+        $headers->XTraceOptionsResponse = 'foo=bar,bar=baz';
+        $this->assertNotNull($sampler->setResponseHeaders($headers, $context, 'traceid', 'span', 1, Attributes::create([]), []));
+    }
+
 }

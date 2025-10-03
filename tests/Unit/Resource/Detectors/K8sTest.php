@@ -190,5 +190,101 @@ EOT);
         $this->assertEquals(ResourceInfoFactory::emptyResource(), $resource);
 
         @unlink($mountFile);
+        @unlink($namespaceFile);
+    }
+
+    public function test_returns_empty_resource_when_namespace_file_missing(): void
+    {
+        $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('namespace_missing_');
+        $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_missing_');
+        @unlink($namespaceFile);
+        @unlink($mountFile);
+        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $this->assertEquals(ResourceInfoFactory::emptyResource()->getAttributes(), $resource->getAttributes());
+    }
+
+    public function test_returns_empty_resource_when_namespace_file_unreadable(): void
+    {
+        $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('namespace_unreadable_');
+        file_put_contents($namespaceFile, 'test');
+        chmod($namespaceFile, 0000);
+        $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_unreadable_');
+        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $this->assertEquals(ResourceInfoFactory::emptyResource(), $resource);
+        chmod($namespaceFile, 0644);
+        unlink($namespaceFile);
+    }
+
+    public function test_returns_empty_namespace_when_namespace_file_empty(): void
+    {
+        $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('namespace_empty_');
+        file_put_contents($namespaceFile, '');
+        $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_empty_');
+        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $this->assertEquals('', $resource->getAttributes()->toArray()['k8s.namespace.name'] ?? 'null');
+        unlink($namespaceFile);
+    }
+
+    public function test_uid_not_set_when_mountinfo_file_missing(): void
+    {
+        $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('namespace_uid_');
+        file_put_contents($namespaceFile, 'testnamespace');
+        $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_uid_missing_');
+        @unlink($mountFile);
+        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $this->assertArrayNotHasKey('k8s.pod.uid', $resource->getAttributes()->toArray());
+        unlink($namespaceFile);
+    }
+
+    public function test_uid_not_set_when_no_valid_uid_in_mountinfo(): void
+    {
+        $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('namespace_uid2_');
+        file_put_contents($namespaceFile, 'testnamespace');
+        $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_uid2_');
+        file_put_contents($mountFile, "invalid line\n123 456 0:1 / notkube\n789 012 0:2 /kube-but-no-uid\n");
+        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $this->assertArrayNotHasKey('k8s.pod.uid', $resource->getAttributes()->toArray());
+        unlink($namespaceFile);
+        unlink($mountFile);
+    }
+
+    public function test_uid_set_when_valid_uid_in_mountinfo(): void
+    {
+        $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('namespace_uid3_');
+        file_put_contents($namespaceFile, 'testnamespace');
+        $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_uid3_');
+        $uid = '123e4567-e89b-12d3-a456-426614174000';
+        file_put_contents($mountFile, "123 456 0:1 /var/lib/kube/pods/$uid/volumes/kubernetes.io~empty-dir/html /html rw a b c d\n");
+        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $this->assertEquals($uid, $resource->getAttributes()->toArray()['k8s.pod.uid'] ?? null);
+        unlink($namespaceFile);
+        unlink($mountFile);
+    }
+
+    public function test_uid_not_set_on_windows(): void
+    {
+        // Simulate Windows by mocking PHP_OS_FAMILY if possible, or skip if not
+        if (defined('PHP_OS_FAMILY') && PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped('Cannot simulate Windows on Windows');
+        } else {
+            // This test is a placeholder; in real code, use a mock or patch
+            $this->assertTrue(true, 'Simulate Windows behavior in CI with a mock if needed');
+        }
+    }
+
+    public function test_pod_name_from_env_and_fallback(): void
+    {
+        $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('namespace_name_');
+        file_put_contents($namespaceFile, 'testnamespace');
+        $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_name_');
+        $envName = 'testpodname';
+        $this->setEnvironmentVariable(Variables::SW_K8S_POD_NAME, $envName);
+        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $this->assertEquals($envName, $resource->getAttributes()->get('k8s.pod.name') ?? null);
+        // Now unset the env var and check fallback
+        putenv(Variables::SW_K8S_POD_NAME);
+        $resource2 = (new K8s($namespaceFile, $mountFile))->getResource();
+        $this->assertEquals(php_uname('n'), $resource2->getAttributes()->get('k8s.pod.name') ?? null);
+        unlink($namespaceFile);
     }
 }

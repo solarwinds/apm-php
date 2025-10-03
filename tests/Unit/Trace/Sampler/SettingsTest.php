@@ -119,4 +119,83 @@ class SettingsTest extends TestCase
         $merged = Settings::merge($remote, $local);
         $this->assertEquals($remote, $merged);
     }
+
+    public function test_constructor_assigns_properties_correctly(): void
+    {
+        $settings = new Settings(
+            42,
+            SampleSource::Remote,
+            0xABCD,
+            ['bucket1', 'bucket2'],
+            'sigKey',
+            1234567890,
+            99
+        );
+        $this->assertSame(42, $settings->sampleRate);
+        $this->assertSame(SampleSource::Remote, $settings->sampleSource);
+        $this->assertSame(0xABCD, $settings->flags);
+        $this->assertSame(['bucket1', 'bucket2'], $settings->buckets);
+        $this->assertSame('sigKey', $settings->signatureKey);
+        $this->assertSame(1234567890, $settings->timestamp);
+        $this->assertSame(99, $settings->ttl);
+    }
+
+    public function test_to_string_returns_valid_json(): void
+    {
+        $settings = new Settings(
+            7,
+            SampleSource::LocalDefault,
+            0x1234,
+            ['a', 'b'],
+            null,
+            111,
+            222
+        );
+        $json = (string) $settings;
+        $data = json_decode($json, true);
+        $this->assertIsArray($data);
+        $this->assertSame(7, $data['sampleRate']);
+        $this->assertSame(SampleSource::LocalDefault->value, $data['sampleSource']);
+        $this->assertSame(0x1234, $data['flags']);
+        $this->assertSame(['a', 'b'], $data['buckets']);
+        $this->assertNull($data['signatureKey']);
+        $this->assertSame(111, $data['timestamp']);
+        $this->assertSame(222, $data['ttl']);
+    }
+
+    public function test_to_string_with_all_fields(): void
+    {
+        $settings = new Settings(
+            0,
+            SampleSource::Remote,
+            0,
+            [],
+            '',
+            0,
+            0
+        );
+        $json = (string) $settings;
+        $data = json_decode($json, true);
+        $this->assertSame('', $data['signatureKey']);
+        $this->assertSame([], $data['buckets']);
+    }
+
+    public function test_merge_with_all_flags_and_edge_cases(): void
+    {
+        $remote = new Settings(
+            100,
+            SampleSource::Remote,
+            Flags::SAMPLE_START->value | Flags::SAMPLE_THROUGH_ALWAYS->value | Flags::TRIGGERED_TRACE->value | Flags::OVERRIDE->value,
+            ['bucketX'],
+            'edge',
+            999,
+            1
+        );
+        $local = new LocalSettings(null, false);
+        $merged = Settings::merge($remote, $local);
+        // TRIGGERED_TRACE should be unset due to local setting
+        $this->assertSame($remote->flags&~Flags::TRIGGERED_TRACE->value, $merged->flags);
+        $this->assertSame($remote->buckets, $merged->buckets);
+        $this->assertSame($remote->signatureKey, $merged->signatureKey);
+    }
 }
