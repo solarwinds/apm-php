@@ -82,4 +82,41 @@ class TransactionNameSpanProcessorTest extends MockeryTestCase
         $this->readWriteSpan->shouldReceive('setAttribute')->with(TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE, 'SiteController.actionIndex');
         $this->transactionNameSpanProcessor->onStart($this->readWriteSpan, Context::getCurrent());
     }
+    public function test_get_instance_returns_singleton(): void
+    {
+        $instance1 = TransactionNameSpanProcessor::getInstance();
+        $instance2 = TransactionNameSpanProcessor::getInstance();
+        $this->assertSame($instance1, $instance2);
+        $this->assertInstanceOf(TransactionNameSpanProcessor::class, $instance1);
+    }
+
+    public function test_transaction_name_truncation(): void
+    {
+        $processor = new TransactionNameSpanProcessor();
+        $pool = $processor->getTransactionNamePool();
+        $longName = str_repeat('a', 300);
+        $truncated = $pool->register($longName);
+        $this->assertLessThanOrEqual(256, strlen($truncated));
+    }
+
+    public function test_transaction_name_default(): void
+    {
+        $processor = new TransactionNameSpanProcessor();
+        $pool = $processor->getTransactionNamePool();
+        $default = $pool->register('');
+        $this->assertEquals('', $default);
+    }
+
+    public function test_transaction_name_pool_limit(): void
+    {
+        $processor = new TransactionNameSpanProcessor();
+        $pool = $processor->getTransactionNamePool();
+        // Fill the pool to its max size
+        for ($i = 0; $i < 200; $i++) {
+            $pool->register('name' . $i);
+        }
+        // Registering another name should return 'other'
+        $result = $pool->register('overflow');
+        $this->assertEquals('other', $result);
+    }
 }
