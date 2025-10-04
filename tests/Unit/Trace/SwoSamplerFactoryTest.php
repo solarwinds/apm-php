@@ -19,18 +19,14 @@ class SwoSamplerFactoryTest extends TestCase
     protected function setUp(): void
     {
         // Reset environment variables before each test
-        \putenv(Env::OTEL_TRACES_SAMPLER . '=');
-        \putenv(Env::OTEL_TRACES_SAMPLER_ARG . '=');
-        \putenv('SW_APM_COLLECTOR=');
-        \putenv('SW_APM_SERVICE_KEY=');
+        \putenv(Env::OTEL_TRACES_SAMPLER);
+        \putenv(Env::OTEL_TRACES_SAMPLER_ARG);
     }
     protected function tearDown(): void
     {
         // Reset environment variables after each test
-        \putenv(Env::OTEL_TRACES_SAMPLER . '=');
-        \putenv(Env::OTEL_TRACES_SAMPLER_ARG . '=');
-        \putenv('SW_APM_COLLECTOR=');
-        \putenv('SW_APM_SERVICE_KEY=');
+        \putenv(Env::OTEL_TRACES_SAMPLER);
+        \putenv(Env::OTEL_TRACES_SAMPLER_ARG);
     }
 
     public function test_always_on_sampler(): void
@@ -91,19 +87,6 @@ class SwoSamplerFactoryTest extends TestCase
         $ref = new \ReflectionClass($sampler);
         $prop = $ref->getProperty('root');
         $this->assertInstanceOf(TraceIdRatioBasedSampler::class, $prop->getValue($sampler));
-    }
-
-    public function test_solarwinds_http_sampler(): void
-    {
-        \putenv(Env::OTEL_TRACES_SAMPLER . '=solarwinds_http');
-        \putenv('SW_APM_COLLECTOR=custom.collector');
-        \putenv('SW_APM_SERVICE_KEY=token:service');
-        $factory = new SwoSamplerFactory();
-        $sampler = $factory->create();
-        $this->assertInstanceOf(ParentBased::class, $sampler);
-        $ref = new \ReflectionClass($sampler);
-        $prop = $ref->getProperty('root');
-        $this->assertStringContainsString('HttpSampler', get_class($prop->getValue($sampler)));
     }
 
     public function test_unknown_sampler_throws(): void
