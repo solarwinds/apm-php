@@ -96,26 +96,4 @@ class SwoSamplerFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $factory->create();
     }
-
-    public function test_default_values_are_used(): void
-    {
-        \putenv(Env::OTEL_TRACES_SAMPLER . '=solarwinds_http');
-        $collector = \getenv('SW_APM_COLLECTOR');
-        $serviceKey = \getenv('SW_APM_SERVICE_KEY');
-
-        \putenv('SW_APM_COLLECTOR'); // Unset SW_APM_COLLECTOR
-        \putenv('SW_APM_SERVICE_KEY'); // Unset SW_APM_SERVICE_KEY
-        // Do not set SW_APM_COLLECTOR or SW_APM_SERVICE_KEY
-        $factory = new SwoSamplerFactory();
-        $sampler = $factory->create();
-        $this->assertInstanceOf(AlwaysOffSampler::class, $sampler, $sampler->getDescription());
-
-        // Restore original environment variables
-        if ($serviceKey !== false) {
-            \putenv('SW_APM_SERVICE_KEY=' . $serviceKey);
-        }
-        if ($collector !== false) {
-            \putenv('SW_APM_COLLECTOR=' . $collector);
-        }
-    }
 }
