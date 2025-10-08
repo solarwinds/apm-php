@@ -18,7 +18,7 @@ class HttpSamplerTest extends TestCase
     public function test_valid_service_key_samples_created_spans(): void
     {
         $serviceKey = getenv('SW_APM_SERVICE_KEY');
-        if ($serviceKey === false) {
+        if (empty($serviceKey)) {
             $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set.');
         }
         [$token, $service] = explode(':', $serviceKey);
@@ -53,7 +53,7 @@ class HttpSamplerTest extends TestCase
     public function test_invalid_collector_does_not_sample_created_spans(): void
     {
         $serviceKey = getenv('SW_APM_SERVICE_KEY');
-        if ($serviceKey === false) {
+        if (empty($serviceKey)) {
             $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set.');
         }
         [$token, $service] = explode(':', $serviceKey);
