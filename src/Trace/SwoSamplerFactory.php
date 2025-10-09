@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Trace;
 
+use Exception;
 use InvalidArgumentException;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
@@ -20,11 +22,12 @@ use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 
 class SwoSamplerFactory
 {
+    use LogsMessagesTrait;
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
     private const SOLARWINDS_PREFIX = 'solarwinds';
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
-    private const DUMMY_SERVICE_KEY = 'your-token:default-service';
+    private const SERVICE_KEY_DELIMITER = ':';
 
     public function create(?MeterProviderInterface $meterProvider = null): SamplerInterface
     {
@@ -41,12 +44,25 @@ class SwoSamplerFactory
 
                     return new ParentBased(new TraceIdRatioBasedSampler($arg));
                 case self::VALUE_SOLARWINDS_HTTP:
-                    $collector = Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR, self::DEFAULT_APM_COLLECTOR);
-                    $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY, self::DUMMY_SERVICE_KEY);
-                    [$token, $service] = explode(':', $serviceKey);
-                    $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
+                    {
+                        try {
+                            $collector = Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR, self::DEFAULT_APM_COLLECTOR);
+                            $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY, '');
+                            if (str_contains($serviceKey, self::SERVICE_KEY_DELIMITER)) {
+                                [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
+                                $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
 
-                    return new ParentBased($http, $http, $http);
+                                return new ParentBased($http, $http, $http);
+                            }
+                            self::logWarning('SW_APM_SERVICE_KEY is not correctly formatted. Falling back to AlwaysOffSampler.');
+
+                            return new AlwaysOffSampler();
+                        } catch (Exception $e) {
+                            self::logWarning('SW_APM_COLLECTOR/SW_APM_SERVICE_KEY ' . $e->getMessage() . '. Falling back to AlwaysOffSampler.');
+
+                            return new AlwaysOffSampler();
+                        }
+                    }
             }
         }
 

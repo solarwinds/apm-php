@@ -100,12 +100,12 @@ class SwoSamplerFactoryTest extends TestCase
     public function test_default_values_are_used(): void
     {
         \putenv(Env::OTEL_TRACES_SAMPLER . '=solarwinds_http');
-        // Do not set SW_APM_COLLECTOR or SW_APM_SERVICE_KEY
+        if (!empty(getenv('SW_APM_SERVICE_KEY'))) {
+            $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is set.');
+        }
+        // Do not set SW_APM_SERVICE_KEY
         $factory = new SwoSamplerFactory();
         $sampler = $factory->create();
-        $this->assertInstanceOf(ParentBased::class, $sampler);
-        $ref = new \ReflectionClass($sampler);
-        $prop = $ref->getProperty('root');
-        $this->assertStringContainsString('HttpSampler', get_class($prop->getValue($sampler)));
+        $this->assertInstanceOf(AlwaysOffSampler::class, $sampler, $sampler->getDescription());
     }
 }
