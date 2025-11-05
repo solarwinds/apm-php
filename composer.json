@@ -1,6 +1,6 @@
 {
   "name": "solarwinds/apm",
-  "description": "OpenTelemetry custom distro to connect to Solarwinds",
+  "description": "Solarwinds specific OpenTelemetry SDK for PHP",
   "keywords": ["solarwinds_apm", "swo", "instrumentation", "performance", "opentelemetry", "observability"],
   "type": "library",
   "readme": "./README.md",
