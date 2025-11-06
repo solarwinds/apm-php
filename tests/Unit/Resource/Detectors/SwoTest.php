@@ -15,6 +15,28 @@ use Solarwinds\ApmPhp\Resource\Detectors\Swo;
 #[CoversClass(Swo::class)]
 class SwoTest extends TestCase
 {
+    /**
+     * This method is called before each test.
+     * @codeCoverageIgnore
+     */
+    private string|array|false $backup;
+    protected function setUp(): void
+    {
+        $this->backup = getenv(SolarwindsEnv::SW_APM_SERVICE_KEY);
+    }
+    /**
+     * This method is called after each test.
+     * @codeCoverageIgnore
+     */
+    protected function tearDown(): void
+    {
+        if ($this->backup !== false && is_string($this->backup)) {
+            putenv(SolarwindsEnv::SW_APM_SERVICE_KEY . '=' . $this->backup);
+        } else {
+            putenv(SolarwindsEnv::SW_APM_SERVICE_KEY);
+        }
+    }
+
     public function test_swo_get_resource_from_ote_l_servic_e_name(): void
     {
         putenv(Variables::OTEL_SERVICE_NAME . '=otel_service_name');
@@ -28,7 +50,6 @@ class SwoTest extends TestCase
         $this->assertSame('apm', $resource->getAttributes()->get(Swo::SW_DATA_MODULE));
         $this->assertSame($version, $resource->getAttributes()->get(Swo::SW_APM_VERSION));
         $this->assertSame('otel_service_name', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-        putenv(SolarwindsEnv::SW_APM_SERVICE_KEY);
         putenv(Variables::OTEL_SERVICE_NAME);
     }
 
@@ -44,8 +65,6 @@ class SwoTest extends TestCase
         $this->assertSame('apm', $resource->getAttributes()->get(Swo::SW_DATA_MODULE));
         $this->assertSame($version, $resource->getAttributes()->get(Swo::SW_APM_VERSION));
         $this->assertSame('sw_apm_service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-
-        putenv(SolarwindsEnv::SW_APM_SERVICE_KEY);
     }
 
     public function test_swo_get_resource_service_name_from_mandatory_default(): void
