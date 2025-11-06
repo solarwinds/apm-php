@@ -32,7 +32,11 @@ class SwoTest extends TestCase
 
     public function test_swo_get_resource_service_name_from_sw_apm_service_key(): void
     {
-        $sw_apm_service_name = getenv(SolarwindsEnv::SW_APM_SERVICE_KEY);
+        $serviceKey = getenv(SolarwindsEnv::SW_APM_SERVICE_KEY);
+        if (empty($serviceKey) || !str_contains($serviceKey, ':')) {
+            $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set or invalid.');
+        }
+        [, $service] = explode(':', $serviceKey);
         $resourceDetector = new swo();
         $resource = $resourceDetector->getResource();
         $name = 'solarwinds/apm';
@@ -41,9 +45,7 @@ class SwoTest extends TestCase
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertSame('apm', $resource->getAttributes()->get(Swo::SW_DATA_MODULE));
         $this->assertSame($version, $resource->getAttributes()->get(Swo::SW_APM_VERSION));
-        if ($sw_apm_service_name !== false && is_string($sw_apm_service_name)) {
-            $this->assertSame($sw_apm_service_name, $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-        }
+        $this->assertSame($service, $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 
     public function test_swo_detector(): void
