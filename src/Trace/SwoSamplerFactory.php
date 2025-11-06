@@ -46,11 +46,17 @@ class SwoSamplerFactory
                 case self::VALUE_SOLARWINDS_HTTP:
                     {
                         try {
-                            $collector = Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR, self::DEFAULT_APM_COLLECTOR);
-                            $serviceKey = Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY, '');
-                            if (str_contains($serviceKey, self::SERVICE_KEY_DELIMITER)) {
+                            $collector = Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
+                                ? Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR)
+                                : self::DEFAULT_APM_COLLECTOR;
+                            $serviceKey = Configuration::has(SolarwindsEnv::SW_APM_SERVICE_KEY)
+                                ? Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY)
+                                : null;
+                            if ($serviceKey && str_contains($serviceKey, self::SERVICE_KEY_DELIMITER)) {
                                 [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
-                                $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
+                                $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
+                                // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
+                                $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
 
                                 return new ParentBased($http, $http, $http);
                             }

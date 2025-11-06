@@ -5,15 +5,50 @@ declare(strict_types=1);
 namespace Solarwinds\ApmPhp\Tests\Unit\Resource\Detectors;
 
 use Composer\InstalledVersions;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\Resource\Detectors\Swo;
 
 #[CoversClass(Swo::class)]
 class SwoTest extends TestCase
 {
-    public function test_swo_get_resource(): void
+    public function test_swo_get_resource_from_ote_l_servic_e_name(): void
+    {
+        putenv(Variables::OTEL_SERVICE_NAME . '=otel_service_name');
+        putenv(SolarwindsEnv::SW_APM_SERVICE_KEY . '=token:sw_apm_service');
+        $resourceDetector = new swo();
+        $resource = $resourceDetector->getResource();
+        $name = 'solarwinds/apm';
+        $version = InstalledVersions::getPrettyVersion($name);
+
+        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertSame('apm', $resource->getAttributes()->get(Swo::SW_DATA_MODULE));
+        $this->assertSame($version, $resource->getAttributes()->get(Swo::SW_APM_VERSION));
+        $this->assertSame('otel_service_name', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        putenv(SolarwindsEnv::SW_APM_SERVICE_KEY);
+        putenv(Variables::OTEL_SERVICE_NAME);
+    }
+
+    public function test_swo_get_resource_service_name_from_s_w_ap_m_servic_e_key(): void
+    {
+        putenv(SolarwindsEnv::SW_APM_SERVICE_KEY . '=token:sw_apm_service');
+        $resourceDetector = new swo();
+        $resource = $resourceDetector->getResource();
+        $name = 'solarwinds/apm';
+        $version = InstalledVersions::getPrettyVersion($name);
+
+        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertSame('apm', $resource->getAttributes()->get(Swo::SW_DATA_MODULE));
+        $this->assertSame($version, $resource->getAttributes()->get(Swo::SW_APM_VERSION));
+        $this->assertSame('sw_apm_service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+
+        putenv(SolarwindsEnv::SW_APM_SERVICE_KEY);
+    }
+
+    public function test_swo_get_resource_service_name_from_mandatory_default(): void
     {
         $resourceDetector = new swo();
         $resource = $resourceDetector->getResource();
@@ -23,6 +58,8 @@ class SwoTest extends TestCase
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertSame('apm', $resource->getAttributes()->get(Swo::SW_DATA_MODULE));
         $this->assertSame($version, $resource->getAttributes()->get(Swo::SW_APM_VERSION));
+        $this->assertSame('unknown_service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+
     }
 
     public function test_swo_detector(): void
@@ -31,6 +68,7 @@ class SwoTest extends TestCase
 
         $this->assertNotNull($resource->getAttributes()->get(Swo::SW_DATA_MODULE));
         $this->assertNotNull($resource->getAttributes()->get(Swo::SW_APM_VERSION));
+        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 
 }
