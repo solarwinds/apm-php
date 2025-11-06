@@ -31,6 +31,11 @@ Install the SolarWinds APM library:
 composer require solarwinds/apm
 ```
 
+Install a PSR-compatible HTTP client (required for OTLP exporter):
+```bash
+composer require guzzlehttp/guzzle
+```
+
 Set your service key (via environment variable):
 ```bash
 export SW_APM_SERVICE_KEY=<your-service-key>
@@ -41,10 +46,6 @@ export SW_APM_SERVICE_KEY=<your-service-key>
 export SW_APM_COLLECTOR=<your-collector-url>
 ```
 
-Install a PSR-compatible HTTP client (required for OTLP exporter):
-```bash
-composer require guzzlehttp/guzzle
-```
 
 ## Example Application
 
@@ -102,9 +103,6 @@ Get your `<token>` from [SolarWinds SaaS Free Trial](https://www.solarwinds.com/
 Start the app with tracing:
 ```bash
 env OTEL_PHP_AUTOLOAD_ENABLED=true \
-    OTEL_TRACES_EXPORTER=otlp \
-    OTEL_METRICS_EXPORTER=otlp \
-    OTEL_LOGS_EXPORTER=otlp \
     OTEL_SERVICE_NAME=php-example \
     OTEL_TRACES_SAMPLER=solarwinds_http \
     OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions \
