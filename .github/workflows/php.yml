@@ -2,9 +2,9 @@ name: PHP CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 permissions: read-all
 
@@ -15,12 +15,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [ '8.1', '8.2', '8.3' ]
+        php-version: ['8.1', '8.2', '8.3']
         experimental: [false]
         composer_args: [""]
         include:
           - php-version: 8.4
             experimental: false
+            composer_args: "--ignore-platform-reqs"
+          - php-version: 8.5
+            experimental: true
             composer_args: "--ignore-platform-reqs"
     env:
       extensions: ast, grpc, opentelemetry, protobuf
@@ -45,9 +48,10 @@ jobs:
           echo "psalm=${{steps.psalm.outcome}}"
           echo "phpstan=${{steps.phpstan.outcome}}"
           echo "unit=${{steps.unit.outcome}}"
+          echo "integration=${{steps.integration.outcome}}"
           echo "::endgroup::"
 
-          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.phan.outcome == 'failure' || steps.psalm.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' }} == true ]; then \
+          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.phan.outcome == 'failure' || steps.psalm.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' }} == true ]; then \
             echo "::error::One or more steps failed"; \
           fi
 
@@ -74,48 +78,49 @@ jobs:
         tools: php-cs-fixer
         extensions: ${{ env.extensions }}
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
+    - name: Validate composer.json
+      run: composer validate
 
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: vendor
-        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
+        key: ${{ runner.os }}-${{ matrix.php-version }}-vendor-${{ hashFiles('composer.json') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.php-version }}-php-
+          ${{ runner.os }}-${{ matrix.php-version }}-vendor-
 
     - name: Cache test tools
       id: test-tools-cache
       uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: vendor-bin
-        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
+        key: ${{ runner.os }}-${{ matrix.php-version }}-vendor-bin-${{ hashFiles('vendor-bin/*/composer.json') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.php-version }}-php-
+          ${{ runner.os }}-${{ matrix.php-version }}-vendor-bin-
 
     - name: Install dependencies
       id: composer
       if: steps.composer-cache.outputs.cache-hit != 'true'
-      run: composer install --prefer-dist --no-progress ${{ matrix.composer_args }}
+      run: |
+        composer --version
+        composer install --prefer-dist --no-progress ${{ matrix.composer_args }}
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
-
-    # - name: Run test suite
-    #   run: composer run-script test
     - name: Check Style
       id: style
       continue-on-error: ${{ matrix.experimental }}
       env:
         PHP_CS_FIXER_IGNORE_ENV: 1
-      run: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
+      run: |
+        vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer --version
+        vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
 
     - name: Check Dependencies
       id: deps
       continue-on-error: ${{ matrix.experimental }}
-      run: vendor-bin/deptrac/vendor/bin/deptrac --formatter=github-actions --report-uncovered
+      run: |
+        vendor-bin/deptrac/vendor/bin/deptrac --version
+        vendor-bin/deptrac/vendor/bin/deptrac --formatter=github-actions --report-uncovered
 
     - name: Run Phan
       id: phan
@@ -123,17 +128,23 @@ jobs:
       env:
         XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
-      run: vendor-bin/phan/vendor/bin/phan
+      run: |
+        vendor-bin/phan/vendor/bin/phan --version
+        vendor-bin/phan/vendor/bin/phan
 
     - name: Run Psalm
       id: psalm
       continue-on-error: ${{ matrix.experimental }}
-      run: vendor-bin/psalm/vendor/bin/psalm --output-format=github
+      run: |
+        vendor-bin/psalm/vendor/bin/psalm --version
+        vendor-bin/psalm/vendor/bin/psalm --output-format=github
 
     - name: Run Phpstan
       id: phpstan
       continue-on-error: ${{ matrix.experimental }}
-      run: vendor/bin/phpstan analyse --error-format=github
+      run: |
+        vendor/bin/phpstan --version
+        vendor/bin/phpstan analyse --error-format=github
 
     - name: Run PHPUnit (unit tests)
       id: unit
@@ -141,7 +152,17 @@ jobs:
       env:
         OTEL_LOG_LEVEL: none
         SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
-      run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit
+      run: |
+        vendor/bin/phpunit --version
+        php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit
+
+    - name: Run PHPUnit (integration tests)
+      id: integration
+      continue-on-error: ${{ matrix.experimental }}
+      env:
+        OTEL_LOG_LEVEL: none
+        SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
+      run: vendor/bin/phpunit --testsuite integration
 
     - name: Code Coverage
       uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
@@ -150,3 +171,11 @@ jobs:
         files: ./coverage.clover
         flags: ${{ matrix.php-version }}
         verbose: false
+
+  packages:
+    uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@main
+    needs: php
+    with:
+      matrix_extension: '["ast, json, grpc"]'
+      matrix_php_version: '["8.1", "8.2", "8.3"]'
+      install_directory: '~/.test/.packages'
