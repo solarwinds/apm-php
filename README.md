@@ -90,7 +90,7 @@ Install the OpenTelemetry PHP extension ([instructions](https://opentelemetry.io
 php --ri opentelemetry
 ```
 
-Add SolarWinds APM Library and required dependencies. More instrumentation libraries can be found [here](https://packagist.org/packages/open-telemetry/opentelemetry-sqlcommenter?query=open--telemetry%2Fopentelemetry-):
+Add SolarWinds APM Library and required dependencies. More instrumentation libraries can be found [here](https://packagist.org/packages/open-telemetry/?query=open-telemetry%2Fopentelemetry-):
 ```bash
 composer config allow-plugins.php-http/discovery false
 composer require guzzlehttp/guzzle solarwinds/apm open-telemetry/opentelemetry-auto-slim open-telemetry/exporter-otlp
