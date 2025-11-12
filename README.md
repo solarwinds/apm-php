@@ -46,12 +46,12 @@ export SW_APM_SERVICE_KEY=<your-service-key>
 export SW_APM_COLLECTOR=<your-collector-url>
 ```
 
-
 ## Example Application
 
 This section demonstrates automatic instrumentation using Slim and SolarWinds APM.
 
 ### 1. Create a minimal Slim app
+
 ```bash
 composer init --no-interaction --require slim/slim:"^4" --require slim/psr7:"^1"
 composer update
@@ -90,7 +90,7 @@ Install the OpenTelemetry PHP extension ([instructions](https://opentelemetry.io
 php --ri opentelemetry
 ```
 
-Add SolarWinds APM Library and required dependencies, more instrumentation libraries can be found [here](https://packagist.org/packages/open-telemetry/opentelemetry-sqlcommenter?query=open--telemetry%2Fopentelemetry-):
+Add SolarWinds APM Library and required dependencies. More instrumentation libraries can be found [here](https://packagist.org/packages/open-telemetry/opentelemetry-sqlcommenter?query=open--telemetry%2Fopentelemetry-):
 ```bash
 composer config allow-plugins.php-http/discovery false
 composer require guzzlehttp/guzzle solarwinds/apm open-telemetry/opentelemetry-auto-slim open-telemetry/exporter-otlp
@@ -141,21 +141,34 @@ OTEL_PHP_SQLCOMMENTER_ATTRIBUTE=true
 
 ## Trace Context in Logs
 
-Install [OpenTelemetry Monolog logger](https://packagist.org/packages/open-telemetry/opentelemetry-logger-monolog) to propagate trace context to log record:
+Install [OpenTelemetry Monolog logger](https://packagist.org/packages/open-telemetry/opentelemetry-logger-monolog) to propagate trace context to log records:
 ```bash
 composer require open-telemetry/opentelemetry-logger-monolog
 ```
-`service.name`, `traceId`, `spanId` & `flags` will be automatically added to Opentelemetry logs.
-```php
-``echo `json
+`service.name`, `traceId`, `spanId` & `flags` will be automatically added to OpenTelemetry logs.
+
+Example log output:
+```json
 {
-...
+  ...
   {"resource":{"attributes":[{"key":"service.name","value":{"stringValue":"php-example"}}]}},
-...
+  ...
   {"logRecords":[{"timeUnixNano":"1762572315653380000","observedTimeUnixNano":"1762572315653559040","severityNumber":9,"severityText":"INFO","body":{"stringValue":"hello, otel"},"flags":1,"traceId":"1c52067371dfddaa6ed58c42d43d0a2f","spanId":"f33aaf87fc3ca8ab"}]},
-...
+  ...
 }
 ```
+
+## Custom Transaction Name
+
+Set a custom transaction name at the beginning of your application:
+```php
+use Solarwinds\ApmPhp\API\TransactionName;
+TransactionName::set('custom-transaction-name');
+```
+
+## Upgrade from SolarWinds APM PHP library 8.x
+
+If you are upgrading from version 8.x, fully uninstall the previous version before installing 9.x or later to avoid conflicts.
 
 ## Contributing
 
