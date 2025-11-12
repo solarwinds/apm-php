@@ -151,9 +151,9 @@ Example log output:
 ```json
 {
   ...
-  {"resource":{"attributes":[{"key":"service.name","value":{"stringValue":"php-example"}}]}},
+  "resource":{"attributes":[{"key":"service.name","value":{"stringValue":"php-example"}}]},
   ...
-  {"logRecords":[{"timeUnixNano":"1762572315653380000","observedTimeUnixNano":"1762572315653559040","severityNumber":9,"severityText":"INFO","body":{"stringValue":"hello, otel"},"flags":1,"traceId":"1c52067371dfddaa6ed58c42d43d0a2f","spanId":"f33aaf87fc3ca8ab"}]},
+  "logRecords":[{"timeUnixNano":"1762572315653380000","observedTimeUnixNano":"1762572315653559040","severityNumber":9,"severityText":"INFO","body":{"stringValue":"hello, otel"},"flags":1,"traceId":"1c52067371dfddaa6ed58c42d43d0a2f","spanId":"f33aaf87fc3ca8ab"}],
   ...
 }
 ```
