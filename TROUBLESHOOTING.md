@@ -19,6 +19,15 @@
 ## Environment Variable Configuration
 - **Timing:** Set OpenTelemetry environment variables before including the Composer autoloader (e.g., before `vendor/autoload.php`). Setting them too late can prevent proper initialization.
 - **Verification:** Use `printenv` to confirm all OpenTelemetry-related environment variables are set and accessible to your PHP application.
+- **Common Environment Variables:**
+- - `OTEL_PHP_AUTOLOAD_ENABLED`
+  - `OTEL_SERVICE_NAME`
+  - `OTEL_TRACES_SAMPLER`
+  - `OTEL_PROPAGATORS`
+  - `OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS`
+  - `OTEL_EXPORTER_OTLP_ENDPOINT`
+  - `OTEL_EXPORTER_OTLP_HEADERS`
+  - `SW_APM_SERVICE_KEY`
 
 ## PHP-Specific Considerations
 - **open_basedir:** If using PHP's `open_basedir`, ensure it allows access to required OpenTelemetry files and directories.
@@ -27,28 +36,22 @@
 
 ## SolarWinds Observability (SWO) Issues
 
-### Verifying Telemetry Generation with OpenTelemetry Collector
-- **Debug Exporter:** Change your exporter to `debug` to confirm traces, metrics, or logs are being generated and output to the console. This helps isolate issues between instrumentation and the collector/SWO.
-  ```yaml
-  receivers:
-    otlp:
-  exporters:
-    debug:
-  service:
-    pipelines:
-      traces:
-        receivers: [otlp] # Or your chosen receiver
-        exporters: [debug]
-  ```
+### Verifying Telemetry Generation
+- **Console Exporter:** Change your exporter to `console` to confirm traces, metrics, or logs are being generated and output to the console. This helps isolate issues between instrumentation and the SWO.
+  ```bash
+    export OTEL_TRACES_EXPORTER=console
+    export OTEL_METRICS_EXPORTER=console
+    export OTEL_LOGS_EXPORTER=console
+   ```
 - **Detailed Logging:** Enable debug logs for more insight into instrumentation and errors:
   ```bash
   export OTEL_LOG_LEVEL=debug
   ```
 
 ### Troubleshooting SWO Export Issues
-- **Collector Logs:** If data appears in the console but not in SWO, check OpenTelemetry Collector logs to verify data is received, processed, and exported correctly.
-- **Configuration Verification:** Ensure your `SW_APM_SERVICE_KEY` is set correctly.
+- **Error Logs:** If data appears in the console but not in SWO, check error logs to verify data is exported correctly.
+- **Configuration Verification:** Ensure your `OTEL_EXPORTER_OTLP_HEADERS` & `OTEL_EXPORTER_OTLP_ENDPOINT` are set correctly.
 
 ---
 
-If you continue to experience issues, consult the [OpenTelemetry PHP documentation](https://opentelemetry.io/docs/instrumentation/php/) or the [SolarWinds Observability documentation](https://documentation.solarwinds.com/en/success_center/observability/default.htm) for further guidance.
+If you continue to experience issues, consult the [OpenTelemetry PHP documentation](https://opentelemetry.io/docs/instrumentation/php/) for further guidance.
