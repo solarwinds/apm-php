@@ -139,6 +139,24 @@ Enable SQL comment attributes:
 OTEL_PHP_SQLCOMMENTER_ATTRIBUTE=true
 ```
 
+## Trace Context in Logs
+
+Install [OpenTelemetry Monolog logger](https://packagist.org/packages/open-telemetry/opentelemetry-logger-monolog) to propagate trace context to log record:
+```bash
+composer require open-telemetry/opentelemetry-logger-monolog
+```
+service.name, traceId, spanId & flags will be automatically added to logRecords.
+```php
+``echo `json
+{
+...
+  {"resource":{"attributes":[{"key":"service.name","value":{"stringValue":"php-example"}}]}},
+...
+  {"logRecords":[{"timeUnixNano":"1762572315653380000","observedTimeUnixNano":"1762572315653559040","severityNumber":9,"severityText":"INFO","body":{"stringValue":"hello, otel"},"flags":1,"traceId":"1c52067371dfddaa6ed58c42d43d0a2f","spanId":"f33aaf87fc3ca8ab"}]},
+...
+}
+```
+
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
