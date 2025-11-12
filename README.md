@@ -145,7 +145,7 @@ Install [OpenTelemetry Monolog logger](https://packagist.org/packages/open-telem
 ```bash
 composer require open-telemetry/opentelemetry-logger-monolog
 ```
-service.name, traceId, spanId & flags will be automatically added to logRecords.
+`service.name`, `traceId`, `spanId` & `flags` will be automatically added to Opentelemetry logs.
 ```php
 ``echo `json
 {
