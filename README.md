@@ -179,6 +179,9 @@ Thanks to all contributors:
   <img src="https://contributors-img.web.app/image?repo=solarwinds/apm-php"/>
 </a>
 
+## Troubleshooting
+For troubleshooting, refer to the [Troubleshooting Guide](./TROUBLESHOOTING.md).
+
 ## License
 
 Apache-2.0. See [LICENSE](./LICENSE) for details.
