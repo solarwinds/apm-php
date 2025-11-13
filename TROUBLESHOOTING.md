@@ -20,7 +20,7 @@
 - **Timing:** Set OpenTelemetry environment variables before including the Composer autoloader (e.g., before `vendor/autoload.php`). Setting them too late can prevent proper initialization.
 - **Verification:** Use `printenv` to confirm all OpenTelemetry-related environment variables are set and accessible to your PHP application.
 - **Common Environment Variables:**
-- - `OTEL_PHP_AUTOLOAD_ENABLED`
+  - `OTEL_PHP_AUTOLOAD_ENABLED`
   - `OTEL_SERVICE_NAME`
   - `OTEL_TRACES_SAMPLER`
   - `OTEL_PROPAGATORS`
@@ -37,12 +37,12 @@
 ## SolarWinds Observability (SWO) Issues
 
 ### Verifying Telemetry Generation
-- **Console Exporter:** Change your exporter to `console` to confirm traces, metrics, or logs are being generated and output to the console. This helps isolate issues between instrumentation and the SWO.
+- **Console Exporter:** Change your exporter to `console` to confirm traces, metrics, or logs are being generated and output to the console. This helps isolate issues between instrumentation and SWO.
   ```bash
-    export OTEL_TRACES_EXPORTER=console
-    export OTEL_METRICS_EXPORTER=console
-    export OTEL_LOGS_EXPORTER=console
-   ```
+  export OTEL_TRACES_EXPORTER=console
+  export OTEL_METRICS_EXPORTER=console
+  export OTEL_LOGS_EXPORTER=console
+  ```
 - **Detailed Logging:** Enable debug logs for more insight into instrumentation and errors:
   ```bash
   export OTEL_LOG_LEVEL=debug
@@ -50,7 +50,7 @@
 
 ### Troubleshooting SWO Export Issues
 - **Error Logs:** If data appears in the console but not in SWO, check error logs to verify data is exported correctly.
-- **Configuration Verification:** Ensure your `OTEL_EXPORTER_OTLP_HEADERS` & `OTEL_EXPORTER_OTLP_ENDPOINT` are set correctly.
+- **Configuration Verification:** Ensure your `OTEL_EXPORTER_OTLP_HEADERS` and `OTEL_EXPORTER_OTLP_ENDPOINT` are set correctly.
 
 ---
 
