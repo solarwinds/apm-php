@@ -158,6 +158,20 @@ Example log output:
 }
 ```
 
+To add trace context to log messages, use OTEL SDK function `Context::getCurrent()`.
+
+Monolog example capturing the trace context with a [processor](https://seldaek.github.io/monolog/doc/01-usage.html#using-processors):
+```php
+use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\Context\Context;
+
+$logger->pushProcessor(function ($record) {
+  $spanContext = Span::fromContext(Context::getCurrent())->getContext();
+  $record['message'] .= ' trace_id='.$spanContext->getTraceId() . ' span_id=' . $spanContext->getSpanId() . ' trace_flags=' . ($spanContext->getTraceFlags() ? '01' : '00');
+  return $record;
+});
+```
+
 ## Custom Transaction Name
 
 Set a custom transaction name at the beginning of your application:
