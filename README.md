@@ -41,7 +41,7 @@ Set your service key (via environment variable):
 export SW_APM_SERVICE_KEY=<your-service-key>
 ```
 
-(Optional) Change the [default collector](apm.collector.na-01.cloud.solarwinds.com):
+Set the [collector endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm?#Find), default is `apm.collector.na-01.cloud.solarwinds.com`:
 ```bash
 export SW_APM_COLLECTOR=<your-collector-url>
 ```
