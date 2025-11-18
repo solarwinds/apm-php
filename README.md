@@ -130,6 +130,8 @@ TransactionName::set('custom-transaction-name');
 ## Upgrade from SolarWinds APM PHP library 8.x
 
 If you are upgrading from version 8.x, fully uninstall the previous version before installing 9.x or later to avoid conflicts.
+Instruction can be found in the [UPGRADE.md](./UPGRADE.md).
+
 
 ## Contributing
 
