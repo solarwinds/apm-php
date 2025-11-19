@@ -27,6 +27,18 @@ Install [OpenTelemetry Monolog logger](https://packagist.org/packages/open-telem
 composer require open-telemetry/opentelemetry-logger-monolog
 ```
 
+### Automatic configuration
+`solarwinds/apm` uses OpenTelemetry SDK autoloading with `OTEL_PHP_AUTOLOAD_ENABLED=true`, you can retrieve the global logger provider. That may be a no-op implementation if there was any misconfiguration.
+
+Retrieve the Globals LoggerProvider and pass it to the handler:
+```php
+$handler = new Handler(
+    OpenTelemetry\API\Globals::loggerProvider(),
+    LogLevel::INFO, //or `Logger::INFO`, or `Level::Info` depending on monolog version
+    true,
+);
+```
+
 ## Trace Context in Logs
 
 When [Exporting Application Logs](#exporting-application-logs)
