@@ -29,7 +29,8 @@ composer require open-telemetry/opentelemetry-logger-monolog
 
 ## Trace Context in Logs
 
-`service.name`, `traceId`, `spanId` & `flags` will be automatically added to OpenTelemetry logs.
+When [Exporting Application Logs](#exporting-application-logs)
+`service.name`, `traceId`, `spanId` & `flags` will be automatically added to the OpenTelemetry logs.
 
 Example log output:
 ```json
