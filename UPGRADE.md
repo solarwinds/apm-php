@@ -32,7 +32,7 @@ Starting with version 9, proprietary `solarwinds_apm_*` tracing API is no longer
 
 ## Upgrade Steps
 1. **Uninstall 8.x Version:**
-   Before installing version 9.x, fully [uninstall](https://documentation.solarwinds.com/en/success_center/observability/content/configure/services/php/install.htm#link12) version 8.x to avoid conflicts.
+   Before installing version 9.x, migrate proprietary `solarwinds_apm_*` tracing API calls and fully [uninstall](https://documentation.solarwinds.com/en/success_center/observability/content/configure/services/php/install.htm#link12) version 8.x to avoid conflicts.
 
 2. **Install 9.x+ Version:**
    Follow the installation and Add zero-code instrumentation instructions in the [README.md](./README.md) to install version 9.x or later.
