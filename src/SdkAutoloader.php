@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp;
 
+use Solarwinds\ApmPhp\Trace\SpanProcessor\ExcimerProfilerSpanProcessor;
 use function class_exists;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
@@ -108,6 +109,7 @@ class SdkAutoloader
         $meterProvider = (new MeterProviderFactory())->create($resource);
         $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
         $tracerProvider = (new TracerProviderBuilder())
+            ->addSpanProcessor(ExcimerProfilerSpanProcessor::getInstance())      // Excimer Profiler Span Processor (Used singleton due to Excimer Profiler limitations)
             ->addSpanProcessor(TransactionNameSpanProcessor::getInstance())      // Transaction Name Span Processor (Used singleton due to the transaction name pool)
             ->addSpanProcessor(new ResponseTimeSpanProcessor($meterProvider))    // Response Time Span Processor
             ->addSpanProcessor($spanProcessor)                                   // Otel Span Processors

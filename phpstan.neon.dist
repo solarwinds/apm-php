@@ -8,3 +8,5 @@ parameters:
     paths:
         - ./src
         - ./tests
+    bootstrapFiles:
+        - stubs/autoload.php
