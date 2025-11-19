@@ -43,7 +43,7 @@ Example log output:
 }
 ```
 
-To add trace context to log messages, use OTEL SDK function `Context::getCurrent()`.
+If the application log is not exported via OTLP, trace context can be injected into the log messages by using the OTel SDK function `Context::getCurrent()`.
 
 Monolog example capturing the trace context with a [processor](https://seldaek.github.io/monolog/doc/01-usage.html#using-processors):
 ```php
