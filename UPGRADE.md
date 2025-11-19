@@ -9,7 +9,7 @@ This document outlines the steps and considerations for upgrading from SolarWind
 - Review any custom instrumentation or integrations you have implemented.
 
 ## API changes from 8.x to 9.x
-- The 8.x version used legacy internal hooks for instrumentation, while 9.x leverages OpenTelemetry auto-instrumentation. Review your custom instrumentation to ensure compatibility.
+Starting with version 9, proprietary `solarwinds_apm_*` tracing API is no longer supported, standard PHP OTel API should be used instead. The table below lists the recommended API when upgrading to version 9.
 
 | API                                 | 8\.x | 9\.x | Recommendation                                                                                                                               |
 |-------------------------------------|------|------|----------------------------------------------------------------------------------------------------------------------------------------------|
