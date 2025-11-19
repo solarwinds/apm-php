@@ -29,10 +29,6 @@ composer require open-telemetry/opentelemetry-logger-monolog
 
 ## Trace Context in Logs
 
-Install [OpenTelemetry Monolog logger](https://packagist.org/packages/open-telemetry/opentelemetry-logger-monolog) to propagate trace context to log records:
-```bash
-composer require open-telemetry/opentelemetry-logger-monolog
-```
 `service.name`, `traceId`, `spanId` & `flags` will be automatically added to OpenTelemetry logs.
 
 Example log output:
