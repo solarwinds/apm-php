@@ -17,6 +17,8 @@ class ExcimerProfilerSpanProcessor extends NoopSpanProcessor implements SpanProc
     use LogsMessagesTrait;
 
     private ?\ExcimerProfiler $profiler = null;
+
+    private int $cnt = 0;
     private static ?SpanProcessorInterface $instance = null;
 
     public function __construct()
@@ -29,6 +31,7 @@ class ExcimerProfilerSpanProcessor extends NoopSpanProcessor implements SpanProc
         $this->profiler->setEventType(\EXCIMER_REAL);
         $this->profiler->setPeriod(0.001);
         $this->profiler->setMaxDepth(250);
+        $this->cnt = 0;
     }
 
     public static function getInstance(): SpanProcessorInterface
@@ -42,17 +45,25 @@ class ExcimerProfilerSpanProcessor extends NoopSpanProcessor implements SpanProc
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
         if ($this->profiler !== null) {
-            $this->profiler->start();
+            if ($this->cnt == 0) {
+                $this->profiler->start();
+            }
+            $this->cnt++;
         }
     }
 
     public function onEnd(ReadableSpanInterface $span): void
     {
         if ($this->profiler !== null) {
-            $this->profiler->stop();
-            $data = $this->profiler->getLog()->getSpeedscopeData();
-            $data['profiles'][0]['name'] = 'jerry-test-profile';
-            file_put_contents('/tmp/speedscope.json', json_encode($data, FILE_APPEND | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ));
+            $this->cnt--;
+            if ($this->cnt == 0) {
+                $this->profiler->stop();
+                $log = $this->profiler->flush();
+                echo "Log count: ".$log->count().PHP_EOL;
+                $data = $log->getSpeedscopeData();
+                $data['profiles'][0]['name'] = $span->getName();
+                file_put_contents('/tmp/'.$span->getName().'.json', json_encode($data, FILE_APPEND | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ));
+            }
         }
     }
 

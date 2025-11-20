@@ -57,4 +57,14 @@ $child2->end();
 $mainScope->detach();
 $main->end();
 
+$main2 = $tracer->spanBuilder('main-operation-2')->startSpan();
+$main2Scope = $main2->activate();
+$main2->setAttributes([
+    'host.name' => 'abc',
+    'host.ip' => '127.0.0.1',
+]);
+sleep(1);
+$main2Scope->detach();
+$main2->end();
+
 echo 'Finished!' . PHP_EOL;
