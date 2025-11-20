@@ -1,0 +1,70 @@
+# Configuration
+
+## Trace Context in Database Queries
+
+Install [OpenTelemetry SQL Commenter](https://packagist.org/packages/open-telemetry/opentelemetry-sqlcommenter) to propagate trace context to database queries:
+```bash
+composer require open-telemetry/opentelemetry-sqlcommenter
+```
+Supported DB libraries:
+- open-telemetry/opentelemetry-auto-mysqli
+- open-telemetry/opentelemetry-auto-pdo
+- open-telemetry/opentelemetry-auto-postgresql
+
+Enable context propagation:
+```bash
+OTEL_PHP_SQLCOMMENTER_CONTEXT_PROPAGATORS=tracecontext
+```
+Enable SQL comment attributes:
+```bash
+OTEL_PHP_SQLCOMMENTER_ATTRIBUTE=true
+```
+
+## Exporting Application Logs
+
+Install [OpenTelemetry Monolog logger](https://packagist.org/packages/open-telemetry/opentelemetry-logger-monolog) and follow its [usage](https://github.com/opentelemetry-php/contrib-logger-monolog?tab=readme-ov-file#usage) to export application logs for [monolog/monolog](https://packagist.org/packages/monolog/monolog).
+```bash
+composer require open-telemetry/opentelemetry-logger-monolog
+```
+
+### Automatic configuration
+`solarwinds/apm` uses OpenTelemetry SDK autoloading with `OTEL_PHP_AUTOLOAD_ENABLED=true`, you can retrieve the global logger provider. That may be a no-op implementation if there was any misconfiguration.
+
+Retrieve the Globals LoggerProvider and pass it to the handler:
+```php
+$handler = new Handler(
+    OpenTelemetry\API\Globals::loggerProvider(),
+    LogLevel::INFO, //or `Logger::INFO`, or `Level::Info` depending on monolog version
+    true,
+);
+```
+
+## Trace Context in Logs
+
+When [Exporting Application Logs](#exporting-application-logs)
+`service.name`, `traceId`, `spanId` & `flags` will be automatically added to the OpenTelemetry logs.
+
+Example log output:
+```json
+{
+  ...
+  "resource":{"attributes":[{"key":"service.name","value":{"stringValue":"php-example"}}]},
+  ...
+  "logRecords":[{"timeUnixNano":"1762572315653380000","observedTimeUnixNano":"1762572315653559040","severityNumber":9,"severityText":"INFO","body":{"stringValue":"hello, otel"},"flags":1,"traceId":"1c52067371dfddaa6ed58c42d43d0a2f","spanId":"f33aaf87fc3ca8ab"}],
+  ...
+}
+```
+
+If the application log is not exported via OTLP, trace context can be injected into the log messages by using the OTel SDK function `Context::getCurrent()`.
+
+Monolog example capturing the trace context with a [processor](https://seldaek.github.io/monolog/doc/01-usage.html#using-processors):
+```php
+use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\Context\Context;
+
+$logger->pushProcessor(function ($record) {
+  $spanContext = Span::fromContext(Context::getCurrent())->getContext();
+  $record['message'] .= ' trace_id='.$spanContext->getTraceId() . ' span_id=' . $spanContext->getSpanId() . ' trace_flags=' . ($spanContext->getTraceFlags() ? '01' : '00');
+  return $record;
+});
+```
