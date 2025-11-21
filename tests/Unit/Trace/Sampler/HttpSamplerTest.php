@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Tests\Unit\Trace\Sampler;
 
+use Http\Client\HttpAsyncClient;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 
@@ -70,12 +74,13 @@ class HttpSamplerTest extends TestCase
 
     public function test_non_200_status_code_does_not_sample(): void
     {
-        $client = $this->createMock(\Psr\Http\Client\ClientInterface::class);
-        $requestFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
-        $request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
-        $response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $client = $this->createMock(HttpAsyncClient::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
         $requestFactory->method('createRequest')->willReturn($request);
-        $client->method('sendRequest')->willReturn($response);
+        $promise = $this->createMock(\Http\Promise\Promise::class);
+        $client->method('sendAsyncRequest')->willReturn($promise);
         $response->method('getStatusCode')->willReturn(500);
         $response->method('getHeaderLine')->willReturn('application/json');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags'=>'SAMPLE_START','value'=>1,'timestamp'=>time(),'ttl'=>60,'arguments'=>[]]) ]));
@@ -86,12 +91,13 @@ class HttpSamplerTest extends TestCase
 
     public function test_non_json_content_type_does_not_sample(): void
     {
-        $client = $this->createMock(\Psr\Http\Client\ClientInterface::class);
-        $requestFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
-        $request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
-        $response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $client = $this->createMock(HttpAsyncClient::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
         $requestFactory->method('createRequest')->willReturn($request);
-        $client->method('sendRequest')->willReturn($response);
+        $promise = $this->createMock(\Http\Promise\Promise::class);
+        $client->method('sendAsyncRequest')->willReturn($promise);
         $response->method('getStatusCode')->willReturn(200);
         $response->method('getHeaderLine')->willReturn('text/plain');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => 'not json']));
@@ -102,12 +108,13 @@ class HttpSamplerTest extends TestCase
 
     public function test_invalid_json_response_does_not_sample(): void
     {
-        $client = $this->createMock(\Psr\Http\Client\ClientInterface::class);
-        $requestFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
-        $request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
-        $response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $client = $this->createMock(HttpAsyncClient::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $promise = $this->createMock(\Http\Promise\Promise::class);
         $requestFactory->method('createRequest')->willReturn($request);
-        $client->method('sendRequest')->willReturn($response);
+        $client->method('sendAsyncRequest')->willReturn($promise);
         $response->method('getStatusCode')->willReturn(200);
         $response->method('getHeaderLine')->willReturn('application/json');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => '{not valid json']));
@@ -118,11 +125,11 @@ class HttpSamplerTest extends TestCase
 
     public function test_exception_during_request_does_not_sample(): void
     {
-        $client = $this->createMock(\Psr\Http\Client\ClientInterface::class);
-        $requestFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
-        $request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
+        $client = $this->createMock(HttpAsyncClient::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
         $requestFactory->method('createRequest')->willReturn($request);
-        $client->method('sendRequest')->willThrowException(new \Exception('fail'));
+        $client->method('sendAsyncRequest')->willThrowException(new \Exception('fail'));
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
         $this->assertEquals(0, $result->getDecision());
@@ -130,8 +137,13 @@ class HttpSamplerTest extends TestCase
 
     public function test_skip_loop_within_60_seconds(): void
     {
-        $client = $this->createMock(\Psr\Http\Client\ClientInterface::class);
-        $requestFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
+        $client = $this->createMock(HttpAsyncClient::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $promise = $this->createMock(\Http\Promise\Promise::class);
+        $requestFactory->method('createRequest')->willReturn($request);
+        $client->method('sendAsyncRequest')->willReturn($promise);
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null, $client, $requestFactory);
         // Set the request_timestamp to now
         $ref = new \ReflectionClass($sampler);
@@ -151,12 +163,13 @@ class HttpSamplerTest extends TestCase
 
     public function test_warning_deduplication(): void
     {
-        $client = $this->createMock(\Psr\Http\Client\ClientInterface::class);
-        $requestFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
-        $request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
-        $response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $client = $this->createMock(HttpAsyncClient::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
         $requestFactory->method('createRequest')->willReturn($request);
-        $client->method('sendRequest')->willReturn($response);
+        $promise = $this->createMock(\Http\Promise\Promise::class);
+        $client->method('sendAsyncRequest')->willReturn($promise);
         $response->method('getStatusCode')->willReturn(500);
         $response->method('getHeaderLine')->willReturn('application/json');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags'=>'SAMPLE_START','value'=>1,'timestamp'=>time(),'ttl'=>60,'arguments'=>[]]) ]));

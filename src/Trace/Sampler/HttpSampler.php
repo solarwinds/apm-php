@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace Solarwinds\ApmPhp\Trace\Sampler;
 
 use Exception;
+use Http\Client\HttpAsyncClient;
+use Http\Discovery\HttpAsyncClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
-use Http\Discovery\Psr18ClientDiscovery;
+use Http\Promise\Promise;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
-use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 
 /**
@@ -31,10 +33,11 @@ class HttpSampler extends Sampler
     private string $hostname;
     private ?string $lastWarningMessage = null;
     private ?int $request_timestamp = null;
-    private ClientInterface $client;
+    private HttpAsyncClient $client;
+    private ?Promise $promise = null;
     private RequestFactoryInterface $requestFactory;
 
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null)
+    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?HttpAsyncClient $client = null, ?RequestFactoryInterface $requestFactory = null)
     {
         parent::__construct($meterProvider, $config, $initial);
 
@@ -42,7 +45,7 @@ class HttpSampler extends Sampler
         $this->service = urlencode($config->getService());
         $this->headers = $config->getHeaders();
         $this->hostname = urlencode(gethostname());
-        $this->client = $client ?? Psr18ClientDiscovery::find();
+        $this->client = $client ?? HttpAsyncClientDiscovery::find();
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
 
         $this->loop();
@@ -62,30 +65,36 @@ class HttpSampler extends Sampler
             foreach ($this->headers as $key => $value) {
                 $req = $req->withHeader($key, $value);
             }
-            $res = $this->client->sendRequest($req);
+            $this->promise = $this->client->sendAsyncRequest($req);
             $this->request_timestamp = time();
-            if ($res->getStatusCode() !== 200) {
-                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
+            $this->promise->then(function (ResponseInterface $response) {
+                if ($response->getStatusCode() !== 200) {
+                    $this->warn('Received unexpected status code ' . $response->getStatusCode());
 
-                return;
-            }
-            // Check if the content type is JSON
-            $contentType = $res->getHeaderLine('Content-Type');
-            if (stripos($contentType, 'application/json') === false) {
-                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
+                    return $response;
+                }
+                // Check if the content type is JSON
+                $contentType = $response->getHeaderLine('Content-Type');
+                if (stripos($contentType, 'application/json') === false) {
+                    $this->warn('Received unexpected content type ' . $contentType);
 
-                return;
-            }
-            $content = $res->getBody()->getContents();
-            $this->logDebug('Received sampling settings response ' . $content);
-            $unparsed = json_decode($content, true);
-            $parsed = $this->parsedAndUpdateSettings($unparsed);
-            if (!$parsed) {
-                $this->warn('Retrieved sampling settings are invalid');
+                    return $response;
+                }
+                $content = $response->getBody()->getContents();
+                $this->logDebug('Received sampling settings response ' . $content);
+                $unparsed = json_decode($content, true);
+                $parsed = $this->parsedAndUpdateSettings($unparsed);
+                if (!$parsed) {
+                    $this->warn('Retrieved sampling settings are invalid');
 
-                return;
-            }
-            $this->lastWarningMessage = null;
+                    return $response;
+                }
+                $this->lastWarningMessage = null;
+
+                return $response;
+            }, function (Exception $e) {
+                $this->warn('Unexpected error occurred: ' . $e->getMessage());
+            });
         } catch (Exception $e) {
             $this->warn('Unexpected error occurred: ' . $e->getMessage());
         }
@@ -109,7 +118,13 @@ class HttpSampler extends Sampler
         AttributesInterface $attributes,
         array $links,
     ): SamplingResult {
-        $this->loop();
+        if ($this->promise && $this->promise->getState() !== Promise::FULFILLED) {
+            try {
+                $this->promise->wait();
+            } catch (\Throwable $e) {
+                $this->warn('Unexpected error occurred: ' . $e->getMessage());
+            }
+        }
 
         return parent::shouldSample(...func_get_args());
     }
