@@ -45,11 +45,11 @@ class HttpSampler extends Sampler
         $this->client = $client ?? Psr18ClientDiscovery::find();
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
 
-        $this->loop();
-        self::logInfo('Starting HTTP sampler loop');
+        $this->request();
+        self::logInfo('Starting HTTP sampler');
     }
 
-    private function loop(): void
+    private function request(): void
     {
         if ($this->request_timestamp !== null && $this->request_timestamp + 60 >= time()) {
             return;
@@ -109,7 +109,7 @@ class HttpSampler extends Sampler
         AttributesInterface $attributes,
         array $links,
     ): SamplingResult {
-        $this->loop();
+        $this->request();
 
         return parent::shouldSample(...func_get_args());
     }
