@@ -56,7 +56,7 @@ class HttpSampler extends Sampler
         }
 
         try {
-            $url = "http://localhost:8080/";// $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
+            $url = "http://local-go:8080/";// $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
             $req = $this->requestFactory->createRequest('GET', $url);
             foreach ($this->headers as $key => $value) {
