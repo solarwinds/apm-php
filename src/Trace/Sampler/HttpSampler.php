@@ -56,7 +56,7 @@ class HttpSampler extends Sampler
         }
 
         try {
-            $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
+            $url = "http://localhost:8080/";// $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
             $req = $this->requestFactory->createRequest('GET', $url);
             foreach ($this->headers as $key => $value) {
@@ -79,6 +79,7 @@ class HttpSampler extends Sampler
             $content = $res->getBody()->getContents();
             $this->logDebug('Received sampling settings response ' . $content);
             $unparsed = json_decode($content, true);
+            $unparsed['timestamp'] = time();
             $parsed = $this->parsedAndUpdateSettings($unparsed);
             if (!$parsed) {
                 $this->warn('Retrieved sampling settings are invalid');
