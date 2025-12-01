@@ -62,23 +62,31 @@ class HttpSampler extends Sampler
             foreach ($this->headers as $key => $value) {
                 $req = $req->withHeader($key, $value);
             }
-            $res = $this->client->sendRequest($req);
+            // $res = $this->client->sendRequest($req);
             $this->request_timestamp = time();
-            if ($res->getStatusCode() !== 200) {
-                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
+//            if ($res->getStatusCode() !== 200) {
+//                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
+//
+//                return;
+//            }
+//            // Check if the content type is JSON
+//            $contentType = $res->getHeaderLine('Content-Type');
+//            if (stripos($contentType, 'application/json') === false) {
+//                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
+//
+//                return;
+//            }
+//            $content = $res->getBody()->getContents();
+            $path = '/tmp/solarwinds-apm-settings.json';
+            $content = file_get_contents($path);
+            if ($content === false) {
+                $this->logError('Unable to get content from ' . $path, ['path' => $path]);
 
                 return;
             }
-            // Check if the content type is JSON
-            $contentType = $res->getHeaderLine('Content-Type');
-            if (stripos($contentType, 'application/json') === false) {
-                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
-
-                return;
-            }
-            $content = $res->getBody()->getContents();
             $this->logDebug('Received sampling settings response ' . $content);
             $unparsed = json_decode($content, true);
+            $unparsed['timestamp'] = time();
             $parsed = $this->parsedAndUpdateSettings($unparsed);
             if (!$parsed) {
                 $this->warn('Retrieved sampling settings are invalid');
