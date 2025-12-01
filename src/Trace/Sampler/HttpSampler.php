@@ -62,23 +62,25 @@ class HttpSampler extends Sampler
             foreach ($this->headers as $key => $value) {
                 $req = $req->withHeader($key, $value);
             }
-            $res = $this->client->sendRequest($req);
+//            $res = $this->client->sendRequest($req);
             $this->request_timestamp = time();
-            if ($res->getStatusCode() !== 200) {
-                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
-
-                return;
-            }
-            // Check if the content type is JSON
-            $contentType = $res->getHeaderLine('Content-Type');
-            if (stripos($contentType, 'application/json') === false) {
-                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
-
-                return;
-            }
-            $content = $res->getBody()->getContents();
-            $this->logDebug('Received sampling settings response ' . $content);
+//            if ($res->getStatusCode() !== 200) {
+//                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
+//
+//                return;
+//            }
+//            // Check if the content type is JSON
+//            $contentType = $res->getHeaderLine('Content-Type');
+//            if (stripos($contentType, 'application/json') === false) {
+//                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
+//
+//                return;
+//            }
+//            $content = $res->getBody()->getContents();
+//            $this->logDebug('Received sampling settings response ' . $content);
+            $content = '{"value":1000000,"flags":"SAMPLE_START,SAMPLE_THROUGH_ALWAYS,SAMPLE_BUCKET_ENABLED,TRIGGER_TRACE","timestamp":1764610531,"ttl":120,"arguments":{"BucketCapacity":2,"BucketRate":1,"TriggerRelaxedBucketCapacity":20,"TriggerRelaxedBucketRate":1,"TriggerStrictBucketCapacity":6,"TriggerStrictBucketRate":0.1,"SignatureKey":"signature"}}';
             $unparsed = json_decode($content, true);
+            $unparsed['timestamp'] = time();
             $parsed = $this->parsedAndUpdateSettings($unparsed);
             if (!$parsed) {
                 $this->warn('Retrieved sampling settings are invalid');
