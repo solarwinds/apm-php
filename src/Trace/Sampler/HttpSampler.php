@@ -6,10 +6,10 @@ namespace Solarwinds\ApmPhp\Trace\Sampler;
 
 use Exception;
 use Http\Discovery\Psr17FactoryDiscovery;
-use Http\Discovery\Psr18ClientDiscovery;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use Psr\Http\Client\ClientInterface;
@@ -42,7 +42,9 @@ class HttpSampler extends Sampler
         $this->service = urlencode($config->getService());
         $this->headers = $config->getHeaders();
         $this->hostname = urlencode(gethostname());
-        $this->client = $client ?? Psr18ClientDiscovery::find();
+        $this->client = $client ?? Discovery::find([
+            'timeout' => 10,
+        ]);
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
 
         $this->request();
