@@ -14,6 +14,9 @@ use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use React\Http\Browser;
+use React\Promise\PromiseInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 
 /**
@@ -33,6 +36,9 @@ class HttpSampler extends Sampler
     private ?int $request_timestamp = null;
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
+    private Browser $browser;
+
+    private PromiseInterface $promise;
 
     public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null)
     {
@@ -44,6 +50,8 @@ class HttpSampler extends Sampler
         $this->hostname = urlencode(gethostname());
         $this->client = $client ?? Psr18ClientDiscovery::find();
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
+
+        $this->browser = new Browser();
 
         $this->loop();
         self::logInfo('Starting HTTP sampler loop');
@@ -58,34 +66,55 @@ class HttpSampler extends Sampler
         try {
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
-            $req = $this->requestFactory->createRequest('GET', $url);
-            foreach ($this->headers as $key => $value) {
-                $req = $req->withHeader($key, $value);
-            }
-            $res = $this->client->sendRequest($req);
+            $this->promise = $this->browser->get($url, $this->headers)->then(function (ResponseInterface $response) use ($url) {
+                $contentType = $response->getHeaderLine('Content-Type');
+                if (stripos($contentType, 'application/json') === false) {
+                    $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
+
+                    return;
+                }
+                $content = $response->getBody()->getContents();
+                $this->logDebug(microtime(true). ' Received sampling settings response ' . $content);
+                $unparsed = json_decode($content, true);
+                $parsed = $this->parsedAndUpdateSettings($unparsed);
+                if (!$parsed) {
+                    $this->warn('Retrieved sampling settings are invalid');
+
+                    return;
+                }
+                $this->lastWarningMessage = null;
+            }, null);
+            $this->logInfo(microtime(true) . ' Just sent request to ' . $url);
             $this->request_timestamp = time();
-            if ($res->getStatusCode() !== 200) {
-                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
 
-                return;
-            }
-            // Check if the content type is JSON
-            $contentType = $res->getHeaderLine('Content-Type');
-            if (stripos($contentType, 'application/json') === false) {
-                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
-
-                return;
-            }
-            $content = $res->getBody()->getContents();
-            $this->logDebug('Received sampling settings response ' . $content);
-            $unparsed = json_decode($content, true);
-            $parsed = $this->parsedAndUpdateSettings($unparsed);
-            if (!$parsed) {
-                $this->warn('Retrieved sampling settings are invalid');
-
-                return;
-            }
-            $this->lastWarningMessage = null;
+//            $req = $this->requestFactory->createRequest('GET', $url);
+//            foreach ($this->headers as $key => $value) {
+//                $req = $req->withHeader($key, $value);
+//            }
+//            $res = $this->client->sendRequest($req);
+//            $this->request_timestamp = time();
+//            if ($res->getStatusCode() !== 200) {
+//                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
+//
+//                return;
+//            }
+//            // Check if the content type is JSON
+//            $contentType = $res->getHeaderLine('Content-Type');
+//            if (stripos($contentType, 'application/json') === false) {
+//                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
+//
+//                return;
+//            }
+//            $content = $res->getBody()->getContents();
+//            $this->logDebug('Received sampling settings response ' . $content);
+//            $unparsed = json_decode($content, true);
+//            $parsed = $this->parsedAndUpdateSettings($unparsed);
+//            if (!$parsed) {
+//                $this->warn('Retrieved sampling settings are invalid');
+//
+//                return;
+//            }
+//            $this->lastWarningMessage = null;
         } catch (Exception $e) {
             $this->warn('Unexpected error occurred: ' . $e->getMessage());
         }
