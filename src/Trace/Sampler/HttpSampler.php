@@ -6,10 +6,10 @@ namespace Solarwinds\ApmPhp\Trace\Sampler;
 
 use Exception;
 use Http\Discovery\Psr17FactoryDiscovery;
-use Http\Discovery\Psr18ClientDiscovery;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use Psr\Http\Client\ClientInterface;
@@ -42,14 +42,16 @@ class HttpSampler extends Sampler
         $this->service = urlencode($config->getService());
         $this->headers = $config->getHeaders();
         $this->hostname = urlencode(gethostname());
-        $this->client = $client ?? Psr18ClientDiscovery::find();
+        $this->client = $client ?? Discovery::find([
+            'timeout' => 10,
+        ]);
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
 
-        $this->loop();
-        self::logInfo('Starting HTTP sampler loop');
+        $this->request();
+        self::logInfo('Starting HTTP sampler');
     }
 
-    private function loop(): void
+    private function request(): void
     {
         if ($this->request_timestamp !== null && $this->request_timestamp + 60 >= time()) {
             return;
@@ -109,7 +111,7 @@ class HttpSampler extends Sampler
         AttributesInterface $attributes,
         array $links,
     ): SamplingResult {
-        $this->loop();
+        $this->request();
 
         return parent::shouldSample(...func_get_args());
     }

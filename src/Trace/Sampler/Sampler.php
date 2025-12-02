@@ -12,7 +12,6 @@ use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
@@ -157,8 +156,6 @@ abstract class Sampler extends OboeSampler
     private bool $triggerMode;
     private array $transactionSettings = [];
 
-    private CompletedFuture $ready;
-
     public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, mixed $initial = null)
     {
         parent::__construct($meterProvider);
@@ -173,8 +170,6 @@ abstract class Sampler extends OboeSampler
             $this->transactionSettings[] = new TransactionSetting($transactionSetting['tracing'] ?? false, $transactionSetting['matcher'] ?? fn () => false);
         }
 
-        $this->ready = new CompletedFuture(false);
-
         if ($initial) {
             $this->parsedAndUpdateSettings($initial);
         }
@@ -186,9 +181,6 @@ abstract class Sampler extends OboeSampler
         if (isset($parsed['settings'])) {
             $this->logDebug('Valid settings ' . $parsed['settings']);
             parent::updateSettings($parsed['settings']);
-            if (!$this->ready->await()) {
-                $this->ready->map(static fn (): bool => true);
-            }
 
             if (!empty($parsed['warning'])) {
                 $this->logWarning($parsed['warning']);
@@ -201,19 +193,6 @@ abstract class Sampler extends OboeSampler
 
         return null;
 
-    }
-
-    public function waitUntilReady(int $timeout): bool
-    {
-        while (!$this->ready->await()) {
-            $timeout -= 5;
-            if ($timeout <= 0) {
-                break;
-            }
-            usleep(5 * 1000);
-        }
-
-        return $this->ready->await();
     }
 
     public function localSettings(
