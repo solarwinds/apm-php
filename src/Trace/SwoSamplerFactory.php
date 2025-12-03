@@ -18,6 +18,7 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
+use Solarwinds\ApmPhp\Trace\Sampler\HttpAsyncSampler;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 
 class SwoSamplerFactory
@@ -26,6 +27,7 @@ class SwoSamplerFactory
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
     private const SOLARWINDS_PREFIX = 'solarwinds';
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
+    private const VALUE_SOLARWINDS_HTTP_ASYNC = 'solarwinds_http_async';
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
     private const SERVICE_KEY_DELIMITER = ':';
 
@@ -59,6 +61,32 @@ class SwoSamplerFactory
                                 $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
 
                                 return new ParentBased($http, $http, $http);
+                            }
+                            self::logWarning('SW_APM_SERVICE_KEY is not correctly formatted. Falling back to AlwaysOffSampler.');
+
+                            return new AlwaysOffSampler();
+                        } catch (Exception $e) {
+                            self::logWarning('SW_APM_COLLECTOR/SW_APM_SERVICE_KEY ' . $e->getMessage() . '. Falling back to AlwaysOffSampler.');
+
+                            return new AlwaysOffSampler();
+                        }
+                    }
+                case self::VALUE_SOLARWINDS_HTTP_ASYNC:
+                    {
+                        try {
+                            $collector = Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
+                                ? Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR)
+                                : self::DEFAULT_APM_COLLECTOR;
+                            $serviceKey = Configuration::has(SolarwindsEnv::SW_APM_SERVICE_KEY)
+                                ? Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY)
+                                : null;
+                            if ($serviceKey && str_contains($serviceKey, self::SERVICE_KEY_DELIMITER)) {
+                                [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
+                                $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
+                                // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
+                                $httpAsync = new HttpAsyncSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
+
+                                return new ParentBased($httpAsync, $httpAsync, $httpAsync);
                             }
                             self::logWarning('SW_APM_SERVICE_KEY is not correctly formatted. Falling back to AlwaysOffSampler.');
 
