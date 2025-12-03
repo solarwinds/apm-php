@@ -61,11 +61,10 @@ class SdkAutoloader
 {
     use LogsMessagesTrait;
 
+    private const SW_APM_AUTOLOAD_ENABLED = 'SW_APM_AUTOLOAD_ENABLED';
+
     public static function autoload(): bool
     {
-        // Reset the globals to avoid any previous configuration
-        Globals::reset();
-
         if (!self::isEnabled() || self::isExcludedUrl()) {
             return false;
         }
@@ -294,7 +293,7 @@ class SdkAutoloader
      */
     public static function isEnabled(): bool
     {
-        return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+        return Configuration::getBoolean(self::SW_APM_AUTOLOAD_ENABLED);
     }
 
     /**
