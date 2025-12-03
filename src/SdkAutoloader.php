@@ -65,6 +65,7 @@ class SdkAutoloader
     {
         // Reset the globals to avoid any previous configuration
         Globals::reset();
+        self::logInfo("SDK autoloader invoked");
 
         if (!self::isEnabled() || self::isExcludedUrl()) {
             return false;
