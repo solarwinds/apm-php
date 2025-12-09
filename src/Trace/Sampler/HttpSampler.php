@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
@@ -30,7 +31,6 @@ class HttpSampler extends Sampler
     private string $service;
     private string $hostname;
     private ?string $lastWarningMessage = null;
-    private ?int $request_timestamp = null;
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
 
@@ -47,16 +47,28 @@ class HttpSampler extends Sampler
         ]);
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
 
-        $this->request();
-        self::logInfo('Starting HTTP sampler');
+        $this->logInfo('Starting HTTP sampler');
     }
 
     private function request(): void
     {
-        if ($this->request_timestamp !== null && $this->request_timestamp + 60 >= time()) {
-            return;
+        $filename = sys_get_temp_dir() . 'php-worker-' . getmypid() . '.json';
+        if (file_exists($filename)) {
+            $content = file_get_contents($filename);
+            $this->logDebug('Reading sampling settings from ' . $filename);
+            $unparsed = json_decode($content, true);
+            if (is_array($unparsed) && isset($unparsed['timestamp']) && $unparsed['timestamp'] + 60 >= time()) {
+                $this->logDebug('Using cached sampling settings from ' . $filename);
+                $parsed = $this->parsedAndUpdateSettings($unparsed);
+                if ($parsed) {
+                    $this->lastWarningMessage = null;
+
+                    return;
+                }
+            }
         }
 
+        // otherwise make the HTTP request
         try {
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
@@ -65,7 +77,6 @@ class HttpSampler extends Sampler
                 $req = $req->withHeader($key, $value);
             }
             $res = $this->client->sendRequest($req);
-            $this->request_timestamp = time();
             if ($res->getStatusCode() !== 200) {
                 $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
 
@@ -88,6 +99,10 @@ class HttpSampler extends Sampler
                 return;
             }
             $this->lastWarningMessage = null;
+            // cache the settings to the temp file
+            file_put_contents($filename, $content);
+        } catch (ClientExceptionInterface $e) {
+            $this->warn('Unexpected PSR client exception occurred: ' . $e->getMessage());
         } catch (Exception $e) {
             $this->warn('Unexpected error occurred: ' . $e->getMessage());
         }
