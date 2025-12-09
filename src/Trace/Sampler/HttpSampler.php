@@ -52,7 +52,7 @@ class HttpSampler extends Sampler
 
     private function request(): void
     {
-        $filename = sys_get_temp_dir() . 'php-worker-' . getmypid() . '.json';
+        $filename = sys_get_temp_dir() . '/php-worker-' . getmypid() . '.json';
         $this->logInfo('Using temp file ' . $filename . ' for caching sampling settings');
         if (file_exists($filename)) {
             $content = file_get_contents($filename);
