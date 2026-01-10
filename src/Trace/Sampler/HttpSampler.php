@@ -21,7 +21,7 @@ class HttpSampler extends Sampler
     use LogsMessagesTrait;
 
     private ?string $lastWarningMessage = null;
-    const SETTING = '{"value":1000000,"flags":"SAMPLE_START,SAMPLE_THROUGH_ALWAYS,SAMPLE_BUCKET_ENABLED,TRIGGER_TRACE","timestamp":1768001828,"ttl":120,"arguments":{"BucketCapacity":2,"BucketRate":1,"TriggerRelaxedBucketCapacity":20,"TriggerRelaxedBucketRate":1,"TriggerStrictBucketCapacity":6,"TriggerStrictBucketRate":0.1,"SignatureKey":"a9012f2c6b25d1f5d8b87ed1a3858abd230cac7c99e8ec2aeacfaba6aa123456"}}';
+    const PATH = '/tmp/solarwinds-apm-settings.json';
 
     public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null)
     {
@@ -32,7 +32,12 @@ class HttpSampler extends Sampler
 
     private function request(): void
     {
-        $content = HttpSampler::SETTING;
+        $content = file_get_contents(HttpSampler::PATH);
+        if ($content === false) {
+            $this->logError('Unable to get content from ' . HttpSampler::PATH, ['path' => HttpSampler::PATH]);
+
+            return;
+        }
         $this->logDebug('Received sampling settings response ' . $content);
         $unparsed = json_decode($content, true);
         $unparsed['timestamp'] = time();
