@@ -75,6 +75,7 @@ class HttpSampler extends Sampler
             $content = $res->getBody()->getContents();
             $this->logDebug('Received sampling settings response ' . $content);
             $unparsed = json_decode($content, true);
+            $unparsed['timestamp'] = time();
             $parsed = $this->parsedAndUpdateSettings($unparsed);
             if (!$parsed) {
                 $this->warn('Retrieved sampling settings are invalid');
