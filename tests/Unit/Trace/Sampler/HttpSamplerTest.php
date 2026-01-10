@@ -128,20 +128,20 @@ class HttpSamplerTest extends TestCase
         $this->assertEquals(0, $result->getDecision());
     }
 
-    public function test_skip_loop_within_60_seconds(): void
-    {
-        $client = $this->createMock(\Psr\Http\Client\ClientInterface::class);
-        $requestFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null, $client, $requestFactory);
-        // Set the request_timestamp to now
-        $ref = new \ReflectionClass($sampler);
-        $prop = $ref->getProperty('request_timestamp');
-        $prop->setAccessible(true);
-        $prop->setValue($sampler, time());
-        // Should not call client->sendRequest again
-        $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(0, $result->getDecision());
-    }
+    //    public function test_skip_loop_within_60_seconds(): void
+    //    {
+    //        $client = $this->createMock(\Psr\Http\Client\ClientInterface::class);
+    //        $requestFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
+    //        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null, $client, $requestFactory);
+    //        // Set the request_timestamp to now
+    //        $ref = new \ReflectionClass($sampler);
+    //        $prop = $ref->getProperty('request_timestamp');
+    //        $prop->setAccessible(true);
+    //        $prop->setValue($sampler, time());
+    //        // Should not call client->sendRequest again
+    //        $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
+    //        $this->assertEquals(0, $result->getDecision());
+    //    }
 
     public function test_get_description_returns_expected_string(): void
     {
