@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Trace\Sampler;
 
-use Exception;
-use Http\Discovery\Psr17FactoryDiscovery;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 
 /**
@@ -25,71 +20,25 @@ class HttpSampler extends Sampler
 {
     use LogsMessagesTrait;
 
-    private string $url;
-    private array $headers;
-    private string $service;
-    private string $hostname;
     private ?string $lastWarningMessage = null;
-    private ?int $request_timestamp = null;
-    private ClientInterface $client;
-    private RequestFactoryInterface $requestFactory;
+    const SETTING = '{"value":1000000,"flags":"SAMPLE_START,SAMPLE_THROUGH_ALWAYS,SAMPLE_BUCKET_ENABLED,TRIGGER_TRACE","timestamp":1768001828,"ttl":120,"arguments":{"BucketCapacity":2,"BucketRate":1,"TriggerRelaxedBucketCapacity":20,"TriggerRelaxedBucketRate":1,"TriggerStrictBucketCapacity":6,"TriggerStrictBucketRate":0.1,"SignatureKey":"a9012f2c6b25d1f5d8b87ed1a3858abd230cac7c99e8ec2aeacfaba6aa123456"}}';
 
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null)
+    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null)
     {
         parent::__construct($meterProvider, $config, $initial);
 
-        $this->url = $config->getCollector();
-        $this->service = urlencode($config->getService());
-        $this->headers = $config->getHeaders();
-        $this->hostname = urlencode(gethostname());
-        $this->client = $client ?? Discovery::find([
-            'timeout' => 10,
-        ]);
-        $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
-
-        $this->request();
-        self::logInfo('Starting HTTP sampler');
+        self::logInfo('Starting HTTP hardcode sampler');
     }
 
     private function request(): void
     {
-        if ($this->request_timestamp !== null && $this->request_timestamp + 60 >= time()) {
-            return;
-        }
-
-        try {
-            $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
-            $this->logDebug('Retrieving sampling settings from ' . $url);
-            $req = $this->requestFactory->createRequest('GET', $url);
-            foreach ($this->headers as $key => $value) {
-                $req = $req->withHeader($key, $value);
-            }
-            $res = $this->client->sendRequest($req);
-            $this->request_timestamp = time();
-            if ($res->getStatusCode() !== 200) {
-                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
-
-                return;
-            }
-            // Check if the content type is JSON
-            $contentType = $res->getHeaderLine('Content-Type');
-            if (stripos($contentType, 'application/json') === false) {
-                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
-
-                return;
-            }
-            $content = $res->getBody()->getContents();
-            $this->logDebug('Received sampling settings response ' . $content);
-            $unparsed = json_decode($content, true);
-            $parsed = $this->parsedAndUpdateSettings($unparsed);
-            if (!$parsed) {
-                $this->warn('Retrieved sampling settings are invalid');
-
-                return;
-            }
-            $this->lastWarningMessage = null;
-        } catch (Exception $e) {
-            $this->warn('Unexpected error occurred: ' . $e->getMessage());
+        $content = HttpSampler::SETTING;
+        $this->logDebug('Received sampling settings response ' . $content);
+        $unparsed = json_decode($content, true);
+        $unparsed['timestamp'] = time();
+        $parsed = $this->parsedAndUpdateSettings($unparsed);
+        if (!$parsed) {
+            $this->warn('Retrieved sampling settings are invalid');
         }
     }
 
@@ -97,7 +46,6 @@ class HttpSampler extends Sampler
     {
         if ($message !== $this->lastWarningMessage) {
             $this->logWarning($message, $context);
-            $this->lastWarningMessage = $message;
         } else {
             $this->logDebug($message, $context);
         }
@@ -118,6 +66,6 @@ class HttpSampler extends Sampler
 
     public function getDescription(): string
     {
-        return sprintf('HTTP Sampler (%s)', parse_url($this->url, PHP_URL_HOST));
+        return 'HTTP hardcode Sampler';
     }
 }
