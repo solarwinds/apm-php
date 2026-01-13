@@ -56,6 +56,9 @@ class HttpSampler extends Sampler
             $this->logInfo('Retrieved sampling settings from Swo extension: ' . $setting);
             if (strlen($setting) > 0) {
                 $unparsed = json_decode($setting, true);
+                $unparsed["values"] = 1000000;
+                $unparsed["arguments"]["BucketCapacity"] = 2;
+                $unparsed["arguments"]["BucketRate"] = 2;
                 $parsed = $this->parsedAndUpdateSettings($unparsed);
                 if (!$parsed) {
                     $this->warn('Retrieved sampling settings are invalid');
