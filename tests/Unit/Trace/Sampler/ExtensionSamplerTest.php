@@ -66,7 +66,7 @@ class ExtensionSamplerTest extends TestCase
         $config = $this->createMock(Configuration::class);
         $sampler = $this->getMockBuilder(ExtensionSampler::class)->setConstructorArgs([$meterProvider, $config])->onlyMethods(['isExtensionLoaded', 'settingsFunction'])->getMock();
         $sampler->expects($this->once())->method('isExtensionLoaded')->willReturn(true);
-        $sampler->expects($this->once())->method('settingsFunction')->willReturn('{"value":1000000,"flags":"SAMPLE_START,SAMPLE_THROUGH_ALWAYS,SAMPLE_BUCKET_ENABLED,TRIGGER_TRACE","timestamp":4072744812,"ttl":120,"arguments":{"BucketCapacity":2,"BucketRate":1,"TriggerRelaxedBucketCapacity":20,"TriggerRelaxedBucketRate":1,"TriggerStrictBucketCapacity":6,"TriggerStrictBucketRate":0.1,"SignatureKey":"a9012f2c6b25d1f5d8b87ed1a3858abd230cac7c99e8ec2aeacfaba6aa123456"}');
+        $sampler->expects($this->once())->method('settingsFunction')->willReturn('{"value":1000000,"flags":"SAMPLE_START,SAMPLE_THROUGH_ALWAYS,SAMPLE_BUCKET_ENABLED,TRIGGER_TRACE","timestamp":4072744812,"ttl":120,"arguments":{"BucketCapacity":2,"BucketRate":1,"TriggerRelaxedBucketCapacity":20,"TriggerRelaxedBucketRate":1,"TriggerStrictBucketCapacity":6,"TriggerStrictBucketRate":0.1,"SignatureKey":"signaturekey"}');
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
         $this->assertEquals(0, $result->getDecision());
     }
