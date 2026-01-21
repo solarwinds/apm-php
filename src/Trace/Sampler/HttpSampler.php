@@ -30,7 +30,6 @@ class HttpSampler extends Sampler
     private string $service;
     private string $hostname;
     private ?string $lastWarningMessage = null;
-    private ?int $request_timestamp = null;
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
 
@@ -47,16 +46,11 @@ class HttpSampler extends Sampler
         ]);
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
 
-        $this->request();
         self::logInfo('Starting HTTP sampler');
     }
 
     private function request(): void
     {
-        if ($this->request_timestamp !== null && $this->request_timestamp + 60 >= time()) {
-            return;
-        }
-
         try {
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
@@ -65,7 +59,6 @@ class HttpSampler extends Sampler
                 $req = $req->withHeader($key, $value);
             }
             $res = $this->client->sendRequest($req);
-            $this->request_timestamp = time();
             if ($res->getStatusCode() !== 200) {
                 $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
 

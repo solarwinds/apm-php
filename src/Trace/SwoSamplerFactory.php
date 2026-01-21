@@ -18,14 +18,18 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
+use Solarwinds\ApmPhp\Trace\Sampler\ExtensionSampler;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 
 class SwoSamplerFactory
 {
     use LogsMessagesTrait;
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
     private const SOLARWINDS_PREFIX = 'solarwinds';
+    private const VALUE_SOLARWINDS_EXTENSION = 'solarwinds_extension';
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
+    private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
     private const SERVICE_KEY_DELIMITER = ':';
 
@@ -43,6 +47,10 @@ class SwoSamplerFactory
                     $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
 
                     return new ParentBased(new TraceIdRatioBasedSampler($arg));
+                case self::VALUE_SOLARWINDS_EXTENSION:
+                    $ext = new ExtensionSampler($meterProvider, new SolarwindsConfiguration(true, '', '', [], true, true, null, []));
+
+                    return new ParentBased($ext, $ext, $ext);
                 case self::VALUE_SOLARWINDS_HTTP:
                     {
                         try {
@@ -69,6 +77,10 @@ class SwoSamplerFactory
                             return new AlwaysOffSampler();
                         }
                     }
+                case self::VALUE_SOLARWINDS_JSON:
+                    $json = new JsonSampler($meterProvider, new SolarwindsConfiguration(true, '', '', [], true, true, null, []));
+
+                    return new ParentBased($json, $json, $json);
             }
         }
 
