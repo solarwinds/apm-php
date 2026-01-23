@@ -23,7 +23,7 @@ final class Solarwinds
 
                 return $sampler->waitUntilReady($timeoutMs);
             }
-            self::logDebug('Solarwinds not ready. SamplerInterface is not an instance of ExtensionSampler');
+            self::logDebug('Solarwinds not ready. SamplerInterface is not an instance of Solarwinds ParentBasedSampler');
 
             return false;
 
