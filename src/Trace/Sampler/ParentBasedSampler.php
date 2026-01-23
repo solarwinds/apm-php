@@ -65,6 +65,7 @@ class ParentBasedSampler implements SamplerInterface
 
             return $extensionSampler->isExtensionLoaded() && strlen($extensionSampler->settingsFunction($timeoutMs)) > 0;
         }
+
         // For other sampler types, they are always ready as apm-php is single-threaded
         return true;
     }
