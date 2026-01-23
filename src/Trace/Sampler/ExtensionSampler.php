@@ -52,7 +52,7 @@ class ExtensionSampler extends Sampler
     private function request(): void
     {
         if ($this->isExtensionLoaded()) {
-            $settings = $this->settingsFunction(-1);
+            $settings = $this->settingsFunction();
             $this->logInfo('Retrieved sampling settings from apm_ext extension: ' . $settings);
             if (strlen($settings) > 0) {
                 try {
