@@ -18,12 +18,9 @@ require __DIR__ . '/../vendor/autoload.php';
 
 // Check if SDK is ready before starting any tracing operations.
 $ready = Solarwinds::waitUntilReady(1000);
-
+echo 'Solarwinds SDK ready: ' . ($ready ? 'true' : 'false') . PHP_EOL;
 // Create a tracer. Usually, tracer is a global variable.
 $tracer = Globals::tracerProvider()->getTracer('app_or_package_name');
-
-echo 'Solarwinds SDK ready: ' . ($ready ? 'true' : 'false') . PHP_EOL;
-
 // Create a root span (a trace) to measure some operation.
 $main = $tracer->spanBuilder('main-operation')->startSpan();
 // Future spans will be parented to the currently active span.
