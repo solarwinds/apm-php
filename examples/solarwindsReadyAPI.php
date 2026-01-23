@@ -16,11 +16,11 @@ putenv('OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions');
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Create a tracer. Usually, tracer is a global variable.
-$tracer = Globals::tracerProvider()->getTracer('app_or_package_name');
-
 // Check if SDK is ready before starting any tracing operations.
 $ready = Solarwinds::waitUntilReady(1000);
+
+// Create a tracer. Usually, tracer is a global variable.
+$tracer = Globals::tracerProvider()->getTracer('app_or_package_name');
 
 echo 'Solarwinds SDK ready: ' . ($ready ? 'true' : 'false') . PHP_EOL;
 
