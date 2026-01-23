@@ -30,21 +30,29 @@ class ExtensionSampler extends Sampler
         return extension_loaded('apm_ext');
     }
 
-    public function settingsFunction(): string
+    public function settingsFunction(int $timeoutMs = -1): string
     {
         if (function_exists('\Solarwinds\Sampler\settings')) {
-            return \Solarwinds\Sampler\settings();
+            if ($timeoutMs <= 0) {
+                return \Solarwinds\Sampler\settings();
+            }
+            $settings = '';
+            while ($timeoutMs > 0 && strlen($settings = \Solarwinds\Sampler\settings()) == 0) {
+                usleep(1000); // 1ms sleep
+                $timeoutMs--;
+            }
+
+            return $settings;
         }
         $this->logWarning('settings function from apm_ext does not exist');
 
         return '';
-
     }
 
     private function request(): void
     {
         if ($this->isExtensionLoaded()) {
-            $settings = $this->settingsFunction();
+            $settings = $this->settingsFunction(-1);
             $this->logInfo('Retrieved sampling settings from apm_ext extension: ' . $settings);
             if (strlen($settings) > 0) {
                 try {
