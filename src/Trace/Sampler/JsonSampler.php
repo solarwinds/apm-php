@@ -27,10 +27,9 @@ class JsonSampler extends Sampler
     {
         parent::__construct($meterProvider, $config);
         $this->path = $path;
-        $this->loop();
     }
 
-    private function loop(): void
+    private function request(): void
     {
         try {
             if (!file_exists($this->path)) {
@@ -44,7 +43,7 @@ class JsonSampler extends Sampler
 
                 return;
             }
-            $unparsed = json_decode($content, true);
+            $unparsed = json_decode($content, null, 512, JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR);
             if (!is_array($unparsed) || count($unparsed) !== 1) {
                 $this->logError('Invalid settings file', ['data' => $unparsed]);
 
@@ -53,10 +52,10 @@ class JsonSampler extends Sampler
             if (array_key_exists(0, $unparsed)) {
                 $this->parsedAndUpdateSettings($unparsed[0]);
             }
+        } catch (\JsonException $ex) {
+            $this->logError('json_decode error', ['path' => $this->path, 'error' => $ex->getMessage()]);
         } catch (Exception $e) {
             $this->logError('JsonSampler exception', ['path' => $this->path, 'error' => $e->getMessage()]);
-
-            return;
         }
     }
 
@@ -68,7 +67,7 @@ class JsonSampler extends Sampler
         AttributesInterface $attributes,
         array $links,
     ): SamplingResult {
-        $this->loop();
+        $this->request();
 
         return parent::shouldSample(...func_get_args());
     }
