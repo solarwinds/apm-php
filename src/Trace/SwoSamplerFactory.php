@@ -49,9 +49,31 @@ class SwoSamplerFactory
 
                     return new ParentBased(new TraceIdRatioBasedSampler($arg));
                 case self::VALUE_SOLARWINDS_EXTENSION:
-                    $ext = new ExtensionSampler($meterProvider, new SolarwindsConfiguration(true, '', '', [], true, true, null, []));
+                    {
+                        try {
+                            $collector = Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
+                                ? Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR)
+                                : self::DEFAULT_APM_COLLECTOR;
+                            $serviceKey = Configuration::has(SolarwindsEnv::SW_APM_SERVICE_KEY)
+                                ? Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY)
+                                : null;
+                            if ($serviceKey && str_contains($serviceKey, self::SERVICE_KEY_DELIMITER)) {
+                                [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
+                                $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
+                                // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
+                                $ext = new ExtensionSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, $collector, [], true, true, null, []));
 
-                    return new ParentBasedSampler($ext, $ext, $ext);
+                                return new ParentBasedSampler($ext, $ext, $ext);
+                            }
+                            self::logWarning('SW_APM_SERVICE_KEY is not correctly formatted. Falling back to AlwaysOffSampler.');
+
+                            return new AlwaysOffSampler();
+                        } catch (Exception $e) {
+                            self::logWarning('SW_APM_COLLECTOR/SW_APM_SERVICE_KEY ' . $e->getMessage() . '. Falling back to AlwaysOffSampler.');
+
+                            return new AlwaysOffSampler();
+                        }
+                    }
                 case self::VALUE_SOLARWINDS_HTTP:
                     {
                         try {

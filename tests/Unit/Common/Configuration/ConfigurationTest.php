@@ -18,7 +18,9 @@ class ConfigurationTest extends TestCase
 
     public function test_constructor_sets_properties()
     {
-        $transactionName = function () { return 'txn'; };
+        $transactionName = function () {
+            return 'txn';
+        };
         $config = new Configuration(
             true,
             'service-name',
@@ -67,7 +69,9 @@ class ConfigurationTest extends TestCase
         $this->assertNull($config->getTracingMode());
         $config->setTriggerTraceEnabled(true);
         $this->assertTrue($config->isTriggerTraceEnabled());
-        $closure = function () { return 'abc'; };
+        $closure = function () {
+            return 'abc';
+        };
         $config->setTransactionName($closure);
         $this->assertSame($closure, $config->getTransactionName());
         $config->setTransactionName(null);
@@ -78,7 +82,9 @@ class ConfigurationTest extends TestCase
 
     public function test_to_string_method()
     {
-        $closure = function () { return 'txn'; };
+        $closure = function () {
+            return 'txn';
+        };
         $config = new Configuration(true, 'svc', 'coll', ['h' => 'v'], false, true, $closure, ['s' => 'v']);
         $str = (string) $config;
         $this->assertStringContainsString('Configuration(enabled=true, service=svc, collector=coll', $str);
