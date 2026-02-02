@@ -90,17 +90,25 @@ class HttpSampler extends Sampler
                 $cached = $this->getCache($this->url, $this->token, $this->service);
                 if ($cached !== false) {
                     $unparsed = json_decode($cached, true);
-                    if (is_array($unparsed) && time() <= (int) $unparsed['timestamp'] + (int) $unparsed['ttl']) {
-                        $parsed = $this->parsedAndUpdateSettings($unparsed);
-                        if ($parsed) {
-                            // return if settings are valid
-                            $this->logDebug('Applied sampling settings from cache: ' . $cached);
+                    if (is_array($unparsed)) {
+                        if (time() <= (int) $unparsed['timestamp'] + (int) $unparsed['ttl']) {
+                            if ($this->parsedAndUpdateSettings($unparsed)) {
+                                // return if settings are valid
+                                $this->logDebug('Applied sampling settings from cache: ' . $cached);
 
-                            return;
+                                return;
+                            }
+                            $this->logDebug('Failed to parse and update settings from cache: ' . $cached);
+
+                        } else {
+                            $this->logDebug('Expired settings from cache: ' . $cached);
                         }
+                    } else {
+                        $this->logDebug('Wrong settings format from cache: ' . $cached);
                     }
+                } else {
+                    $this->logDebug('No cached settings found');
                 }
-                $this->logDebug('Failed to read settings from cache');
             }
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
