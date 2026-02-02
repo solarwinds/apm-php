@@ -97,10 +97,15 @@ class HttpSampler extends Sampler
                             $this->logDebug('Used sampling settings from cache: ' . $cached);
 
                             return;
+                        } else {
+                            $this->logDebug('Failed to parse sampling settings from cache: ' . $cached);
                         }
+                    } else {
+                        $this->logDebug('Unable to parse JSON data from cache: ' . $cached);
                     }
+                } else {
+                    $this->logDebug('Failed to read settings from cache');
                 }
-                $this->logDebug('Failed to read settings from cache');
             }
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
