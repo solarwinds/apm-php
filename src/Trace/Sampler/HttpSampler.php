@@ -93,6 +93,17 @@ class HttpSampler extends Sampler
                 if ($cached !== false) {
                     $unparsed = json_decode($cached, true);
                     $this->logDebug('unparsed' . implode(',', $unparsed));
+                    if (isset($unparsed['timestamp'], $unparsed['ttl'])) {
+                        $this->logDebug('unparsed timestamp: ' . $unparsed['timestamp']);
+                        $this->logDebug('unparsed ttl: ' . $unparsed['ttl']);
+                    } else {
+                        $this->logDebug('timestamp, ttl is not set');
+                    }
+                    if (is_array($unparsed)) {
+                        $this->logDebug('$unparsed is an array');
+                    } else {
+                        $this->logDebug('$unparsed is not an array');
+                    }
 //                    if (
 //                        isset($unparsed['value'], $unparsed['timestamp'], $unparsed['ttl']) &&
 //                        is_numeric($unparsed['value']) &&
