@@ -88,38 +88,19 @@ class HttpSampler extends Sampler
             // Try from cache
             if ($this->isExtensionLoaded()) {
                 $cached = $this->getCache($this->url, $this->token, $this->service);
-                $this->logDebug('cached = ' . $cached);
-                // $cached = "{\"value\":1000000,\"flags\":\"SAMPLE_START,SAMPLE_THROUGH_ALWAYS,SAMPLE_BUCKET_ENABLED,TRIGGER_TRACE\",\"timestamp\":1770065186,\"ttl\":120,\"arguments\":{\"BucketCapacity\":2,\"BucketRate\":1,\"TriggerRelaxedBucketCapacity\":20,\"TriggerRelaxedBucketRate\":1,\"TriggerStrictBucketCapacity\":6,\"TriggerStrictBucketRate\":0.1,\"SignatureKey\":\"a9012f2c6b25d1f5d8b87ed1a3858abd230cac7c99e8ec2aeacfaba6aa31ffc0\"}}";
                 if ($cached !== false) {
                     $unparsed = json_decode($cached, true);
-//                    $this->logDebug('unparsed' . implode(',', $unparsed));
-//                    if (isset($unparsed['timestamp'], $unparsed['ttl'])) {
-//                        $this->logDebug('unparsed timestamp: ' . $unparsed['timestamp']);
-//                        $this->logDebug('unparsed ttl: ' . $unparsed['ttl']);
-//                    } else {
-//                        $this->logDebug('timestamp, ttl is not set');
-//                    }
-//                    if (is_array($unparsed)) {
-//                        $this->logDebug('$unparsed is an array');
-//                    } else {
-//                        $this->logDebug('$unparsed is not an array');
-//                    }
                     if (is_array($unparsed) && time() <= (int) $unparsed['timestamp'] + (int) $unparsed['ttl']) {
                         $parsed = $this->parsedAndUpdateSettings($unparsed);
                         if ($parsed) {
                             // return if settings are valid
-                            $this->logDebug('Used sampling settings from cache: ' . $cached);
+                            $this->logDebug('Applied sampling settings from cache: ' . $cached);
 
                             return;
-                        } else {
-                            $this->logDebug('Failed to parse sampling settings from cache: ' . $cached);
                         }
-                    } else {
-                        $this->logDebug('Unable to parse JSON data from cache: ' . $cached);
                     }
-                } else {
-                    $this->logDebug('Failed to read settings from cache');
                 }
+                $this->logDebug('Failed to read settings from cache');
             }
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
