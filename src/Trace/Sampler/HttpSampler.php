@@ -88,10 +88,11 @@ class HttpSampler extends Sampler
             // Try from cache
             if ($this->isExtensionLoaded()) {
                 $cached = $this->getCache($this->url, $this->token, $this->service);
+                $this->logDebug('cached = ' . $cached);
                 // $cached = "{\"value\":1000000,\"flags\":\"SAMPLE_START,SAMPLE_THROUGH_ALWAYS,SAMPLE_BUCKET_ENABLED,TRIGGER_TRACE\",\"timestamp\":1770065186,\"ttl\":120,\"arguments\":{\"BucketCapacity\":2,\"BucketRate\":1,\"TriggerRelaxedBucketCapacity\":20,\"TriggerRelaxedBucketRate\":1,\"TriggerStrictBucketCapacity\":6,\"TriggerStrictBucketRate\":0.1,\"SignatureKey\":\"a9012f2c6b25d1f5d8b87ed1a3858abd230cac7c99e8ec2aeacfaba6aa31ffc0\"}}";
                 if ($cached !== false) {
                     $unparsed = json_decode($cached, true);
-                    $this->logDebug('unparsed', $unparsed);
+                    $this->logDebug('unparsed' . $unparsed);
 //                    if (
 //                        isset($unparsed['value'], $unparsed['timestamp'], $unparsed['ttl']) &&
 //                        is_numeric($unparsed['value']) &&
