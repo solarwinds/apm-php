@@ -20,7 +20,6 @@ use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfigurat
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
-use Solarwinds\ApmPhp\Trace\Sampler\ParentBasedSampler;
 
 class SwoSamplerFactory
 {
@@ -61,7 +60,7 @@ class SwoSamplerFactory
                                 // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
                                 $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, 'https://' . $collector, $token, [], true, true, null, []), null);
 
-                                return new ParentBasedSampler($http, $http, $http);
+                                return new ParentBased($http, $http, $http);
                             }
                             self::logWarning('SW_APM_SERVICE_KEY is not correctly formatted. Falling back to AlwaysOffSampler.');
 
@@ -75,7 +74,7 @@ class SwoSamplerFactory
                 case self::VALUE_SOLARWINDS_JSON:
                     $json = new JsonSampler($meterProvider, new SolarwindsConfiguration(true, '', '', '', [], true, true, null, []));
 
-                    return new ParentBasedSampler($json, $json, $json);
+                    return new ParentBased($json, $json, $json);
             }
         }
 
