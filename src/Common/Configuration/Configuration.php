@@ -11,6 +11,7 @@ class Configuration
     private bool $enabled;
     private string $service;
     private string $collector;
+    private string $token;
     private array $headers;
     private ?bool $tracingMode;
     private bool $triggerTraceEnabled;
@@ -21,6 +22,7 @@ class Configuration
         bool $enabled,
         string $service,
         string $collector,
+        string $token,
         array $headers,
         ?bool $tracingMode,
         bool $triggerTraceEnabled,
@@ -30,6 +32,7 @@ class Configuration
         $this->enabled = $enabled;
         $this->service = $service;
         $this->collector = $collector;
+        $this->token = $token;
         $this->headers = $headers;
         $this->tracingMode = $tracingMode;
         $this->triggerTraceEnabled = $triggerTraceEnabled;
@@ -65,6 +68,16 @@ class Configuration
     public function setCollector(string $value): void
     {
         $this->collector = $value;
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $value): void
+    {
+        $this->token = $value;
     }
 
     public function getHeaders(): array
@@ -120,10 +133,11 @@ class Configuration
     public function __toString(): string
     {
         return sprintf(
-            'Configuration(enabled=%s, service=%s, collector=%s, headers=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)',
+            'Configuration(enabled=%s, service=%s, collector=%s, token=%s, headers=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)',
             $this->enabled ? 'true' : 'false',
             $this->service,
             $this->collector,
+            substr_replace($this->token, '****', 4, -3),
             json_encode($this->headers),
             $this->tracingMode !== null ? ($this->tracingMode ? 'true' : 'false') : 'null',
             $this->triggerTraceEnabled ? 'true' : 'false',

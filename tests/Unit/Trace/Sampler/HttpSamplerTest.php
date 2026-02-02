@@ -23,7 +23,7 @@ class HttpSamplerTest extends TestCase
         }
         [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
-        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://apm.collector.na-01.cloud.solarwinds.com', ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://apm.collector.na-01.cloud.solarwinds.com', $token, [], true, true, null, []), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -40,7 +40,7 @@ class HttpSamplerTest extends TestCase
     public function test_invalid_service_key_does_not_sample_created_spans(): void
     {
         $spanExporter = new InMemoryExporter();
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'https://apm.collector.na-01.cloud.solarwinds.com', ['Authorization' => 'Bearer oh no'], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'https://apm.collector.na-01.cloud.solarwinds.com', 'oh no', [], true, true, null, []), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -58,7 +58,7 @@ class HttpSamplerTest extends TestCase
         }
         [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
-        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://collector.invalid', ['Authorization' => 'Bearer ' . $token,], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, $service, 'https://collector.invalid', $token, [], true, true, null, []), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -75,11 +75,12 @@ class HttpSamplerTest extends TestCase
         $request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
         $response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
         $requestFactory->method('createRequest')->willReturn($request);
+        $request->method('withHeader')->willReturn($request);
         $client->method('sendRequest')->willReturn($response);
         $response->method('getStatusCode')->willReturn(500);
         $response->method('getHeaderLine')->willReturn('application/json');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags'=>'SAMPLE_START','value'=>1,'timestamp'=>time(),'ttl'=>60,'arguments'=>[]]) ]));
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null, $client, $requestFactory);
+        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
         $this->assertEquals(0, $result->getDecision());
     }
@@ -91,11 +92,12 @@ class HttpSamplerTest extends TestCase
         $request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
         $response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
         $requestFactory->method('createRequest')->willReturn($request);
+        $request->method('withHeader')->willReturn($request);
         $client->method('sendRequest')->willReturn($response);
         $response->method('getStatusCode')->willReturn(200);
         $response->method('getHeaderLine')->willReturn('text/plain');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => 'not json']));
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null, $client, $requestFactory);
+        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
         $this->assertEquals(0, $result->getDecision());
     }
@@ -107,11 +109,12 @@ class HttpSamplerTest extends TestCase
         $request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
         $response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
         $requestFactory->method('createRequest')->willReturn($request);
+        $request->method('withHeader')->willReturn($request);
         $client->method('sendRequest')->willReturn($response);
         $response->method('getStatusCode')->willReturn(200);
         $response->method('getHeaderLine')->willReturn('application/json');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => '{not valid json']));
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null, $client, $requestFactory);
+        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
         $this->assertEquals(0, $result->getDecision());
     }
@@ -122,15 +125,16 @@ class HttpSamplerTest extends TestCase
         $requestFactory = $this->createMock(\Psr\Http\Message\RequestFactoryInterface::class);
         $request = $this->createMock(\Psr\Http\Message\RequestInterface::class);
         $requestFactory->method('createRequest')->willReturn($request);
+        $request->method('withHeader')->willReturn($request);
         $client->method('sendRequest')->willThrowException(new \Exception('fail'));
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null, $client, $requestFactory);
+        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
         $this->assertEquals(0, $result->getDecision());
     }
 
     public function test_get_description_returns_expected_string(): void
     {
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null);
+        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null);
         $this->assertStringContainsString('HTTP Sampler (localhost)', $sampler->getDescription());
     }
 
@@ -142,10 +146,11 @@ class HttpSamplerTest extends TestCase
         $response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
         $requestFactory->method('createRequest')->willReturn($request);
         $client->method('sendRequest')->willReturn($response);
+        $request->method('withHeader')->willReturn($request);
         $response->method('getStatusCode')->willReturn(500);
         $response->method('getHeaderLine')->willReturn('application/json');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags'=>'SAMPLE_START','value'=>1,'timestamp'=>time(),'ttl'=>60,'arguments'=>[]]) ]));
-        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', [], true, true, null, []), null, $client, $requestFactory);
+        $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory);
         // First call logs warning
         $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
         // Second call with same warning should log debug, not warning

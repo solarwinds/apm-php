@@ -59,7 +59,7 @@ class SwoSamplerFactory
                                 [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
                                 $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
                                 // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
-                                $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
+                                $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, 'https://' . $collector, $token, [], true, true, null, []), null);
 
                                 return new ParentBasedSampler($http, $http, $http);
                             }
@@ -73,7 +73,7 @@ class SwoSamplerFactory
                         }
                     }
                 case self::VALUE_SOLARWINDS_JSON:
-                    $json = new JsonSampler($meterProvider, new SolarwindsConfiguration(true, '', '', [], true, true, null, []));
+                    $json = new JsonSampler($meterProvider, new SolarwindsConfiguration(true, '', '', '', [], true, true, null, []));
 
                     return new ParentBasedSampler($json, $json, $json);
             }

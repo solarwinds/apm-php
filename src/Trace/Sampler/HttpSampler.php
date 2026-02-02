@@ -28,6 +28,7 @@ class HttpSampler extends Sampler
     private string $url;
     private array $headers;
     private string $service;
+    private string $token;
     private string $hostname;
     private ?string $lastWarningMessage = null;
     private ClientInterface $client;
@@ -39,6 +40,7 @@ class HttpSampler extends Sampler
 
         $this->url = $config->getCollector();
         $this->service = urlencode($config->getService());
+        $this->token = $config->getToken();
         $this->headers = $config->getHeaders();
         $this->hostname = urlencode(gethostname());
         $this->client = $client ?? Discovery::find([
@@ -85,14 +87,15 @@ class HttpSampler extends Sampler
         try {
             // Try from cache
             if ($this->isExtensionLoaded()) {
-                $cached = $this->getCache($this->url, $this->headers['Authorization'], $this->service);
+                $cached = $this->getCache($this->url, $this->token, $this->service);
                 if ($cached !== false) {
                     $unparsed = json_decode($cached, true);
-                    if ($unparsed['timestamp'] + $unparsed['ttl'] <= time()) {
+                    if (is_array($unparsed) && (int) $unparsed['timestamp'] + (int) $unparsed['ttl'] <= time()) {
                         $parsed = $this->parsedAndUpdateSettings($unparsed);
                         if ($parsed) {
                             // return if settings are valid
                             $this->logDebug('Used sampling settings from cache: ' . $cached);
+
                             return;
                         }
                     }
@@ -102,6 +105,9 @@ class HttpSampler extends Sampler
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
             $req = $this->requestFactory->createRequest('GET', $url);
+            // Authorization header
+            $req = $req->withHeader('Authorization', 'Bearer ' . $this->token);
+            // Other headers
             foreach ($this->headers as $key => $value) {
                 $req = $req->withHeader($key, $value);
             }
@@ -130,7 +136,7 @@ class HttpSampler extends Sampler
             $this->lastWarningMessage = null;
             // Write cache
             if ($this->isExtensionLoaded()) {
-                if (!$this->putCache($this->url, $this->headers['Authorization'], $this->service, $content)) {
+                if (!$this->putCache($this->url, $this->token, $this->service, $content)) {
                     $this->warn('Failed to cache sampling settings');
                 } else {
                     $this->logDebug('Write sampling settings to cache');
