@@ -18,7 +18,6 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
-use Solarwinds\ApmPhp\Trace\Sampler\ExtensionSampler;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 use Solarwinds\ApmPhp\Trace\Sampler\ParentBasedSampler;
@@ -28,7 +27,6 @@ class SwoSamplerFactory
     use LogsMessagesTrait;
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
     private const SOLARWINDS_PREFIX = 'solarwinds';
-    private const VALUE_SOLARWINDS_EXTENSION = 'solarwinds_extension';
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
     private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
@@ -48,32 +46,6 @@ class SwoSamplerFactory
                     $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
 
                     return new ParentBased(new TraceIdRatioBasedSampler($arg));
-                case self::VALUE_SOLARWINDS_EXTENSION:
-                    {
-                        try {
-                            $collector = Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
-                                ? Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR)
-                                : self::DEFAULT_APM_COLLECTOR;
-                            $serviceKey = Configuration::has(SolarwindsEnv::SW_APM_SERVICE_KEY)
-                                ? Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY)
-                                : null;
-                            if ($serviceKey && str_contains($serviceKey, self::SERVICE_KEY_DELIMITER)) {
-                                [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
-                                $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
-                                // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
-                                $ext = new ExtensionSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, $collector, [], true, true, null, []));
-
-                                return new ParentBasedSampler($ext, $ext, $ext);
-                            }
-                            self::logWarning('SW_APM_SERVICE_KEY is not correctly formatted. Falling back to AlwaysOffSampler.');
-
-                            return new AlwaysOffSampler();
-                        } catch (Exception $e) {
-                            self::logWarning('SW_APM_COLLECTOR/SW_APM_SERVICE_KEY ' . $e->getMessage() . '. Falling back to AlwaysOffSampler.');
-
-                            return new AlwaysOffSampler();
-                        }
-                    }
                 case self::VALUE_SOLARWINDS_HTTP:
                     {
                         try {

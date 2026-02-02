@@ -60,11 +60,11 @@ class ParentBasedSampler implements SamplerInterface
 
     public function waitUntilReady(int $timeoutMs) : bool
     {
-        if ($this->root instanceof ExtensionSampler) {
-            $extensionSampler = $this->root;
-
-            return $extensionSampler->isExtensionLoaded() && strlen($extensionSampler->settingsFunction($timeoutMs)) > 0;
-        }
+        //        if ($this->root instanceof Http) {
+        //            $extensionSampler = $this->root;
+        //
+        //            return $extensionSampler->isExtensionLoaded() && strlen($extensionSampler->settingsFunction($timeoutMs)) > 0;
+        //        }
 
         // For other sampler types, they are always ready as apm-php is single-threaded
         return true;

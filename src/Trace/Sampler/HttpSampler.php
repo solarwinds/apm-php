@@ -18,7 +18,7 @@ use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 
 /**
  * Phan seems to struggle with the variadic arguments in the latest version
- * @phan-file-suppress PhanParamTooFewUnpack
+ * @phan-file-suppress PhanParamTooFewUnpack, PhanUndeclaredFunction
  */
 
 class HttpSampler extends Sampler
@@ -49,9 +49,56 @@ class HttpSampler extends Sampler
         self::logInfo('Starting HTTP sampler');
     }
 
+    public function isExtensionLoaded(): bool
+    {
+        if (!extension_loaded('apm_ext')) {
+            $this->logDebug('apm_ext extension is not loaded');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getCache(string $collector, string $token, string $serviceName): string|false
+    {
+        if (function_exists('\Solarwinds\Cache\get')) {
+            return \Solarwinds\Cache\get($collector, $token, $serviceName);
+        }
+        $this->logWarning('\Solarwinds\Cache\get function from apm_ext does not exist');
+
+        return false;
+    }
+
+    public function putCache(string $collector, string $token, string $serviceName, string $settings): bool
+    {
+        if (function_exists('\Solarwinds\Cache\put')) {
+            return \Solarwinds\Cache\put($collector, $token, $serviceName, $settings);
+        }
+        $this->logWarning('\Solarwinds\Cache\put function from apm_ext does not exist');
+
+        return false;
+    }
+
     private function request(): void
     {
         try {
+            // Try from cache
+            if ($this->isExtensionLoaded()) {
+                $cached = $this->getCache($this->url, $this->headers['Authorization'], $this->service);
+                if ($cached !== false) {
+                    $unparsed = json_decode($cached, true);
+                    if ($unparsed['timestamp'] + $unparsed['ttl'] <= time()) {
+                        $parsed = $this->parsedAndUpdateSettings($unparsed);
+                        if ($parsed) {
+                            // return if settings are valid
+                            $this->logDebug('Used sampling settings from cache: ' . $cached);
+                            return;
+                        }
+                    }
+                }
+                $this->logDebug('Failed to read settings from cache');
+            }
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
             $req = $this->requestFactory->createRequest('GET', $url);
@@ -81,6 +128,14 @@ class HttpSampler extends Sampler
                 return;
             }
             $this->lastWarningMessage = null;
+            // Write cache
+            if ($this->isExtensionLoaded()) {
+                if (!$this->putCache($this->url, $this->headers['Authorization'], $this->service, $content)) {
+                    $this->warn('Failed to cache sampling settings');
+                } else {
+                    $this->logDebug('Write sampling settings to cache');
+                }
+            }
         } catch (Exception $e) {
             $this->warn('Unexpected error occurred: ' . $e->getMessage());
         }
