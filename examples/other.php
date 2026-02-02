@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-putenv('OTEL_SERVICE_NAME="apm-php-other-test-service"');
+putenv('OTEL_SERVICE_NAME=apm-php-other-test-service');
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_TRACES_EXPORTER=console');
 putenv('OTEL_METRICS_EXPORTER=console');
