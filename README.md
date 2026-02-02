@@ -46,6 +46,13 @@ Set the [collector endpoint](https://documentation.solarwinds.com/en/success_cen
 export SW_APM_COLLECTOR=<your-collector-url>
 ```
 
+## Add-on solarwinds/apm_ext installation
+
+Install [solarwinds/apm_ext](https://packagist.org/packages/solarwinds/apm_ext) for caching remote sampling settings to improve performance
+```bash
+pie install solarawinds/apm_ext
+```
+
 ## Example Application
 
 This section demonstrates automatic instrumentation using Slim and SolarWinds APM.
