@@ -46,7 +46,7 @@ Set the [collector endpoint](https://documentation.solarwinds.com/en/success_cen
 export SW_APM_COLLECTOR=<your-collector-url>
 ```
 
-## Add-on solarwinds/apm_ext installation
+## solarwinds/apm_ext installation
 
 Install [solarwinds/apm_ext](https://packagist.org/packages/solarwinds/apm_ext) for caching remote sampling settings to improve request responsiveness
 ```bash
