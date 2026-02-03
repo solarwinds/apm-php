@@ -50,7 +50,7 @@ export SW_APM_COLLECTOR=<your-collector-url>
 
 Install [solarwinds/apm_ext](https://packagist.org/packages/solarwinds/apm_ext) for caching remote sampling settings to improve request responsiveness
 ```bash
-pie install solarawinds/apm_ext
+pie install solarwinds/apm_ext
 ```
 
 ## Example Application
