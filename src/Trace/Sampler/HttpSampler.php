@@ -18,7 +18,7 @@ use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 
 /**
  * Phan seems to struggle with the variadic arguments in the latest version
- * @phan-file-suppress PhanParamTooFewUnpack, PhanUndeclaredFunction
+ * @phan-file-suppress PhanParamTooFewUnpack
  */
 
 class HttpSampler extends Sampler
@@ -34,7 +34,7 @@ class HttpSampler extends Sampler
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
 
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null)
+    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, private readonly CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
         parent::__construct($meterProvider, $config, $initial);
 
@@ -51,43 +51,12 @@ class HttpSampler extends Sampler
         self::logInfo('Starting HTTP sampler');
     }
 
-    public function isExtensionLoaded(): bool
-    {
-        if (!extension_loaded('apm_ext')) {
-            $this->logDebug('apm_ext extension is not loaded');
-
-            return false;
-        }
-
-        return true;
-    }
-
-    public function getCache(string $collector, string $token, string $serviceName): string|false
-    {
-        if (function_exists('\Solarwinds\Cache\get')) {
-            return \Solarwinds\Cache\get($collector, $token, $serviceName);
-        }
-        $this->logWarning('\Solarwinds\Cache\get function from apm_ext does not exist');
-
-        return false;
-    }
-
-    public function putCache(string $collector, string $token, string $serviceName, string $settings): bool
-    {
-        if (function_exists('\Solarwinds\Cache\put')) {
-            return \Solarwinds\Cache\put($collector, $token, $serviceName, $settings);
-        }
-        $this->logWarning('\Solarwinds\Cache\put function from apm_ext does not exist');
-
-        return false;
-    }
-
     private function request(): void
     {
         try {
             // Try from cache
-            if ($this->isExtensionLoaded()) {
-                $cached = $this->getCache($this->url, $this->token, $this->service);
+            if ($this->cacheExtension->isExtensionLoaded()) {
+                $cached = $this->cacheExtension->getCache($this->url, $this->token, $this->service);
                 if ($cached !== false) {
                     $unparsed = json_decode($cached, true);
                     if (is_array($unparsed)) {
@@ -99,7 +68,6 @@ class HttpSampler extends Sampler
                                 return;
                             }
                             $this->logDebug('Failed to parse and update settings from cache: ' . $cached);
-
                         } else {
                             $this->logDebug('Expired settings from cache: ' . $cached);
                         }
@@ -143,8 +111,8 @@ class HttpSampler extends Sampler
             }
             $this->lastWarningMessage = null;
             // Write cache
-            if ($this->isExtensionLoaded()) {
-                if (!$this->putCache($this->url, $this->token, $this->service, $content)) {
+            if ($this->cacheExtension->isExtensionLoaded()) {
+                if (!$this->cacheExtension->putCache($this->url, $this->token, $this->service, $content)) {
                     $this->logDebug('Failed to cache sampling settings');
                 } else {
                     $this->logDebug('Write sampling settings to cache');
