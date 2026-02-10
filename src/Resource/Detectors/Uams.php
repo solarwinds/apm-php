@@ -71,7 +71,7 @@ final class Uams implements ResourceDetectorInterface
 
             return $data[self::UAMS_CLIENT_ID_FIELD];
         } catch (ClientExceptionInterface) {
-            $this->logDebug('Unable to read uams from API');
+            $this->logDebug('Unable to read uams client ID from API');
 
             return null;
         }
