@@ -30,6 +30,7 @@ class SwoSamplerFactory
     private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
     private const SERVICE_KEY_DELIMITER = ':';
+    private const SERVICE_KEY_PATTERN = '/^([^:]+):([^:]+)$/';
 
     public function create(?MeterProviderInterface $meterProvider = null): SamplerInterface
     {
@@ -54,7 +55,7 @@ class SwoSamplerFactory
                             $serviceKey = Configuration::has(SolarwindsEnv::SW_APM_SERVICE_KEY)
                                 ? Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY)
                                 : null;
-                            if ($serviceKey && str_contains($serviceKey, self::SERVICE_KEY_DELIMITER)) {
+                            if ($serviceKey && preg_match(self::SERVICE_KEY_PATTERN, $serviceKey)) {
                                 [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
                                 $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
                                 // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
