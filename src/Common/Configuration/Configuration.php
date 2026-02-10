@@ -132,12 +132,22 @@ class Configuration
 
     public function __toString(): string
     {
+        $token = $this->token;
+        $tokenLength = strlen($token);
+        if ($tokenLength > 8) {
+            $maskedToken = substr($token, 0, 4) . '****' . substr($token, -4);
+        } elseif ($tokenLength > 4) {
+            $maskedToken = substr($token, 0, 2) . '****' . substr($token, -2);
+        } else {
+            $maskedToken = str_repeat('*', $tokenLength);
+        }
+
         return sprintf(
             'Configuration(enabled=%s, service=%s, collector=%s, token=%s, headers=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)',
             $this->enabled ? 'true' : 'false',
             $this->service,
             $this->collector,
-            substr_replace($this->token, '****', 4, -3),
+            $maskedToken,
             json_encode($this->headers),
             $this->tracingMode !== null ? ($this->tracingMode ? 'true' : 'false') : 'null',
             $this->triggerTraceEnabled ? 'true' : 'false',
