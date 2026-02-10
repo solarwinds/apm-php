@@ -30,7 +30,6 @@ class HttpSampler extends Sampler
     private string $service;
     private string $token;
     private string $hostname;
-    private ?string $lastWarningMessage = null;
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
 
@@ -89,14 +88,14 @@ class HttpSampler extends Sampler
             }
             $res = $this->client->sendRequest($req);
             if ($res->getStatusCode() !== 200) {
-                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
+                $this->logWarning('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
 
                 return;
             }
             // Check if the content type is JSON
             $contentType = $res->getHeaderLine('Content-Type');
             if (stripos($contentType, 'application/json') === false) {
-                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
+                $this->logWarning('Received unexpected content type ' . $contentType . ' from ' . $url);
 
                 return;
             }
@@ -105,11 +104,10 @@ class HttpSampler extends Sampler
             $unparsed = json_decode($content, true);
             $parsed = $this->parsedAndUpdateSettings($unparsed);
             if (!$parsed) {
-                $this->warn('Retrieved sampling settings are invalid');
+                $this->logWarning('Retrieved sampling settings are invalid');
 
                 return;
             }
-            $this->lastWarningMessage = null;
             // Write cache
             if ($this->cacheExtension->isExtensionLoaded()) {
                 if (!$this->cacheExtension->putCache($this->url, $this->token, $this->service, $content)) {
@@ -119,17 +117,7 @@ class HttpSampler extends Sampler
                 }
             }
         } catch (Exception $e) {
-            $this->warn('Unexpected error occurred: ' . $e->getMessage());
-        }
-    }
-
-    private function warn(string $message, array $context = []): void
-    {
-        if ($message !== $this->lastWarningMessage) {
-            $this->logWarning($message, $context);
-            $this->lastWarningMessage = $message;
-        } else {
-            $this->logDebug($message, $context);
+            $this->logWarning('Unexpected error occurred: ' . $e->getMessage());
         }
     }
 
