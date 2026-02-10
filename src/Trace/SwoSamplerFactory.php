@@ -58,7 +58,14 @@ class SwoSamplerFactory
                                 [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
                                 $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
                                 // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
-                                $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, 'https://' . $collector, $token, [], true, true, null, []), null);
+                                $enabled = true;
+                                $headers = [];
+                                $tracingMode = true;
+                                $triggerTraceEnabled = true;
+                                $transactionName = null;
+                                $transactionSettings = [];
+                                $configuration = new SolarwindsConfiguration($enabled, $otelServiceName ?? $service, 'https://' . $collector, $token, $headers, $tracingMode, $triggerTraceEnabled, $transactionName, $transactionSettings);
+                                $http = new HttpSampler($meterProvider, $configuration);
 
                                 return new ParentBased($http, $http, $http);
                             }
