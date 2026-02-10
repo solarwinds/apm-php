@@ -67,12 +67,12 @@ class HttpSampler extends Sampler
 
                                 return;
                             }
-                            $this->logDebug('Failed to parse and update settings from cache: ' . $cached);
+                            $this->logWarning('Failed to parse and update settings from cache: ' . $cached);
                         } else {
                             $this->logDebug('Expired settings from cache: ' . $cached);
                         }
                     } else {
-                        $this->logDebug('Wrong settings format from cache: ' . $cached);
+                        $this->logWarning('Wrong settings format from cache: ' . $cached);
                     }
                 } else {
                     $this->logDebug('No cached settings found');
