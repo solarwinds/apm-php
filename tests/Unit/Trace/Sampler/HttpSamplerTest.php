@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Tests\Unit\Trace\Sampler;
 
+use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -82,7 +83,7 @@ class HttpSamplerTest extends TestCase
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags'=>'SAMPLE_START','value'=>1,'timestamp'=>time(),'ttl'=>60,'arguments'=>[]]) ]));
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(0, $result->getDecision());
+        $this->assertEquals(SamplingResult::DROP, $result->getDecision());
     }
 
     public function test_non_json_content_type_does_not_sample(): void
@@ -99,7 +100,7 @@ class HttpSamplerTest extends TestCase
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => 'not json']));
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(0, $result->getDecision());
+        $this->assertEquals(SamplingResult::DROP, $result->getDecision());
     }
 
     public function test_invalid_json_response_does_not_sample(): void
@@ -116,7 +117,7 @@ class HttpSamplerTest extends TestCase
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => '{not valid json']));
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(0, $result->getDecision());
+        $this->assertEquals(SamplingResult::DROP, $result->getDecision());
     }
 
     public function test_exception_during_request_does_not_sample(): void
@@ -129,7 +130,7 @@ class HttpSamplerTest extends TestCase
         $client->method('sendRequest')->willThrowException(new \Exception('fail'));
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(0, $result->getDecision());
+        $this->assertEquals(SamplingResult::DROP, $result->getDecision());
     }
 
     public function test_get_description_returns_expected_string(): void
@@ -178,7 +179,7 @@ class HttpSamplerTest extends TestCase
 
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(2, $result->getDecision());
+        $this->assertEquals(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
     }
 
     public function test_extension_get_cache_but_empty(): void
@@ -201,7 +202,7 @@ class HttpSamplerTest extends TestCase
 
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(1, $result->getDecision());
+        $this->assertEquals(SamplingResult::RECORD_ONLY, $result->getDecision());
     }
 
     public function test_extension_not_loaded(): void
@@ -224,7 +225,7 @@ class HttpSamplerTest extends TestCase
 
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(1, $result->getDecision());
+        $this->assertEquals(SamplingResult::RECORD_ONLY, $result->getDecision());
     }
 
     public function test_extension_loaded_but_no_get_function(): void
@@ -247,7 +248,7 @@ class HttpSamplerTest extends TestCase
 
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(1, $result->getDecision());
+        $this->assertEquals(SamplingResult::RECORD_ONLY, $result->getDecision());
     }
 
     public function test_extension_loaded_but_no_put_function(): void
@@ -270,6 +271,6 @@ class HttpSamplerTest extends TestCase
 
         $sampler = new HttpSampler(null, new Configuration(true, 'phpunit', 'http://localhost', '', [], true, true, null, []), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
-        $this->assertEquals(1, $result->getDecision());
+        $this->assertEquals(SamplingResult::RECORD_ONLY, $result->getDecision());
     }
 }
