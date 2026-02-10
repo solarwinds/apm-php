@@ -111,7 +111,7 @@ class HttpSampler extends Sampler
             // Write cache
             if ($this->cacheExtension->isExtensionLoaded()) {
                 if (!$this->cacheExtension->putCache($this->url, $this->token, $this->service, $content)) {
-                    $this->logDebug('Failed to cache sampling settings');
+                    $this->logWarning('Failed to cache sampling settings');
                 } else {
                     $this->logDebug('Write sampling settings to cache');
                 }
