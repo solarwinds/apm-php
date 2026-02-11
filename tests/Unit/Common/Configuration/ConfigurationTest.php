@@ -18,9 +18,6 @@ class ConfigurationTest extends TestCase
 
     public function test_constructor_sets_properties()
     {
-        $transactionName = function () {
-            return 'txn';
-        };
         $config = new Configuration(
             true,
             'service-name',
@@ -29,7 +26,7 @@ class ConfigurationTest extends TestCase
             ['header1' => 'value1'],
             true,
             false,
-            $transactionName,
+            'txn',
             ['setting1' => 'value1']
         );
         $this->assertTrue($config->getEnabled());
@@ -39,11 +36,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(['header1' => 'value1'], $config->getHeaders());
         $this->assertTrue($config->getTracingMode());
         $this->assertFalse($config->isTriggerTraceEnabled());
-        $transactionNameClosure = $config->getTransactionName();
-        $this->assertNotNull($transactionNameClosure);
-        if ($transactionNameClosure !== null) {
-            $this->assertEquals('txn', $transactionNameClosure());
-        }
+        $this->assertEquals('txn', $config->getTransactionName());
         $this->assertEquals(['setting1' => 'value1'], $config->getTransactionSettings());
     }
 
@@ -73,11 +66,8 @@ class ConfigurationTest extends TestCase
         $this->assertNull($config->getTracingMode());
         $config->setTriggerTraceEnabled(true);
         $this->assertTrue($config->isTriggerTraceEnabled());
-        $closure = function () {
-            return 'abc';
-        };
-        $config->setTransactionName($closure);
-        $this->assertSame($closure, $config->getTransactionName());
+        $config->setTransactionName('txn');
+        $this->assertSame('txn', $config->getTransactionName());
         $config->setTransactionName(null);
         $this->assertNull($config->getTransactionName());
         $config->setTransactionSettings(['x' => 1]);
@@ -86,10 +76,7 @@ class ConfigurationTest extends TestCase
 
     public function test_to_string_method()
     {
-        $closure = function () {
-            return 'txn';
-        };
-        $config = new Configuration(true, 'svc', 'coll', 'token', ['h' => 'v'], false, true, $closure, ['s' => 'v']);
+        $config = new Configuration(true, 'svc', 'coll', 'token', ['h' => 'v'], false, true, 'txn', ['s' => 'v']);
         $str = (string) $config;
         $this->assertStringContainsString('Configuration(enabled=true, service=svc, collector=coll', $str);
         $this->assertStringContainsString('headers={"h":"v"}', $str);

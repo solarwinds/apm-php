@@ -325,7 +325,7 @@ class SamplerTest extends TestCase
     {
         $sampler = new TestSampler(
             null,
-            $this->createConfig(['tracing' => false, 'triggerTrace' => false, 'transactionSettings' => [['tracing' => true, 'matcher' => fn () => true]]]),
+            $this->createConfig(['tracing' => false, 'triggerTrace' => false, 'transactionSettings' => [['tracing' => 'enabled', 'regex' => '/^.*$/']]]),
             $this->createSettings(false, null)
         );
         $spanExporter = new InMemoryExporter();
@@ -348,7 +348,7 @@ class SamplerTest extends TestCase
     {
         $sampler = new TestSampler(
             null,
-            $this->createConfig(['tracing' => true, 'triggerTrace' => true, 'transactionSettings' => [['tracing' => false, 'matcher' => fn () => true]]]),
+            $this->createConfig(['tracing' => true, 'triggerTrace' => true, 'transactionSettings' => [['tracing' => 'disabled', 'regex' => '/^.*$/']]]),
             $this->createSettings(true, null)
         );
         $spanExporter = new InMemoryExporter();
@@ -370,7 +370,7 @@ class SamplerTest extends TestCase
     {
         $sampler = new TestSampler(
             null,
-            $this->createConfig(['tracing' => false, 'triggerTrace' => false, 'transactionSettings' => [['tracing' => true, 'matcher' => fn () => true], ['tracing' => false, 'matcher' => fn () => true]]]),
+            $this->createConfig(['tracing' => false, 'triggerTrace' => false, 'transactionSettings' => [['tracing' => 'enabled', 'regex' => '/^.*$/'], ['tracing' => 'disabled', 'regex' => '/^.*$/']]]),
             $this->createSettings(false, null)
         );
         $spanExporter = new InMemoryExporter();
@@ -396,7 +396,7 @@ class SamplerTest extends TestCase
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => true, 'matcher' => fn (string $name) => $name === '1:test']],
+                'transactionSettings' => [['tracing' => 'enabled', 'regex' => '/^1:test$/']],
             ]),
             $this->createSettings(false, null)
         );
@@ -425,7 +425,7 @@ class SamplerTest extends TestCase
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => true, 'matcher' => fn (string $name) => $name === 'http://localhost/test']],
+                'transactionSettings' => [['tracing' => 'enabled', 'regex' => '/^http:\/\/localhost\/test$/']],
             ]),
             $this->createSettings(false, null)
         );
@@ -462,7 +462,7 @@ class SamplerTest extends TestCase
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => true, 'matcher' => fn (string $name) => $name === 'http://localhost/test']],
+                'transactionSettings' => [['tracing' => 'enabled', 'regex' => '/^http:\/\/localhost\/test$/']],
             ]),
             $this->createSettings(false, null)
         );
@@ -591,7 +591,7 @@ class SamplerTest extends TestCase
         $configMock->method('getTracingMode')->willReturn(true);
         $configMock->method('isTriggerTraceEnabled')->willReturn(true);
         $configMock->method('getTransactionSettings')->willReturn([
-            ['tracing' => true, 'matcher' => fn ($id) => $id === 'match'],
+            ['tracing' => 'enabled', 'regex' => '/^match$/'],
         ]);
         $sampler = new TestSampler(null, $configMock, null);
         $settings = $sampler->localSettings(

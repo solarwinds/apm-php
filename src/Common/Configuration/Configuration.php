@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Common\Configuration;
 
-use Closure;
-
 class Configuration
 {
     private bool $enabled;
@@ -15,7 +13,7 @@ class Configuration
     private array $headers;
     private ?bool $tracingMode;
     private bool $triggerTraceEnabled;
-    private ?Closure $transactionName;
+    private ?string $transactionName;
     private array $transactionSettings;
 
     public function __construct(
@@ -26,7 +24,7 @@ class Configuration
         array $headers,
         ?bool $tracingMode,
         bool $triggerTraceEnabled,
-        ?Closure $transactionName,
+        ?string $transactionName,
         array $transactionSettings,
     ) {
         $this->enabled = $enabled;
@@ -110,12 +108,12 @@ class Configuration
         $this->triggerTraceEnabled = $value;
     }
 
-    public function getTransactionName(): ?Closure
+    public function getTransactionName(): ?string
     {
         return $this->transactionName;
     }
 
-    public function setTransactionName(?Closure $value): void
+    public function setTransactionName(?string $value): void
     {
         $this->transactionName = $value;
     }
