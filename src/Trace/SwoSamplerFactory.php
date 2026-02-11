@@ -32,6 +32,60 @@ class SwoSamplerFactory
     private const SERVICE_KEY_DELIMITER = ':';
     private const SERVICE_KEY_PATTERN = '/^([^:]+):([^:]+)$/';
 
+    /**
+     * Extracts and builds a SolarwindsConfiguration for HTTP or JSON samplers.
+     * @param bool $isHttp True for HTTP, false for JSON
+     * @param string|null $serviceKey Service key string for HTTP, null for JSON
+     * @return SolarwindsConfiguration
+     */
+    private function getSolarwindsConfiguration(bool $isHttp, ?string $serviceKey = null): SolarwindsConfiguration
+    {
+        $collector = $isHttp
+            ? (Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
+                ? Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR)
+                : self::DEFAULT_APM_COLLECTOR)
+            : '';
+        $token = '';
+        $service = '';
+        if ($isHttp && $serviceKey) {
+            [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
+        }
+        $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
+        $enabled = !Configuration::has(SolarwindsEnv::SW_APM_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_ENABLED);
+        $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRACING_MODE);
+        $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED);
+        $transactionName = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
+            ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
+            : null;
+        $transactionSettingsStr = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
+            ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
+            : null;
+        $transactionSettings = [];
+        if ($transactionSettingsStr) {
+            try {
+                $transactionSettingsJson = json_decode($transactionSettingsStr, true);
+                if (is_array($transactionSettingsJson)) {
+                    $transactionSettings = $transactionSettingsJson;
+                } else {
+                    self::logWarning('SW_APM_TRANSACTION_SETTINGS is not a valid JSON array. Falling back to empty transaction settings.');
+                }
+            } catch (Exception $e) {
+                self::logWarning('Error processing SW_APM_TRANSACTION_SETTINGS: ' . $e->getMessage() . '. Falling back to empty transaction settings.');
+            }
+        }
+
+        return new SolarwindsConfiguration(
+            $enabled,
+            $otelServiceName ?? ($isHttp ? $service : 'unknown_service'),
+            $isHttp ? 'https://' . $collector : '',
+            $token,
+            $tracingMode,
+            $triggerTraceEnabled,
+            $transactionName,
+            $transactionSettings
+        );
+    }
+
     public function create(?MeterProviderInterface $meterProvider = null): SamplerInterface
     {
         $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
@@ -49,39 +103,11 @@ class SwoSamplerFactory
                 case self::VALUE_SOLARWINDS_HTTP:
                     {
                         try {
-                            $collector = Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
-                                ? Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR)
-                                : self::DEFAULT_APM_COLLECTOR;
                             $serviceKey = Configuration::has(SolarwindsEnv::SW_APM_SERVICE_KEY)
                                 ? Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY)
                                 : null;
                             if ($serviceKey && preg_match(self::SERVICE_KEY_PATTERN, $serviceKey)) {
-                                [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
-                                $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
-                                $enabled = !Configuration::has(SolarwindsEnv::SW_APM_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_ENABLED);
-                                $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRACING_MODE);
-                                $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED);
-                                $transactionName = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
-                                    ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
-                                    : null;
-                                $transactionSettingsStr = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
-                                    ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
-                                    : null;
-                                $transactionSettings = [];
-                                if ($transactionSettingsStr) {
-                                    try {
-                                        $transactionSettingsJson = json_decode($transactionSettingsStr, true);
-                                        if (is_array($transactionSettingsJson)) {
-                                            $transactionSettings = $transactionSettingsJson;
-                                        } else {
-                                            self::logWarning('SW_APM_TRANSACTION_SETTINGS is not a valid JSON array. Falling back to empty transaction settings.');
-                                        }
-                                    } catch (Exception $e) {
-                                        self::logWarning('Error processing SW_APM_TRANSACTION_SETTINGS: ' . $e->getMessage() . '. Falling back to empty transaction settings.');
-                                    }
-                                }
-                                // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
-                                $configuration = new SolarwindsConfiguration($enabled, $otelServiceName ?? $service, 'https://' . $collector, $token, $tracingMode, $triggerTraceEnabled, $transactionName, $transactionSettings);
+                                $configuration = $this->getSolarwindsConfiguration(true, $serviceKey);
                                 $http = new HttpSampler($meterProvider, $configuration);
 
                                 return new ParentBased($http, $http, $http);
@@ -96,30 +122,7 @@ class SwoSamplerFactory
                         }
                     }
                 case self::VALUE_SOLARWINDS_JSON:
-                    $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
-                    $enabled = !Configuration::has(SolarwindsEnv::SW_APM_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_ENABLED);
-                    $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRACING_MODE);
-                    $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED);
-                    $transactionName = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
-                        ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
-                        : null;
-                    $transactionSettingsStr = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
-                        ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
-                        : null;
-                    $transactionSettings = [];
-                    if ($transactionSettingsStr) {
-                        try {
-                            $transactionSettingsJson = json_decode($transactionSettingsStr, true);
-                            if (is_array($transactionSettingsJson)) {
-                                $transactionSettings = $transactionSettingsJson;
-                            } else {
-                                self::logWarning('SW_APM_TRANSACTION_SETTINGS is not a valid JSON array. Falling back to empty transaction settings.');
-                            }
-                        } catch (Exception $e) {
-                            self::logWarning('Error processing SW_APM_TRANSACTION_SETTINGS: ' . $e->getMessage() . '. Falling back to empty transaction settings.');
-                        }
-                    }
-                    $configuration = new SolarwindsConfiguration($enabled, $otelServiceName ?? 'unknown_service', '', '', $tracingMode, $triggerTraceEnabled, $transactionName, $transactionSettings);
+                    $configuration = $this->getSolarwindsConfiguration(false);
                     $json = new JsonSampler($meterProvider, $configuration);
 
                     return new ParentBased($json, $json, $json);
