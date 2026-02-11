@@ -227,7 +227,6 @@ class SamplerTest extends TestCase
             'test',
             'localhost',
             '',
-            [],
             $options['tracing'] ?? null,
             $options['triggerTrace'] ?? false,
             null,

@@ -58,7 +58,6 @@ class SwoSamplerFactory
                             if ($serviceKey && preg_match(self::SERVICE_KEY_PATTERN, $serviceKey)) {
                                 [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
                                 $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
-                                $headers = [];
                                 $enabled = !Configuration::has(SolarwindsEnv::SW_APM_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_ENABLED);
                                 $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRACING_MODE);
                                 $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED);
@@ -82,7 +81,7 @@ class SwoSamplerFactory
                                     }
                                 }
                                 // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
-                                $configuration = new SolarwindsConfiguration($enabled, $otelServiceName ?? $service, 'https://' . $collector, $token, $headers, $tracingMode, $triggerTraceEnabled, $transactionName, $transactionSettings);
+                                $configuration = new SolarwindsConfiguration($enabled, $otelServiceName ?? $service, 'https://' . $collector, $token, $tracingMode, $triggerTraceEnabled, $transactionName, $transactionSettings);
                                 $http = new HttpSampler($meterProvider, $configuration);
 
                                 return new ParentBased($http, $http, $http);
@@ -97,7 +96,31 @@ class SwoSamplerFactory
                         }
                     }
                 case self::VALUE_SOLARWINDS_JSON:
-                    $json = new JsonSampler($meterProvider, new SolarwindsConfiguration(true, '', '', '', [], true, true, null, []));
+                    $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
+                    $enabled = !Configuration::has(SolarwindsEnv::SW_APM_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_ENABLED);
+                    $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRACING_MODE);
+                    $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED);
+                    $transactionName = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
+                        ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
+                        : null;
+                    $transactionSettingsStr = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
+                        ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
+                        : null;
+                    $transactionSettings = [];
+                    if ($transactionSettingsStr) {
+                        try {
+                            $transactionSettingsJson = json_decode($transactionSettingsStr, true);
+                            if (is_array($transactionSettingsJson)) {
+                                $transactionSettings = $transactionSettingsJson;
+                            } else {
+                                self::logWarning('SW_APM_TRANSACTION_SETTINGS is not a valid JSON array. Falling back to empty transaction settings.');
+                            }
+                        } catch (Exception $e) {
+                            self::logWarning('Error processing SW_APM_TRANSACTION_SETTINGS: ' . $e->getMessage() . '. Falling back to empty transaction settings.');
+                        }
+                    }
+                    $configuration = new SolarwindsConfiguration($enabled, $otelServiceName ?? 'unknown_service', '', '', $tracingMode, $triggerTraceEnabled, $transactionName, $transactionSettings);
+                    $json = new JsonSampler($meterProvider, $configuration);
 
                     return new ParentBased($json, $json, $json);
             }

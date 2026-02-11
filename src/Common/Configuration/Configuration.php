@@ -10,7 +10,6 @@ class Configuration
     private string $service;
     private string $collector;
     private string $token;
-    private array $headers;
     private ?bool $tracingMode;
     private bool $triggerTraceEnabled;
     private ?string $transactionName;
@@ -21,7 +20,6 @@ class Configuration
         string $service,
         string $collector,
         string $token,
-        array $headers,
         ?bool $tracingMode,
         bool $triggerTraceEnabled,
         ?string $transactionName,
@@ -31,7 +29,6 @@ class Configuration
         $this->service = $service;
         $this->collector = $collector;
         $this->token = $token;
-        $this->headers = $headers;
         $this->tracingMode = $tracingMode;
         $this->triggerTraceEnabled = $triggerTraceEnabled;
         $this->transactionName = $transactionName;
@@ -76,16 +73,6 @@ class Configuration
     public function setToken(string $value): void
     {
         $this->token = $value;
-    }
-
-    public function getHeaders(): array
-    {
-        return $this->headers;
-    }
-
-    public function setHeaders(array $value): void
-    {
-        $this->headers = $value;
     }
 
     public function getTracingMode(): ?bool
@@ -141,12 +128,11 @@ class Configuration
         }
 
         return sprintf(
-            'Configuration(enabled=%s, service=%s, collector=%s, token=%s, headers=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)',
+            'Configuration(enabled=%s, service=%s, collector=%s, token=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)',
             $this->enabled ? 'true' : 'false',
             $this->service,
             $this->collector,
             $maskedToken,
-            json_encode($this->headers),
             $this->tracingMode !== null ? ($this->tracingMode ? 'true' : 'false') : 'null',
             $this->triggerTraceEnabled ? 'true' : 'false',
             $this->transactionName !== null ? 'Closure' : 'null',
