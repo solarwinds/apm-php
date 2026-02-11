@@ -13,7 +13,7 @@ class ConfigurationTest extends TestCase
 {
     public function test_can_instantiate()
     {
-        $this->assertInstanceOf(Configuration::class, new Configuration(true, '', '', '', null, false, null, []));
+        $this->assertInstanceOf(Configuration::class, new Configuration(true, '', '', '', null, false, []));
     }
 
     public function test_constructor_sets_properties()
@@ -25,7 +25,6 @@ class ConfigurationTest extends TestCase
             'token',
             true,
             false,
-            'txn',
             ['setting1' => 'value1']
         );
         $this->assertTrue($config->getEnabled());
@@ -34,20 +33,19 @@ class ConfigurationTest extends TestCase
         $this->assertEquals('token', $config->getToken());
         $this->assertTrue($config->getTracingMode());
         $this->assertFalse($config->isTriggerTraceEnabled());
-        $this->assertEquals('txn', $config->getTransactionName());
         $this->assertEquals(['setting1' => 'value1'], $config->getTransactionSettings());
     }
 
     public function test_set_enabled()
     {
-        $config = new Configuration(true, '', '', '', null, false, null, []);
+        $config = new Configuration(true, '', '', '', null, false, []);
         $config->setEnabled(false);
         $this->assertFalse($config->getEnabled());
     }
 
     public function test_setters_and_getters()
     {
-        $config = new Configuration(false, '', '', '', null, false, null, []);
+        $config = new Configuration(false, '', '', '', null, false, []);
         $config->setEnabled(true);
         $this->assertTrue($config->getEnabled());
         $config->setService('svc');
@@ -62,31 +60,25 @@ class ConfigurationTest extends TestCase
         $this->assertNull($config->getTracingMode());
         $config->setTriggerTraceEnabled(true);
         $this->assertTrue($config->isTriggerTraceEnabled());
-        $config->setTransactionName('txn');
-        $this->assertSame('txn', $config->getTransactionName());
-        $config->setTransactionName(null);
-        $this->assertNull($config->getTransactionName());
         $config->setTransactionSettings(['x' => 1]);
         $this->assertEquals(['x' => 1], $config->getTransactionSettings());
     }
 
     public function test_to_string_method()
     {
-        $config = new Configuration(true, 'svc', 'coll', 'token', false, true, 'txn', ['s' => 'v']);
+        $config = new Configuration(true, 'svc', 'coll', 'token', false, true, ['s' => 'v']);
         $str = (string) $config;
         $this->assertStringContainsString('Configuration(enabled=true, service=svc, collector=coll', $str);
         $this->assertStringContainsString('tracingMode=false', $str);
         $this->assertStringContainsString('triggerTraceEnabled=true', $str);
-        $this->assertStringContainsString('transactionName=Closure', $str);
         $this->assertStringContainsString('transactionSettings={"s":"v"}', $str);
     }
 
     public function test_to_string_with_nulls()
     {
-        $config = new Configuration(false, '', '', '', null, false, null, []);
+        $config = new Configuration(false, '', '', '', null, false, []);
         $str = (string) $config;
         $this->assertStringContainsString('enabled=false', $str);
         $this->assertStringContainsString('tracingMode=null', $str);
-        $this->assertStringContainsString('transactionName=null', $str);
     }
 }

@@ -54,9 +54,6 @@ class SwoSamplerFactory
         $enabled = !Configuration::has(SolarwindsEnv::SW_APM_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_ENABLED);
         $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRACING_MODE);
         $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED);
-        $transactionName = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
-            ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_NAME)
-            : null;
         $transactionSettingsStr = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
             ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
             : null;
@@ -81,7 +78,6 @@ class SwoSamplerFactory
             $token,
             $tracingMode,
             $triggerTraceEnabled,
-            $transactionName,
             $transactionSettings
         );
     }

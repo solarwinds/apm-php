@@ -229,7 +229,6 @@ class SamplerTest extends TestCase
             '',
             $options['tracing'] ?? null,
             $options['triggerTrace'] ?? false,
-            null,
             $options['transactionSettings'] ?? []
         );
     }

@@ -35,7 +35,7 @@ class JsonSamplerSpanCreationBench
                 'ttl' => 60,
             ],
         ]));
-        $this->sampler = new JsonSampler(null, new Configuration(true, 'test', '', '', true, true, null, []), $path);
+        $this->sampler = new JsonSampler(null, new Configuration(true, 'test', '', '', true, true, []), $path);
         $this->resource = ResourceInfo::create(Attributes::create([
             'sw.data.module' => 'apm',
             'sw.apm.version' => '0.0.0',

@@ -12,7 +12,6 @@ class Configuration
     private string $token;
     private ?bool $tracingMode;
     private bool $triggerTraceEnabled;
-    private ?string $transactionName;
     private array $transactionSettings;
 
     public function __construct(
@@ -22,7 +21,6 @@ class Configuration
         string $token,
         ?bool $tracingMode,
         bool $triggerTraceEnabled,
-        ?string $transactionName,
         array $transactionSettings,
     ) {
         $this->enabled = $enabled;
@@ -31,7 +29,6 @@ class Configuration
         $this->token = $token;
         $this->tracingMode = $tracingMode;
         $this->triggerTraceEnabled = $triggerTraceEnabled;
-        $this->transactionName = $transactionName;
         $this->transactionSettings = $transactionSettings;
     }
 
@@ -94,17 +91,6 @@ class Configuration
     {
         $this->triggerTraceEnabled = $value;
     }
-
-    public function getTransactionName(): ?string
-    {
-        return $this->transactionName;
-    }
-
-    public function setTransactionName(?string $value): void
-    {
-        $this->transactionName = $value;
-    }
-
     public function getTransactionSettings(): array
     {
         return $this->transactionSettings;
@@ -128,14 +114,13 @@ class Configuration
         }
 
         return sprintf(
-            'Configuration(enabled=%s, service=%s, collector=%s, token=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)',
+            'Configuration(enabled=%s, service=%s, collector=%s, token=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionSettings=%s)',
             $this->enabled ? 'true' : 'false',
             $this->service,
             $this->collector,
             $maskedToken,
             $this->tracingMode !== null ? ($this->tracingMode ? 'true' : 'false') : 'null',
             $this->triggerTraceEnabled ? 'true' : 'false',
-            $this->transactionName !== null ? 'Closure' : 'null',
             json_encode($this->transactionSettings)
         );
     }
