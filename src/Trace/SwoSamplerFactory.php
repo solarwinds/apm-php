@@ -59,13 +59,17 @@ class SwoSamplerFactory
                                 [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
                                 $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
                                 // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
-                                $enabled = true;
-                                $headers = [];
-                                $tracingMode = true;
-                                $triggerTraceEnabled = true;
-                                $transactionName = null;
-                                $transactionSettings = [];
-                                $configuration = new SolarwindsConfiguration($enabled, $otelServiceName ?? $service, 'https://' . $collector, $token, $headers, $tracingMode, $triggerTraceEnabled, $transactionName, $transactionSettings);
+                                $configuration = new SolarwindsConfiguration(
+                                    enabled: true,
+                                    service: $otelServiceName ?? $service,
+                                    collector: 'https://' . $collector,
+                                    token: $token,
+                                    headers: [],
+                                    tracingMode: true,
+                                    triggerTraceEnabled: true,
+                                    transactionName: null,
+                                    transactionSettings: []
+                                );
                                 $http = new HttpSampler($meterProvider, $configuration);
 
                                 return new ParentBased($http, $http, $http);
@@ -80,7 +84,17 @@ class SwoSamplerFactory
                         }
                     }
                 case self::VALUE_SOLARWINDS_JSON:
-                    $json = new JsonSampler($meterProvider, new SolarwindsConfiguration(true, '', '', '', [], true, true, null, []));
+                    $json = new JsonSampler($meterProvider, new SolarwindsConfiguration(
+                        enabled: true,
+                        service: '',
+                        collector: '',
+                        token: '',
+                        headers: [],
+                        tracingMode: true,
+                        triggerTraceEnabled: true,
+                        transactionName: null,
+                        transactionSettings: []
+                    ));
 
                     return new ParentBased($json, $json, $json);
             }
