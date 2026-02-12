@@ -11,11 +11,13 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
@@ -46,11 +48,12 @@ class SwoSamplerFactory
                 : self::DEFAULT_APM_COLLECTOR)
             : '';
         $token = '';
-        $service = '';
+        $service = 'unknown_service';
         if ($isHttp && $serviceKey) {
             [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
         }
         $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
+        $resourceAttributeServiceName = ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
         $enabled = !Configuration::has(SolarwindsEnv::SW_APM_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_ENABLED);
         $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRACING_MODE);
         $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED);
@@ -73,7 +76,7 @@ class SwoSamplerFactory
 
         return new SolarwindsConfiguration(
             $enabled,
-            $otelServiceName ?? ($isHttp ? $service : 'unknown_service'),
+            $otelServiceName ?? $resourceAttributeServiceName ?? $service,
             $isHttp ? 'https://' . $collector : '',
             $token,
             $tracingMode,
