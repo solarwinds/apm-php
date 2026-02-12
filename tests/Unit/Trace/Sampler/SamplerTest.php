@@ -223,7 +223,6 @@ class SamplerTest extends TestCase
     private function createConfig(array $options): Configuration
     {
         return new Configuration(
-            true,
             'test',
             'localhost',
             '',

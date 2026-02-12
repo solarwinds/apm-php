@@ -54,7 +54,6 @@ class SwoSamplerFactory
         }
         $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
         $resourceAttributeServiceName = ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
-        $enabled = !Configuration::has(SolarwindsEnv::SW_APM_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_ENABLED);
         $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRACING_MODE);
         $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED);
         $transactionSettingsStr = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
@@ -75,7 +74,6 @@ class SwoSamplerFactory
         }
 
         return new SolarwindsConfiguration(
-            $enabled,
             $otelServiceName ?? $resourceAttributeServiceName ?? $service,
             $isHttp ? 'https://' . $collector : '',
             $token,

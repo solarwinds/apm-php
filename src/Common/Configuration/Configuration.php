@@ -6,7 +6,6 @@ namespace Solarwinds\ApmPhp\Common\Configuration;
 
 class Configuration
 {
-    private bool $enabled;
     private string $service;
     private string $collector;
     private string $token;
@@ -15,7 +14,6 @@ class Configuration
     private array $transactionSettings;
 
     public function __construct(
-        bool $enabled,
         string $service,
         string $collector,
         string $token,
@@ -23,23 +21,12 @@ class Configuration
         bool $triggerTraceEnabled,
         array $transactionSettings,
     ) {
-        $this->enabled = $enabled;
         $this->service = $service;
         $this->collector = $collector;
         $this->token = $token;
         $this->tracingMode = $tracingMode;
         $this->triggerTraceEnabled = $triggerTraceEnabled;
         $this->transactionSettings = $transactionSettings;
-    }
-
-    public function getEnabled(): bool
-    {
-        return $this->enabled;
-    }
-
-    public function setEnabled(bool $value): void
-    {
-        $this->enabled = $value;
     }
 
     public function getService(): string
@@ -114,8 +101,7 @@ class Configuration
         }
 
         return sprintf(
-            'Configuration(enabled=%s, service=%s, collector=%s, token=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionSettings=%s)',
-            $this->enabled ? 'true' : 'false',
+            'Configuration(service=%s, collector=%s, token=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionSettings=%s)',
             $this->service,
             $this->collector,
             $maskedToken,
