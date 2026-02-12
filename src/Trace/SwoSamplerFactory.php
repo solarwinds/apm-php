@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -33,7 +34,12 @@ class SwoSamplerFactory
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
     private const SERVICE_KEY_DELIMITER = ':';
     private const SERVICE_KEY_PATTERN = '/^([^:]+):([^:]+)$/';
+    private ResourceInfo $resource;
 
+    public function __construct(?ResourceInfo $resource = null)
+    {
+        $this->resource = $resource ?? ResourceInfoFactory::defaultResource();
+    }
     /**
      * Extracts and builds a SolarwindsConfiguration for HTTP or JSON samplers.
      * @param bool $isHttp True for HTTP, false for JSON
@@ -53,7 +59,7 @@ class SwoSamplerFactory
             [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
         }
         $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
-        $resourceAttributeServiceName = ResourceInfoFactory::defaultResource()->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
+        $resourceAttributeServiceName = $this->resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
         $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRACING_MODE);
         $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || Configuration::getBoolean(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED);
         $transactionSettingsStr = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
