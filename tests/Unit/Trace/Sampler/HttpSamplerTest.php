@@ -28,7 +28,7 @@ class HttpSamplerTest extends TestCase
             enabled: true,
             service: $service,
             collector: 'https://apm.collector.na-01.cloud.solarwinds.com',
-            token: '',
+            token: $token,
             headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
