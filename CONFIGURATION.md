@@ -5,17 +5,17 @@
 
 In addition to the [opentelemetry-php configuration](https://github.com/open-telemetry/opentelemetry-php/blob/main/src/SDK/Common/Configuration/Variables.php), the following configurations are supported:
 
-| Configuration                  | Default                                    | Description                                                                                                                                      |
-|--------------------------------|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| `SW_APM_SERVICE_KEY`           |                                            | **Service key**. See [Service Name](#service-name)                                                                                               |
-| `SW_APM_COLLECTOR`             | `apm.collector.na-01.cloud.solarwinds.com` | [APM collector endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm#General) |
-| `SW_APM_TRACING_MODE`          | `true`                                     | Enable observability for the service                                                                                                             |
-| `SW_APM_TRIGGER_TRACE_ENABLED` | `true`                                     | Enable the trigger trace feature in solarwinds sampler                                                                                           |
-| `SW_APM_TRANSACTION_NAME`      |                                            | User defined transaction name for all requests                                                                                                   |
-| `SW_APM_TRANSACTION_SETTINGS`  |                                            | Json string to define the transaction settings. See [Transaction Settings](#transaction-settings)                                                |
-| `SW_K8S_POD_NAMESPACE`         |                                            | User defined k8s pod namespace for k8s resource detector                                                                                         |
-| `SW_K8S_POD_UID`               |                                            | User defined k8s pod uid for k8s resource detector                                                                                               |
-| `SW_K8S_POD_NAME`              |                                            | User defined k8s pod name for k8s resource detector                                                                                              |
+| Configuration                | Default                                  | Description                                                                                                                                      |
+|------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| SW_APM_SERVICE_KEY           |                                          | **Service key**. See [Service Name](#service-name)                                                                                               |
+| SW_APM_COLLECTOR             | apm.collector.na-01.cloud.solarwinds.com | [APM collector endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm#General) |
+| SW_APM_TRACING_MODE          | true                                     | Enable observability for the service                                                                                                             |
+| SW_APM_TRIGGER_TRACE_ENABLED | true                                     | Enable the trigger trace feature in solarwinds sampler                                                                                           |
+| SW_APM_TRANSACTION_NAME      |                                          | User defined transaction name for all requests                                                                                                   |
+| SW_APM_TRANSACTION_SETTINGS  |                                          | Json string to define the transaction settings. See [Transaction Settings](#transaction-settings)                                                |
+| SW_K8S_POD_NAMESPACE         |                                          | User defined k8s pod namespace for k8s resource detector                                                                                         |
+| SW_K8S_POD_UID               |                                          | User defined k8s pod uid for k8s resource detector                                                                                               |
+| SW_K8S_POD_NAME              |                                          | User defined k8s pod name for k8s resource detector                                                                                              |
 
 ### Service Name
 
