@@ -34,6 +34,12 @@
 - **Fibers:** If using `Fibers`, set `OTEL_PHP_FIBERS_ENABLED=true` and consider preloading bindings, especially for non-CLI SAPIs.
 - **Stack Extension:** If you encounter issues with argument handling in pre-hooks, enable `opentelemetry.allow_stack_extension` in `php.ini`.
 
+## Sampling Considerations
+- **solarwinds/apm_ext:** To troubleshoot sampling issues, it is often easier to temporarily disable the `solarwinds/apm_ext` C extension. You can do this by commenting out the extension in your `php.ini` file:
+  ```ini
+  ;extension=apm_ext
+  ```
+
 ## SolarWinds Observability (SWO) Issues
 
 ### Verifying Telemetry Generation

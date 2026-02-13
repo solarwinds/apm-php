@@ -11,6 +11,7 @@ class Configuration
     private bool $enabled;
     private string $service;
     private string $collector;
+    private string $token;
     private array $headers;
     private ?bool $tracingMode;
     private bool $triggerTraceEnabled;
@@ -21,6 +22,7 @@ class Configuration
         bool $enabled,
         string $service,
         string $collector,
+        string $token,
         array $headers,
         ?bool $tracingMode,
         bool $triggerTraceEnabled,
@@ -30,6 +32,7 @@ class Configuration
         $this->enabled = $enabled;
         $this->service = $service;
         $this->collector = $collector;
+        $this->token = $token;
         $this->headers = $headers;
         $this->tracingMode = $tracingMode;
         $this->triggerTraceEnabled = $triggerTraceEnabled;
@@ -65,6 +68,16 @@ class Configuration
     public function setCollector(string $value): void
     {
         $this->collector = $value;
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $value): void
+    {
+        $this->token = $value;
     }
 
     public function getHeaders(): array
@@ -119,11 +132,22 @@ class Configuration
 
     public function __toString(): string
     {
+        $token = $this->token;
+        $tokenLength = strlen($token);
+        if ($tokenLength > 8) {
+            $maskedToken = substr($token, 0, 4) . '****' . substr($token, -4);
+        } elseif ($tokenLength > 4) {
+            $maskedToken = substr($token, 0, 2) . '****' . substr($token, -2);
+        } else {
+            $maskedToken = str_repeat('*', $tokenLength);
+        }
+
         return sprintf(
-            'Configuration(enabled=%s, service=%s, collector=%s, headers=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)',
+            'Configuration(enabled=%s, service=%s, collector=%s, token=%s, headers=%s, tracingMode=%s, triggerTraceEnabled=%s, transactionName=%s, transactionSettings=%s)',
             $this->enabled ? 'true' : 'false',
             $this->service,
             $this->collector,
+            $maskedToken,
             json_encode($this->headers),
             $this->tracingMode !== null ? ($this->tracingMode ? 'true' : 'false') : 'null',
             $this->triggerTraceEnabled ? 'true' : 'false',

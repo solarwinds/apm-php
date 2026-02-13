@@ -5,7 +5,7 @@ declare(strict_types=1);
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Trace\SpanKind;
 
-putenv('OTEL_SERVICE_NAME="apm-php-basic-test-service"');
+putenv('OTEL_SERVICE_NAME=apm-php-basic-test-service');
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_TRACES_EXPORTER=console');
 putenv('OTEL_METRICS_EXPORTER=console');

@@ -28,18 +28,18 @@ class HttpSampler extends Sampler
     private string $url;
     private array $headers;
     private string $service;
+    private string $token;
     private string $hostname;
-    private ?string $lastWarningMessage = null;
-    private ?int $request_timestamp = null;
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
 
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null)
+    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, private readonly CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
         parent::__construct($meterProvider, $config, $initial);
 
         $this->url = $config->getCollector();
         $this->service = urlencode($config->getService());
+        $this->token = $config->getToken();
         $this->headers = $config->getHeaders();
         $this->hostname = urlencode(gethostname());
         $this->client = $client ?? Discovery::find([
@@ -47,34 +47,55 @@ class HttpSampler extends Sampler
         ]);
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
 
-        $this->request();
         self::logInfo('Starting HTTP sampler');
     }
 
     private function request(): void
     {
-        if ($this->request_timestamp !== null && $this->request_timestamp + 60 >= time()) {
-            return;
-        }
-
         try {
+            // Try from cache
+            if ($this->cacheExtension->isExtensionLoaded()) {
+                $cached = $this->cacheExtension->getCache($this->url, $this->token, $this->service);
+                if ($cached !== false) {
+                    $unparsed = json_decode($cached, true);
+                    if (is_array($unparsed)) {
+                        if (time() <= (int) $unparsed['timestamp'] + (int) $unparsed['ttl']) {
+                            if ($this->parsedAndUpdateSettings($unparsed)) {
+                                // return if settings are valid
+                                $this->logDebug('Applied sampling settings from cache: ' . $cached);
+
+                                return;
+                            }
+                            $this->logWarning('Failed to parse and update settings from cache: ' . $cached);
+                        } else {
+                            $this->logDebug('Expired settings from cache: ' . $cached);
+                        }
+                    } else {
+                        $this->logWarning('Wrong settings format from cache: ' . $cached);
+                    }
+                } else {
+                    $this->logDebug('No cached settings found');
+                }
+            }
             $url = $this->url . '/v1/settings/' . $this->service . '/' . $this->hostname;
             $this->logDebug('Retrieving sampling settings from ' . $url);
             $req = $this->requestFactory->createRequest('GET', $url);
+            // Authorization header
+            $req = $req->withHeader('Authorization', 'Bearer ' . $this->token);
+            // Other headers
             foreach ($this->headers as $key => $value) {
                 $req = $req->withHeader($key, $value);
             }
             $res = $this->client->sendRequest($req);
-            $this->request_timestamp = time();
             if ($res->getStatusCode() !== 200) {
-                $this->warn('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
+                $this->logWarning('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);
 
                 return;
             }
             // Check if the content type is JSON
             $contentType = $res->getHeaderLine('Content-Type');
             if (stripos($contentType, 'application/json') === false) {
-                $this->warn('Received unexpected content type ' . $contentType . ' from ' . $url);
+                $this->logWarning('Received unexpected content type ' . $contentType . ' from ' . $url);
 
                 return;
             }
@@ -83,23 +104,20 @@ class HttpSampler extends Sampler
             $unparsed = json_decode($content, true);
             $parsed = $this->parsedAndUpdateSettings($unparsed);
             if (!$parsed) {
-                $this->warn('Retrieved sampling settings are invalid');
+                $this->logWarning('Retrieved sampling settings are invalid');
 
                 return;
             }
-            $this->lastWarningMessage = null;
+            // Write cache
+            if ($this->cacheExtension->isExtensionLoaded()) {
+                if (!$this->cacheExtension->putCache($this->url, $this->token, $this->service, $content)) {
+                    $this->logWarning('Failed to cache sampling settings');
+                } else {
+                    $this->logDebug('Write sampling settings to cache');
+                }
+            }
         } catch (Exception $e) {
-            $this->warn('Unexpected error occurred: ' . $e->getMessage());
-        }
-    }
-
-    private function warn(string $message, array $context = []): void
-    {
-        if ($message !== $this->lastWarningMessage) {
-            $this->logWarning($message, $context);
-            $this->lastWarningMessage = $message;
-        } else {
-            $this->logDebug($message, $context);
+            $this->logWarning('Unexpected error occurred: ' . $e->getMessage());
         }
     }
 

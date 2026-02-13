@@ -19,6 +19,7 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 
 class SwoSamplerFactory
 {
@@ -26,8 +27,10 @@ class SwoSamplerFactory
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
     private const SOLARWINDS_PREFIX = 'solarwinds';
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
+    private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
     private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
     private const SERVICE_KEY_DELIMITER = ':';
+    private const SERVICE_KEY_PATTERN = '/^([^:]+):([^:]+)$/';
 
     public function create(?MeterProviderInterface $meterProvider = null): SamplerInterface
     {
@@ -52,11 +55,22 @@ class SwoSamplerFactory
                             $serviceKey = Configuration::has(SolarwindsEnv::SW_APM_SERVICE_KEY)
                                 ? Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY)
                                 : null;
-                            if ($serviceKey && str_contains($serviceKey, self::SERVICE_KEY_DELIMITER)) {
+                            if ($serviceKey && preg_match(self::SERVICE_KEY_PATTERN, $serviceKey)) {
                                 [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
                                 $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
                                 // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
-                                $http = new HttpSampler($meterProvider, new SolarwindsConfiguration(true, $otelServiceName ?? $service, 'https://' . $collector, ['Authorization' => 'Bearer ' . $token], true, true, null, []), null);
+                                $configuration = new SolarwindsConfiguration(
+                                    enabled: true,
+                                    service: $otelServiceName ?? $service,
+                                    collector: 'https://' . $collector,
+                                    token: $token,
+                                    headers: [],
+                                    tracingMode: true,
+                                    triggerTraceEnabled: true,
+                                    transactionName: null,
+                                    transactionSettings: []
+                                );
+                                $http = new HttpSampler($meterProvider, $configuration);
 
                                 return new ParentBased($http, $http, $http);
                             }
@@ -69,6 +83,20 @@ class SwoSamplerFactory
                             return new AlwaysOffSampler();
                         }
                     }
+                case self::VALUE_SOLARWINDS_JSON:
+                    $json = new JsonSampler($meterProvider, new SolarwindsConfiguration(
+                        enabled: true,
+                        service: '',
+                        collector: '',
+                        token: '',
+                        headers: [],
+                        tracingMode: true,
+                        triggerTraceEnabled: true,
+                        transactionName: null,
+                        transactionSettings: []
+                    ));
+
+                    return new ParentBased($json, $json, $json);
             }
         }
 

@@ -12,7 +12,9 @@ class TransactionSettingTest extends TestCase
 {
     public function test_constructor_and_getters(): void
     {
-        $matcher = function ($input) { return $input === 'foo'; };
+        $matcher = function ($input) {
+            return $input === 'foo';
+        };
         $setting = new TransactionSetting(true, $matcher);
         $this->assertTrue($setting->getTracing());
         $this->assertInstanceOf(Closure::class, $setting->getMatcher());
@@ -22,8 +24,12 @@ class TransactionSettingTest extends TestCase
 
     public function test_setters(): void
     {
-        $matcher1 = function ($input) { return $input === 'foo'; };
-        $matcher2 = function ($input) { return $input === 'bar'; };
+        $matcher1 = function ($input) {
+            return $input === 'foo';
+        };
+        $matcher2 = function ($input) {
+            return $input === 'bar';
+        };
         $setting = new TransactionSetting(false, $matcher1);
         $setting->setTracing(true);
         $this->assertTrue($setting->getTracing());
