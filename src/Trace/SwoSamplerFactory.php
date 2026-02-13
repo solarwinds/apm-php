@@ -80,12 +80,12 @@ class SwoSamplerFactory
         }
 
         return new SolarwindsConfiguration(
-            $otelServiceName ?? $resourceAttributeServiceName ?? $service,
-            $isHttp ? 'https://' . $collector : '',
-            $token,
-            $tracingMode,
-            $triggerTraceEnabled,
-            $transactionSettings
+            service: $otelServiceName ?? $resourceAttributeServiceName ?? $service,
+            collector: $isHttp ? 'https://' . $collector : '',
+            token: $token,
+            tracingMode: $tracingMode,
+            triggerTraceEnabled: $triggerTraceEnabled,
+            transactionSettings: $transactionSettings
         );
     }
 

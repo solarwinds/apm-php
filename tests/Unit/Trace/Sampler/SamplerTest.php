@@ -223,12 +223,12 @@ class SamplerTest extends TestCase
     private function createConfig(array $options): Configuration
     {
         return new Configuration(
-            'test',
-            'localhost',
-            '',
-            $options['tracing'] ?? null,
-            $options['triggerTrace'] ?? false,
-            $options['transactionSettings'] ?? []
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: $options['tracing'] ?? null,
+            triggerTraceEnabled: $options['triggerTrace'] ?? false,
+            transactionSettings: $options['transactionSettings'] ?? []
         );
     }
 

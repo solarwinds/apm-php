@@ -32,7 +32,14 @@ class JsonSamplerTest extends TestCase
             ],
         ]));
         $spanExporter = new InMemoryExporter();
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), $this->path);
+        $sampler = new JsonSampler(null, new Configuration(
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: true,
+            triggerTraceEnabled: true,
+            transactionSettings: []
+        ), $this->path);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -47,7 +54,14 @@ class JsonSamplerTest extends TestCase
     {
         file_put_contents($this->path, json_encode(['hello' => 'world']));
         $spanExporter = new InMemoryExporter();
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), $this->path);
+        $sampler = new JsonSampler(null, new Configuration(
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: true,
+            triggerTraceEnabled: true,
+            transactionSettings: []
+        ), $this->path);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -61,7 +75,14 @@ class JsonSamplerTest extends TestCase
     {
         @unlink($this->path);
         $spanExporter = new InMemoryExporter();
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), $this->path);
+        $sampler = new JsonSampler(null, new Configuration(
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: true,
+            triggerTraceEnabled: true,
+            transactionSettings: []
+        ), $this->path);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -86,7 +107,14 @@ class JsonSamplerTest extends TestCase
             ],
         ]));
         $spanExporter = new InMemoryExporter();
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), $this->path);
+        $sampler = new JsonSampler(null, new Configuration(
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: true,
+            triggerTraceEnabled: true,
+            transactionSettings: []
+        ), $this->path);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -111,7 +139,14 @@ class JsonSamplerTest extends TestCase
             ],
         ]));
         $spanExporter = new InMemoryExporter();
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), $this->path);
+        $sampler = new JsonSampler(null, new Configuration(
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: true,
+            triggerTraceEnabled: true,
+            transactionSettings: []
+        ), $this->path);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -144,7 +179,14 @@ class JsonSamplerTest extends TestCase
     {
         file_put_contents($this->path, '{not valid json');
         $spanExporter = new InMemoryExporter();
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), $this->path);
+        $sampler = new JsonSampler(null, new Configuration(
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: true,
+            triggerTraceEnabled: true,
+            transactionSettings: []
+        ), $this->path);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -157,7 +199,14 @@ class JsonSamplerTest extends TestCase
     {
         file_put_contents($this->path, json_encode([['value' => 1000000]])); // missing flags, timestamp, ttl
         $spanExporter = new InMemoryExporter();
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), $this->path);
+        $sampler = new JsonSampler(null, new Configuration(
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: true,
+            triggerTraceEnabled: true,
+            transactionSettings: []
+        ), $this->path);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -182,7 +231,14 @@ class JsonSamplerTest extends TestCase
             ],
         ]));
         $spanExporter = new InMemoryExporter();
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), $this->path);
+        $sampler = new JsonSampler(null, new Configuration(
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: true,
+            triggerTraceEnabled: true,
+            transactionSettings: []
+        ), $this->path);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();
@@ -194,7 +250,14 @@ class JsonSamplerTest extends TestCase
     public function test_sampler_with_invalid_path_does_not_sample(): void
     {
         $spanExporter = new InMemoryExporter();
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), 'invalid');
+        $sampler = new JsonSampler(null, new Configuration(
+            service: 'test',
+            collector: '',
+            token: '',
+            tracingMode: true,
+            triggerTraceEnabled: true,
+            transactionSettings: []
+        ), 'invalid');
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
         $span = $tracer->spanBuilder('test')->startSpan();

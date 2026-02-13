@@ -13,18 +13,25 @@ class ConfigurationTest extends TestCase
 {
     public function test_can_instantiate()
     {
-        $this->assertInstanceOf(Configuration::class, new Configuration('', '', '', null, false, []));
+        $this->assertInstanceOf(Configuration::class, new Configuration(
+            service: '',
+            collector: '',
+            token: '',
+            tracingMode: null,
+            triggerTraceEnabled: false,
+            transactionSettings: []
+        ));
     }
 
     public function test_constructor_sets_properties()
     {
         $config = new Configuration(
-            'service-name',
-            'collector-url',
-            'token',
-            true,
-            false,
-            ['setting1' => 'value1']
+            service: 'service-name',
+            collector: 'collector-url',
+            token: 'token',
+            tracingMode: true,
+            triggerTraceEnabled: false,
+            transactionSettings: ['setting1' => 'value1']
         );
         $this->assertEquals('service-name', $config->getService());
         $this->assertEquals('collector-url', $config->getCollector());
@@ -36,7 +43,14 @@ class ConfigurationTest extends TestCase
 
     public function test_setters_and_getters()
     {
-        $config = new Configuration('', '', '', null, false, []);
+        $config = new Configuration(
+            service: '',
+            collector: '',
+            token: '',
+            tracingMode: null,
+            triggerTraceEnabled: false,
+            transactionSettings: []
+        );
         $config->setService('svc');
         $this->assertEquals('svc', $config->getService());
         $config->setCollector('coll');
@@ -55,7 +69,14 @@ class ConfigurationTest extends TestCase
 
     public function test_to_string_method()
     {
-        $config = new Configuration('svc', 'coll', 'token', false, true, ['s' => 'v']);
+        $config = new Configuration(
+            service: 'svc',
+            collector: 'coll',
+            token: 'token',
+            tracingMode: false,
+            triggerTraceEnabled: true,
+            transactionSettings: ['s' => 'v']
+        );
         $str = (string) $config;
         $this->assertStringContainsString('Configuration(service=svc, collector=coll', $str);
         $this->assertStringContainsString('tracingMode=false', $str);
@@ -65,7 +86,14 @@ class ConfigurationTest extends TestCase
 
     public function test_to_string_with_nulls()
     {
-        $config = new Configuration('', '', '', null, false, []);
+        $config = new Configuration(
+            service: '',
+            collector: '',
+            token: '',
+            tracingMode: null,
+            triggerTraceEnabled: false,
+            transactionSettings: []
+        );
         $str = (string) $config;
         $this->assertStringContainsString('tracingMode=null', $str);
     }
