@@ -268,7 +268,14 @@ class JsonSamplerTest extends TestCase
 
     public function test_description(): void
     {
-        $sampler = new JsonSampler(null, new Configuration('test', '', '', true, true, []), $this->path);
+        $sampler = new JsonSampler(null, new Configuration(
+          service: 'test',
+          collector: '',
+          token: '',
+          tracingMode: true,
+          triggerTraceEnabled: true,
+          transactionSettings: []
+        ), $this->path);
         $this->assertStringContainsString('JSON Sampler (' . sys_get_temp_dir() . '/solarwinds-apm-settings.json', $sampler->getDescription());
     }
 

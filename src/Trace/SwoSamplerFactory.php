@@ -127,7 +127,6 @@ class SwoSamplerFactory
                 case self::VALUE_SOLARWINDS_JSON:
                     $configuration = $this->getSolarwindsConfiguration(false);
                     $json = new JsonSampler($meterProvider, $configuration);
-
                     return new ParentBased($json, $json, $json);
             }
         }
