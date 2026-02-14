@@ -167,7 +167,9 @@ abstract class Sampler extends OboeSampler
         $this->triggerMode = $config->isTriggerTraceEnabled();
 
         foreach ($config->getTransactionSettings() as $transactionSetting) {
-            $this->transactionSettings[] = new TransactionSetting($transactionSetting['tracing'] ?? false, $transactionSetting['matcher'] ?? fn () => false);
+            if (isset($transactionSetting['tracing'], $transactionSetting['regex']) && is_string($transactionSetting['tracing']) && is_string($transactionSetting['regex'])) {
+                $this->transactionSettings[] = new TransactionSetting(strtolower($transactionSetting['tracing']) === 'enabled', fn (string $identifier) => preg_match($transactionSetting['regex'], $identifier) === 1);
+            }
         }
 
         if ($initial) {

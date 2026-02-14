@@ -112,7 +112,7 @@ class SdkAutoloader
             ->addSpanProcessor(new ResponseTimeSpanProcessor($meterProvider))    // Response Time Span Processor
             ->addSpanProcessor($spanProcessor)                                   // Otel Span Processors
             ->setResource($resource)
-            ->setSampler((new SwoSamplerFactory())->create($meterProvider))
+            ->setSampler((new SwoSamplerFactory($resource))->create($meterProvider))
             ->build();
 
         $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
