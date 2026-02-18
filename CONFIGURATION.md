@@ -24,12 +24,19 @@ By default, the service name portion of the service key is used, e.g. `my-servic
 
 ### Transaction Settings
 
-Transaction settings is to filter specific transactions for sampling and trigger trace. It is a JSON string with the following format:
+Transaction settings allow you to filter specific transactions for sampling and trigger trace.
+You can define these settings as a JSON array string, where each entry has the following format:
 
-Config value:
-- `tracing`: `enabled` or `disabled` to indicate whether the transaction should be traced when the regex matches.
-- `regex`: a regular expression to match the transaction name.
+- **tracing**: `"enabled"` or `"disabled"` — indicates whether the transaction should be traced when the regex matches.
+- **regex**: a [regular expression](https://www.php.net/manual/en/book.pcre.php) to match the transaction name.
 
+**How matching works:**
+- Each entry is compared against the URL (e.g., `scheme://host/request_uri`) or the [span kind](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#spankind) and span name (concatenated as `INTERNAL:span-name`).
+- Entries are applied in the order they appear in the JSON array.
+- If multiple entries match, the first one is used.
+- Setting `tracing` to `"enabled"` does not guarantee the transaction will be traced.
+
+**Example JSON array string:**
 ```json
 [
   {
@@ -42,6 +49,11 @@ Config value:
   }
 ]
 ```
+
+You can provide the JSON array string in a file and set its path with the `SW_APM_TRANSACTION_SETTINGS_FILE` environment variable, or set it directly with the `SW_APM_TRANSACTION_SETTINGS` environment variable.
+
+> **Note:**
+> If both `SW_APM_TRANSACTION_SETTINGS_FILE` and `SW_APM_TRANSACTION_SETTINGS` are set, the file takes precedence.
 
 ## Trace Context in Database Queries
 
