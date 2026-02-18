@@ -19,6 +19,7 @@ interface Variables
     public const SW_APM_TRIGGER_TRACE_ENABLED = 'SW_APM_TRIGGER_TRACE_ENABLED';
     public const SW_APM_TRANSACTION_NAME = 'SW_APM_TRANSACTION_NAME';
     public const SW_APM_TRANSACTION_SETTINGS = 'SW_APM_TRANSACTION_SETTINGS';
+    public const SW_APM_TRANSACTION_SETTINGS_FILE = 'SW_APM_TRANSACTION_SETTINGS_FILE';
     /**
      * k8s resource attributes configuration
      */

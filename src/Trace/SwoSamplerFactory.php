@@ -62,11 +62,30 @@ class SwoSamplerFactory
         $resourceAttributeServiceName = $this->resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
         $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRACING_MODE)) === 'enabled';
         $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED)) === 'enabled';
+        $transactionSettingsFile = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS_FILE)
+            ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS_FILE)
+            : null;
         $transactionSettingsStr = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
             ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS)
             : null;
         $transactionSettings = [];
-        if ($transactionSettingsStr) {
+        if ($transactionSettingsFile && file_exists($transactionSettingsFile)) {
+            try {
+                $transactionSettingsContent = file_get_contents($transactionSettingsFile);
+                if ($transactionSettingsContent !== false) {
+                    $transactionSettingsJson = json_decode($transactionSettingsContent, true);
+                    if (is_array($transactionSettingsJson)) {
+                        $transactionSettings = $transactionSettingsJson;
+                    } else {
+                        self::logWarning('Content of SW_APM_TRANSACTION_SETTINGS_FILE is not a valid JSON array. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
+                    }
+                } else {
+                    self::logWarning('Unable to read SW_APM_TRANSACTION_SETTINGS_FILE. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
+                }
+            } catch (Exception $e) {
+                self::logWarning('Error processing SW_APM_TRANSACTION_SETTINGS_FILE: ' . $e->getMessage() . '. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
+            }
+        } elseif ($transactionSettingsStr) {
             try {
                 $transactionSettingsJson = json_decode($transactionSettingsStr, true);
                 if (is_array($transactionSettingsJson)) {
