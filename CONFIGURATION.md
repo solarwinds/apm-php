@@ -37,15 +37,26 @@ You can define these settings as a JSON array string, where each entry has the f
 - Setting `tracing` to `"enabled"` does not guarantee the transaction will be traced.
 
 **Example JSON array string:**
+
+Below is an example that disables tracing for all checkout page requests, enables tracing for all `.php` and `.html` requests, and disables tracing for all `.css` requests:
+
 ```json
 [
   {
+    "tracing": "disabled",
+    "regex": "/^.*\/checkout\/.*$/"
+  },
+  {
     "tracing": "enabled",
-    "regex": "/^.*$/"
+    "regex": "/^.*\\php$/"
+  },
+  {
+    "tracing": "enabled",
+    "regex": "/^.*\\html$/"
   },
   {
     "tracing": "disabled",
-    "regex": "/^http:\\/\\/localhost\\/test$/"
+    "regex": "/^.*\\css$/"
   }
 ]
 ```
