@@ -1,9 +1,9 @@
 # Configuration
 
 ## Specification
-[solarwinds/apm](https://packagist.org/packages/solarwinds/apm) supports [OpenTelemetry SDK configuration](https://opentelemetry.io/docs/zero-code/php/#configuration).
+[solarwinds/apm](https://packagist.org/packages/solarwinds/apm) supports [OpenTelemetry SDK configuration](https://opentelemetry.io/docs/zero-code/php/#configuration), all available variables are listed [here](https://github.com/open-telemetry/opentelemetry-php/blob/main/src/SDK/Common/Configuration/Variables.php).
 
-In addition to the [opentelemetry-php configuration](https://github.com/open-telemetry/opentelemetry-php/blob/main/src/SDK/Common/Configuration/Variables.php), the following configurations are supported:
+Additionally the following SolarWinds-specific configurations are supported:
 
 | Configuration                    | Default                                  | Description                                                                                                                                      |
 |----------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
