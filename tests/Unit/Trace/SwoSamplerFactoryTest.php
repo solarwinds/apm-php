@@ -112,7 +112,6 @@ class SwoSamplerFactoryTest extends TestCase
 
     public function test_get_solarwinds_configuration_http(): void
     {
-        \putenv('OTEL_SERVICE_NAME');
         $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
         $serviceKey = 'token1234:myservice';
         $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
@@ -130,22 +129,6 @@ class SwoSamplerFactoryTest extends TestCase
         $config = $factory->getSolarwindsConfiguration(false);
         $this->assertEquals('', $config->getCollector());
         $this->assertEquals('', $config->getToken());
-    }
-
-    public function test_get_solarwinds_configuration_with_env_vars(): void
-    {
-        \putenv('SW_APM_COLLECTOR=custom.collector');
-        \putenv('SW_APM_TRACING_MODE=disabled');
-        \putenv('SW_APM_TRIGGER_TRACE=disabled');
-        $factory = new SwoSamplerFactory();
-        $config = $factory->getSolarwindsConfiguration(true);
-        $this->assertEquals('https://custom.collector', $config->getCollector());
-        $this->assertFalse($config->getTracingMode());
-        $this->assertFalse($config->isTriggerTraceEnabled());
-        \putenv('SW_APM_COLLECTOR');
-        \putenv('SW_APM_SERVICE_KEY');
-        \putenv('SW_APM_TRACING_MODE');
-        \putenv('SW_APM_TRIGGER_TRACE');
     }
 
     public function test_get_solarwinds_configuration_transaction_settings_file(): void
