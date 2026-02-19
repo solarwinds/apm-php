@@ -46,7 +46,7 @@ class SwoSamplerFactory
      * @param string|null $serviceKey Service key string for HTTP, null for JSON
      * @return SolarwindsConfiguration
      */
-    private function getSolarwindsConfiguration(bool $isHttp, ?string $serviceKey = null): SolarwindsConfiguration
+    public function getSolarwindsConfiguration(bool $isHttp, ?string $serviceKey = null): SolarwindsConfiguration
     {
         $collector = $isHttp
             ? (Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
@@ -77,7 +77,7 @@ class SwoSamplerFactory
                     if (is_array($transactionSettingsJson)) {
                         $transactionSettings = $transactionSettingsJson;
                     } else {
-                        self::logWarning('Content of SW_APM_TRANSACTION_SETTINGS_FILE ' . $transactionSettingsFile .' is not a valid JSON array. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
+                        self::logWarning('Content of SW_APM_TRANSACTION_SETTINGS_FILE ' . $transactionSettingsFile . ' is not a valid JSON array. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
                     }
                 } else {
                     self::logWarning('Unable to read SW_APM_TRANSACTION_SETTINGS_FILE ' . $transactionSettingsFile . ' . Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
