@@ -77,13 +77,13 @@ class SwoSamplerFactory
                     if (is_array($transactionSettingsJson)) {
                         $transactionSettings = $transactionSettingsJson;
                     } else {
-                        self::logWarning('Content of SW_APM_TRANSACTION_SETTINGS_FILE is not a valid JSON array. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
+                        self::logWarning('Content of SW_APM_TRANSACTION_SETTINGS_FILE ' . $transactionSettingsFile .' is not a valid JSON array. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
                     }
                 } else {
-                    self::logWarning('Unable to read SW_APM_TRANSACTION_SETTINGS_FILE. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
+                    self::logWarning('Unable to read SW_APM_TRANSACTION_SETTINGS_FILE ' . $transactionSettingsFile . ' . Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
                 }
             } catch (Exception $e) {
-                self::logWarning('Error processing SW_APM_TRANSACTION_SETTINGS_FILE: ' . $e->getMessage() . '. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
+                self::logWarning('Error processing SW_APM_TRANSACTION_SETTINGS_FILE ' . $transactionSettingsFile . ' : ' . $e->getMessage() . '. Falling back to SW_APM_TRANSACTION_SETTINGS environment variable or empty transaction settings.');
             }
         } elseif ($transactionSettingsStr) {
             try {
