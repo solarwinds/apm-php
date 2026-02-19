@@ -128,7 +128,6 @@ class SwoSamplerFactoryTest extends TestCase
     {
         $factory = new SwoSamplerFactory();
         $config = $factory->getSolarwindsConfiguration(false);
-        $this->assertEquals('unknown_service', $config->getService());
         $this->assertEquals('', $config->getCollector());
         $this->assertEquals('', $config->getToken());
     }
@@ -136,15 +135,11 @@ class SwoSamplerFactoryTest extends TestCase
     public function test_get_solarwinds_configuration_with_env_vars(): void
     {
         \putenv('SW_APM_COLLECTOR=custom.collector');
-        \putenv('SW_APM_SERVICE_KEY=token9999:envservice');
         \putenv('SW_APM_TRACING_MODE=disabled');
         \putenv('SW_APM_TRIGGER_TRACE=disabled');
         $factory = new SwoSamplerFactory();
-        $serviceKey = 'token9999:envservice';
-        $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
-        $this->assertEquals('envservice', $config->getService());
+        $config = $factory->getSolarwindsConfiguration(true);
         $this->assertEquals('https://custom.collector', $config->getCollector());
-        $this->assertEquals('token9999', $config->getToken());
         $this->assertFalse($config->getTracingMode());
         $this->assertFalse($config->isTriggerTraceEnabled());
         \putenv('SW_APM_COLLECTOR');
