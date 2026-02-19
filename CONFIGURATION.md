@@ -48,15 +48,33 @@ Below is an example that disables tracing for all checkout page requests, enable
   },
   {
     "tracing": "enabled",
-    "regex": "/^.*\\php$/"
+    "regex": "/^.*.php$/"
   },
   {
     "tracing": "enabled",
-    "regex": "/^.*\\html$/"
+    "regex": "/^.*.html$/"
   },
   {
     "tracing": "disabled",
-    "regex": "/^.*\\css$/"
+    "regex": "/^.*.css$/"
+  }
+]
+```
+Another example to disable tracing for url `http://my.domain.com/foo`:
+```json
+[
+  {
+    "tracing": "disabled",
+    "regex": "/^http:\\/\\/my.domain.com\\/foo$/"
+  }
+]
+```
+or use other regex delimiter, e.g. `#`
+```json
+[
+  {
+    "tracing": "disabled",
+    "regex": "#^http://my.domain.com/foo$#"
   }
 ]
 ```
