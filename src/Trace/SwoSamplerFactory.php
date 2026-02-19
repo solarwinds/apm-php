@@ -61,7 +61,7 @@ class SwoSamplerFactory
         $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
         $resourceAttributeServiceName = $this->resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
         $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRACING_MODE)) === 'enabled';
-        $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRIGGER_TRACE_ENABLED)) === 'enabled';
+        $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRIGGER_TRACE)) === 'enabled';
         $transactionSettingsFile = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS_FILE)
             ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS_FILE)
             : null;
