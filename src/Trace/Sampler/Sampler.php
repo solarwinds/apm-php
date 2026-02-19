@@ -212,7 +212,16 @@ abstract class Sampler extends OboeSampler
         }
 
         $meta = httpSpanMetadata($spanKind, $attributes);
-        $identifier = $meta['http'] ? $meta['url'] : $spanKind . ':' . $spanName;
+        $mapping = fn ($kind) =>
+            match ($kind) {
+                SpanKind::KIND_INTERNAL => 'INTERNAL',
+                SpanKind::KIND_CLIENT => 'CLIENT',
+                SpanKind::KIND_SERVER => 'SERVER',
+                SpanKind::KIND_PRODUCER => 'PRODUCER',
+                SpanKind::KIND_CONSUMER => 'CONSUMER',
+                default => 'UNSPECIFIED',
+            };
+        $identifier = $meta['http'] ? $meta['url'] : $mapping($spanKind) . ':' . $spanName;
 
         foreach ($this->transactionSettings as $transactionSetting) {
             if (is_a($transactionSetting, TransactionSetting::class) && $transactionSetting->getMatcher()($identifier)) {

@@ -31,7 +31,7 @@ You can define these settings as a JSON array string, where each entry has the f
 - **regex**: a [regular expression](https://www.php.net/manual/en/book.pcre.php) to match the transaction name.
 
 **How matching works:**
-- Each entry is compared against the URL (e.g., `scheme://host/request_uri`) or the [span kind](https://github.com/open-telemetry/opentelemetry-php/blob/main/src/API/Trace/SpanKind.php) and span name (concatenated as `0:span-name`).
+- Each entry is compared against the URL (e.g., `scheme://host/request_uri`) or the [span kind](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#spankind) and span name (concatenated as `INTERNAL:span-name`).
 - Entries are applied in the order they appear in the JSON array.
 - If multiple entries match, the first one is used.
 - Setting `tracing` to `"enabled"` does not guarantee the transaction will be traced.

@@ -393,7 +393,7 @@ class SamplerTest extends TestCase
             $this->createConfig([
                 'tracing' => false,
                 'triggerTrace' => false,
-                'transactionSettings' => [['tracing' => 'enabled', 'regex' => '/^1:test$/']],
+                'transactionSettings' => [['tracing' => 'enabled', 'regex' => '/^CLIENT:test$/']],
             ]),
             $this->createSettings(false, null)
         );
