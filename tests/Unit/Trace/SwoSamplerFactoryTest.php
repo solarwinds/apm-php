@@ -165,14 +165,14 @@ class SwoSamplerFactoryTest extends TestCase
         // Global disable tracing mode to ensure transaction settings are applied
         \putenv('SW_APM_TRACING_MODE=disabled');
         $file = tempnam(sys_get_temp_dir(), 'sw_transaction_settings');
-        file_put_contents($file, json_encode([(object) ['tracing' => 'enabled', 'regex' => '/^INTERNAL:test$/']]));
+        file_put_contents($file, '[{"tracing":"enabled","regex":"#^INTERNAL:http://my.domain.com/foo$#"}]');
         \putenv('SW_APM_TRANSACTION_SETTINGS_FILE=' . $file);
         $factory = new SwoSamplerFactory();
         $sampler = $factory->create();
         $spanExporter = new InMemoryExporter();
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
-        $span = $tracer->spanBuilder('test')->startSpan();
+        $span = $tracer->spanBuilder('http://my.domain.com/foo')->startSpan();
         $this->assertTrue($span->isRecording());
         $span->end();
         $spans = $spanExporter->getSpans();
@@ -196,13 +196,13 @@ class SwoSamplerFactoryTest extends TestCase
         \putenv(Env::OTEL_TRACES_SAMPLER . '=solarwinds_http');
         // Global disable tracing mode to ensure transaction settings are applied
         \putenv('SW_APM_TRACING_MODE=disabled');
-        \putenv('SW_APM_TRANSACTION_SETTINGS=' . json_encode([(object) ['tracing' => 'enabled', 'regex' => '/^INTERNAL:test$/']]));
+        \putenv('SW_APM_TRANSACTION_SETTINGS=[{"tracing":"enabled","regex":"#^INTERNAL:http://my.domain.com/foo$#"}]');
         $factory = new SwoSamplerFactory();
         $sampler = $factory->create();
         $spanExporter = new InMemoryExporter();
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
         $tracer = $tracerProvider->getTracer('test');
-        $span = $tracer->spanBuilder('test')->startSpan();
+        $span = $tracer->spanBuilder('http://my.domain.com/foo')->startSpan();
         $this->assertTrue($span->isRecording());
         $span->end();
         $spans = $spanExporter->getSpans();
