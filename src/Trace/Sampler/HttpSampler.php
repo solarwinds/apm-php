@@ -26,7 +26,6 @@ class HttpSampler extends Sampler
     use LogsMessagesTrait;
 
     private string $url;
-    private array $headers;
     private string $service;
     private string $token;
     private string $hostname;
@@ -40,7 +39,6 @@ class HttpSampler extends Sampler
         $this->url = $config->getCollector();
         $this->service = urlencode($config->getService());
         $this->token = $config->getToken();
-        $this->headers = $config->getHeaders();
         $this->hostname = urlencode(gethostname());
         $this->client = $client ?? Discovery::find([
             'timeout' => 10,
@@ -82,10 +80,6 @@ class HttpSampler extends Sampler
             $req = $this->requestFactory->createRequest('GET', $url);
             // Authorization header
             $req = $req->withHeader('Authorization', 'Bearer ' . $this->token);
-            // Other headers
-            foreach ($this->headers as $key => $value) {
-                $req = $req->withHeader($key, $value);
-            }
             $res = $this->client->sendRequest($req);
             if ($res->getStatusCode() !== 200) {
                 $this->logWarning('Received unexpected status code ' . $res->getStatusCode() . ' from ' . $url);

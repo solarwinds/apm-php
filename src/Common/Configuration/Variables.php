@@ -15,6 +15,11 @@ interface Variables
      */
     public const SW_APM_SERVICE_KEY = 'SW_APM_SERVICE_KEY';
     public const SW_APM_COLLECTOR = 'SW_APM_COLLECTOR';
+    public const SW_APM_TRACING_MODE = 'SW_APM_TRACING_MODE';
+    public const SW_APM_TRIGGER_TRACE = 'SW_APM_TRIGGER_TRACE';
+    public const SW_APM_TRANSACTION_NAME = 'SW_APM_TRANSACTION_NAME';
+    public const SW_APM_TRANSACTION_SETTINGS = 'SW_APM_TRANSACTION_SETTINGS';
+    public const SW_APM_TRANSACTION_SETTINGS_FILE = 'SW_APM_TRANSACTION_SETTINGS_FILE';
     /**
      * k8s resource attributes configuration
      */

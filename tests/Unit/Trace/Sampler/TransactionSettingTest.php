@@ -37,4 +37,25 @@ class TransactionSettingTest extends TestCase
         $this->assertTrue(($setting->getMatcher())('bar'));
         $this->assertFalse(($setting->getMatcher())('foo'));
     }
+
+    public function test_setters_url_single_escape(): void
+    {
+        $matcher = fn (string $identifier) => preg_match('/^http:\/\/my.domain.com\/foo$/', $identifier) === 1;
+        $setting = new TransactionSetting(false, $matcher);
+        $this->assertTrue(($setting->getMatcher())('http://my.domain.com/foo'));
+    }
+
+    public function test_setters_url_double_escape(): void
+    {
+        $matcher = fn (string $identifier) => preg_match('/^http:\\/\\/my.domain.com\\/foo$/', $identifier) === 1;
+        $setting = new TransactionSetting(false, $matcher);
+        $this->assertTrue(($setting->getMatcher())('http://my.domain.com/foo'));
+    }
+
+    public function test_setters_url_different_delimiter(): void
+    {
+        $matcher = fn (string $identifier) => preg_match('#^http://my.domain.com/foo$#', $identifier) === 1;
+        $setting = new TransactionSetting(false, $matcher);
+        $this->assertTrue(($setting->getMatcher())('http://my.domain.com/foo'));
+    }
 }

@@ -30,6 +30,9 @@ Starting with version 9, proprietary `solarwinds_apm_*` tracing API is no longer
 | solarwinds_apm_metric_increment     | Use [Opentelemetry Metrics API](https://open-telemetry.github.io/opentelemetry-php/namespaces/opentelemetry-api-metrics.html)                                                                                                                                                                                                               |
 | solarwinds_apm_get_log_trace_id     | Use [Context::getCurrent()](https://open-telemetry.github.io/opentelemetry-php/classes/OpenTelemetry-Context-Context.html#method_getCurrent)                                                                                                                                                                                                |
 
+## Transaction Settings changes from 8.x to 9.x
+With version 9, the proprietary [transaction settings format](https://documentation.solarwinds.com/en/success_center/observability/content/configure/services/php/configure.htm#transaction-settings-file) is no longer supported. Please refer to the updated [CONFIGURATION.md](./CONFIGURATION.md) for the new transaction settings format and update your configuration accordingly.
+
 ## Upgrade Steps
 1. **Uninstall 8.x Version:**
    Before installing version 9.x, migrate proprietary `solarwinds_apm_*` tracing API calls and fully [uninstall](https://documentation.solarwinds.com/en/success_center/observability/content/configure/services/php/install.htm#link12) version 8.x to avoid conflicts.

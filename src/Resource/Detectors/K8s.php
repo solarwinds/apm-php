@@ -110,15 +110,15 @@ final class K8s implements ResourceDetectorInterface
                 }
 
                 [$identity, $parentId, , $root] = array_slice($fields, 0, 4);
-                if (!ctype_digit($identity) || !ctype_digit($parentId)) {
+                if (!ctype_digit((string) $identity) || !ctype_digit((string) $parentId)) {
                     continue;
                 }
 
-                if (!str_contains($root, 'kube')) {
+                if (!str_contains((string) $root, 'kube')) {
                     continue;
                 }
 
-                if (preg_match(self::UID_REGEX, $root, $matches)) {
+                if (preg_match(self::UID_REGEX, (string) $root, $matches)) {
                     return $matches[0];
                 }
             }
