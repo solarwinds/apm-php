@@ -186,4 +186,33 @@ class SwoSamplerFactoryTest extends TestCase
         \putenv(Env::OTEL_TRACES_SAMPLER);
         unlink($file);
     }
+
+    public function test_get_solarwinds_configuration_transaction_settings_env_end2end(): void
+    {
+        $serviceKey = getenv('SW_APM_SERVICE_KEY');
+        if (empty($serviceKey)) {
+            $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set.');
+        }
+        \putenv(Env::OTEL_TRACES_SAMPLER . '=solarwinds_http');
+        // Global disable tracing mode to ensure transaction settings are applied
+        \putenv('SW_APM_TRACING_MODE=disabled');
+        \putenv('SW_APM_TRANSACTION_SETTINGS=' . json_encode([(object) ['tracing' => 'enabled', 'regex' => '/^INTERNAL:test$/']]));
+        $factory = new SwoSamplerFactory();
+        $sampler = $factory->create();
+        $spanExporter = new InMemoryExporter();
+        $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
+        $tracer = $tracerProvider->getTracer('test');
+        $span = $tracer->spanBuilder('test')->startSpan();
+        $this->assertTrue($span->isRecording());
+        $span->end();
+        $spans = $spanExporter->getSpans();
+        $this->assertCount(1, $spans);
+        $this->assertArrayHasKey('SampleRate', $spans[0]->getAttributes()->toArray());
+        $this->assertArrayHasKey('SampleSource', $spans[0]->getAttributes()->toArray());
+        $this->assertArrayHasKey('BucketCapacity', $spans[0]->getAttributes()->toArray());
+        $this->assertArrayHasKey('BucketRate', $spans[0]->getAttributes()->toArray());
+        \putenv('SW_APM_TRANSACTION_SETTINGS');
+        \putenv('SW_APM_TRACING_MODE');
+        \putenv(Env::OTEL_TRACES_SAMPLER);
+    }
 }
