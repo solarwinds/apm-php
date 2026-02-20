@@ -24,26 +24,26 @@ By default, the service name portion of the service key is used, e.g. `my-servic
 
 ### Transaction Settings
 
-Transaction settings allow you to filter specific transactions for sampling and trigger trace.
+Transaction settings allow you to filter specific transactions from being sampled or trigger traced.
 You can define these settings as a JSON array string, where each entry has the following format:
 
 - **tracing**: `"enabled"` or `"disabled"` — indicates whether the transaction should be traced when the regex matches.
 - **regex**: value should be a PHP regular expression (see [pcre](https://www.php.net/manual/en/book.pcre.php) specification). Since the regular expression is defined in a JSON string, double backslashes are needed for PHP regex escapes. The first backslash ensures the second backslash is retained as a PHP escape character, for example, the JSON string `\\.` would become the regular expression `\.` that matches on a literal `.` instead of any character.
 
 **How matching works:**
-- Each entry is compared against the URL (e.g., `scheme://host/request_uri`) or the [span kind](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#spankind) and span name (concatenated as `INTERNAL:span-name`).
+- Each entry is compared against the URL (e.g., `scheme://host/request_uri`) or the [span kind](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#spankind) and span name (concatenated with `:`, e.g. `INTERNAL:span-name`).
 - Entries are applied in the order they appear in the JSON array.
 - If multiple entries match, the first one is used.
 
 **Example JSON array string:**
 
-Below is an example that disables tracing for all checkout page requests, and disables tracing for all `.css` requests:
+Below is an example that disables tracing for all `/ping/` and `.css` requests:
 
 ```json
 [
   {
     "tracing": "disabled",
-    "regex": "/^.*\\/checkout\\/.*$/"
+    "regex": "/^.*\\/ping\\/.*$/"
   },
   {
     "tracing": "disabled",
@@ -56,7 +56,7 @@ Another example to disable tracing for url `http://my.domain.com/foo`:
 [
   {
     "tracing": "disabled",
-    "regex": "/^http:\\/\\/my.domain.com\\/foo$/"
+    "regex": "/^http:\\/\\/my\\.domain\\.com\\/foo$/"
   }
 ]
 ```
@@ -65,7 +65,7 @@ or use other regex delimiter, e.g. `#`
 [
   {
     "tracing": "disabled",
-    "regex": "#^http://my.domain.com/foo$#"
+    "regex": "#^http://my\\.domain\\.com/foo$#"
   }
 ]
 ```
