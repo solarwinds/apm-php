@@ -115,7 +115,7 @@ class SwoSamplerFactoryTest extends TestCase
 
     public function test_get_solarwinds_configuration_http(): void
     {
-        $factory = new SwoSamplerFactory();
+        $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
         $serviceKey = 'token1234:myservice';
         $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
         $this->assertEquals('myservice', $config->getService());
