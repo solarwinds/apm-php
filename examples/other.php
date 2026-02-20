@@ -16,7 +16,7 @@ putenv('SW_APM_SERVICE_KEY=token:apm-php-other');
 putenv('SW_APM_TRACING_MODE=enabled');
 putenv('SW_APM_TRIGGER_TRACE=enabled');
 putenv('SW_APM_TRANSACTION_NAME=txn');
-putenv('SW_APM_TRANSACTION_SETTINGS=[{"tracing":"disabled", "regex":"/^.*.css$/"},{"tracing":"enabled", "regex":"/^.*.html$/"},{"tracing":"enabled", "regex":"/^.*.php$/"}]');
+putenv('SW_APM_TRANSACTION_SETTINGS=[{"tracing":"disabled", "regex":"/^.*\\.css$/"}]');
 putenv('OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions');
 
 echo 'autoloading SDK example starting...' . PHP_EOL;
