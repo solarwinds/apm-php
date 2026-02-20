@@ -182,6 +182,8 @@ class SwoSamplerFactoryTest extends TestCase
         $this->assertArrayHasKey('BucketCapacity', $spans[0]->getAttributes()->toArray());
         $this->assertArrayHasKey('BucketRate', $spans[0]->getAttributes()->toArray());
         \putenv('SW_APM_TRANSACTION_SETTINGS_FILE');
+        \putenv('SW_APM_TRACING_MODE');
+        \putenv(Env::OTEL_TRACES_SAMPLER);
         unlink($file);
     }
 }
