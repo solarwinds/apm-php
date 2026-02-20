@@ -28,35 +28,26 @@ Transaction settings allow you to filter specific transactions for sampling and 
 You can define these settings as a JSON array string, where each entry has the following format:
 
 - **tracing**: `"enabled"` or `"disabled"` — indicates whether the transaction should be traced when the regex matches.
-- **regex**: a [regular expression](https://www.php.net/manual/en/book.pcre.php) to match the transaction name.
+- **regex**: value should be a PHP regular expression (see [pcre](https://www.php.net/manual/en/book.pcre.php) specification). Since the regular expression is defined in a JSON string, double backslashes are needed for PHP regex escapes. The first backslash ensures the second backslash is retained as a PHP escape character, for example, the JSON string `\\.` would become the regular expression `\.` that matches on a literal `.` instead of any character.
 
 **How matching works:**
 - Each entry is compared against the URL (e.g., `scheme://host/request_uri`) or the [span kind](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#spankind) and span name (concatenated as `INTERNAL:span-name`).
 - Entries are applied in the order they appear in the JSON array.
 - If multiple entries match, the first one is used.
-- Setting `tracing` to `"enabled"` does not guarantee the transaction will be traced.
 
 **Example JSON array string:**
 
-Below is an example that disables tracing for all checkout page requests, enables tracing for all `.php` and `.html` requests, and disables tracing for all `.css` requests:
+Below is an example that disables tracing for all checkout page requests, and disables tracing for all `.css` requests:
 
 ```json
 [
   {
     "tracing": "disabled",
-    "regex": "/^.*\/checkout\/.*$/"
-  },
-  {
-    "tracing": "enabled",
-    "regex": "/^.*.php$/"
-  },
-  {
-    "tracing": "enabled",
-    "regex": "/^.*.html$/"
+    "regex": "/^.*\\/checkout\\/.*$/"
   },
   {
     "tracing": "disabled",
-    "regex": "/^.*.css$/"
+    "regex": "/^.*\\.css$/"
   }
 ]
 ```
