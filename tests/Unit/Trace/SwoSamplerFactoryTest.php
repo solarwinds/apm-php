@@ -12,6 +12,9 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
+use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
 use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 
@@ -112,7 +115,7 @@ class SwoSamplerFactoryTest extends TestCase
 
     public function test_get_solarwinds_configuration_http(): void
     {
-        $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
+        $factory = new SwoSamplerFactory();
         $serviceKey = 'token1234:myservice';
         $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
         $this->assertEquals('myservice', $config->getService());
@@ -150,5 +153,35 @@ class SwoSamplerFactoryTest extends TestCase
         $config = $factory->getSolarwindsConfiguration(true, 'token:service');
         $this->assertEquals([['tracing' => 'enabled', 'regex' => '/^.*.html$/'], ['tracing' => 'disabled', 'regex' => '/^.*.css$/']], $config->getTransactionSettings());
         \putenv('SW_APM_TRANSACTION_SETTINGS');
+    }
+
+    public function test_get_solarwinds_configuration_transaction_settings_file_end2end(): void
+    {
+        $serviceKey = getenv('SW_APM_SERVICE_KEY');
+        if (empty($serviceKey)) {
+            $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set.');
+        }
+        \putenv(Env::OTEL_TRACES_SAMPLER . '=solarwinds_http');
+        // Global disable tracing mode to ensure transaction settings are applied
+        \putenv('SW_APM_TRACING_MODE=disabled');
+        $file = tempnam(sys_get_temp_dir(), 'sw_transaction_settings');
+        file_put_contents($file, json_encode([(object) ['tracing' => 'enabled', 'regex' => '/^INTERNAL:test$/']]));
+        \putenv('SW_APM_TRANSACTION_SETTINGS_FILE=' . $file);
+        $factory = new SwoSamplerFactory();
+        $sampler = $factory->create();
+        $spanExporter = new InMemoryExporter();
+        $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
+        $tracer = $tracerProvider->getTracer('test');
+        $span = $tracer->spanBuilder('test')->startSpan();
+        $this->assertTrue($span->isRecording());
+        $span->end();
+        $spans = $spanExporter->getSpans();
+        $this->assertCount(1, $spans);
+        $this->assertArrayHasKey('SampleRate', $spans[0]->getAttributes()->toArray());
+        $this->assertArrayHasKey('SampleSource', $spans[0]->getAttributes()->toArray());
+        $this->assertArrayHasKey('BucketCapacity', $spans[0]->getAttributes()->toArray());
+        $this->assertArrayHasKey('BucketRate', $spans[0]->getAttributes()->toArray());
+        \putenv('SW_APM_TRANSACTION_SETTINGS_FILE');
+        unlink($file);
     }
 }
