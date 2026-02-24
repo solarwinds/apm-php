@@ -167,7 +167,9 @@ abstract class Sampler extends OboeSampler
         $this->triggerMode = $config->isTriggerTraceEnabled();
 
         foreach ($config->getTransactionSettings() as $transactionSetting) {
-            $this->transactionSettings[] = new TransactionSetting($transactionSetting['tracing'] ?? false, $transactionSetting['matcher'] ?? fn () => false);
+            if (isset($transactionSetting['tracing'], $transactionSetting['regex']) && is_string($transactionSetting['tracing']) && is_string($transactionSetting['regex'])) {
+                $this->transactionSettings[] = new TransactionSetting(strtolower($transactionSetting['tracing']) === 'enabled', fn (string $identifier) => preg_match($transactionSetting['regex'], $identifier) === 1);
+            }
         }
 
         if ($initial) {
@@ -210,7 +212,16 @@ abstract class Sampler extends OboeSampler
         }
 
         $meta = httpSpanMetadata($spanKind, $attributes);
-        $identifier = $meta['http'] ? $meta['url'] : $spanKind . ':' . $spanName;
+        $mapping = fn ($kind) =>
+            match ($kind) {
+                SpanKind::KIND_INTERNAL => 'INTERNAL',
+                SpanKind::KIND_CLIENT => 'CLIENT',
+                SpanKind::KIND_SERVER => 'SERVER',
+                SpanKind::KIND_PRODUCER => 'PRODUCER',
+                SpanKind::KIND_CONSUMER => 'CONSUMER',
+                default => 'UNSPECIFIED',
+            };
+        $identifier = $meta['http'] ? $meta['url'] : $mapping($spanKind) . ':' . $spanName;
 
         foreach ($this->transactionSettings as $transactionSetting) {
             if (is_a($transactionSetting, TransactionSetting::class) && $transactionSetting->getMatcher()($identifier)) {

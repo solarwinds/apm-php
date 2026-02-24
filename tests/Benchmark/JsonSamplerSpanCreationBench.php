@@ -36,14 +36,11 @@ class JsonSamplerSpanCreationBench
             ],
         ]));
         $this->sampler = new JsonSampler(null, new Configuration(
-            enabled: true,
             service: 'test',
             collector: '',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), $path);
         $this->resource = ResourceInfo::create(Attributes::create([

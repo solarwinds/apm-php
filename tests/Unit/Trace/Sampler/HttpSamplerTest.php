@@ -25,14 +25,11 @@ class HttpSamplerTest extends TestCase
         [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: $service,
             collector: 'https://apm.collector.na-01.cloud.solarwinds.com',
             token: $token,
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
@@ -52,14 +49,11 @@ class HttpSamplerTest extends TestCase
     {
         $spanExporter = new InMemoryExporter();
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'https://apm.collector.na-01.cloud.solarwinds.com',
             token: 'oh no',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
@@ -80,14 +74,11 @@ class HttpSamplerTest extends TestCase
         [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: $service,
             collector: 'https://collector.invalid',
             token: $token,
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null);
         $tracerProvider = TracerProvider::builder()->addSpanProcessor(new SimpleSpanProcessor($spanExporter))->setSampler($sampler)->build();
@@ -112,14 +103,11 @@ class HttpSamplerTest extends TestCase
         $response->method('getHeaderLine')->willReturn('application/json');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags'=>'SAMPLE_START','value'=>1,'timestamp'=>time(),'ttl'=>60,'arguments'=>[]]) ]));
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
@@ -139,14 +127,11 @@ class HttpSamplerTest extends TestCase
         $response->method('getHeaderLine')->willReturn('text/plain');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => 'not json']));
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
@@ -166,14 +151,11 @@ class HttpSamplerTest extends TestCase
         $response->method('getHeaderLine')->willReturn('application/json');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => '{not valid json']));
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
@@ -189,14 +171,11 @@ class HttpSamplerTest extends TestCase
         $request->method('withHeader')->willReturn($request);
         $client->method('sendRequest')->willThrowException(new \Exception('fail'));
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
@@ -206,14 +185,11 @@ class HttpSamplerTest extends TestCase
     public function test_get_description_returns_expected_string(): void
     {
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null);
         $this->assertStringContainsString('HTTP Sampler (localhost)', $sampler->getDescription());
@@ -232,14 +208,11 @@ class HttpSamplerTest extends TestCase
         $response->method('getHeaderLine')->willReturn('application/json');
         $response->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags'=>'SAMPLE_START','value'=>1,'timestamp'=>time(),'ttl'=>60,'arguments'=>[]]) ]));
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory);
         // First call logs warning
@@ -261,21 +234,16 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->never())->method('getStatusCode')->willReturn(200);
         $response->expects($this->never())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->never())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-
         $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->once())->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getCache')->willReturn(json_encode(['flags' => 'SAMPLE_START', 'value' => 1000000, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 2, 'BucketCapacity' => 2]]));
         $cacheExtensionInterface->expects($this->never())->method('putCache')->willReturn(true);
-
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
@@ -294,21 +262,16 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-
         $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->exactly(2))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->exactly(1))->method('getCache')->willReturn('');
         $cacheExtensionInterface->expects($this->exactly(1))->method('putCache')->willReturn(true);
-
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
@@ -327,21 +290,16 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-
         $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->exactly(2))->method('isExtensionLoaded')->willReturn(false);
         $cacheExtensionInterface->expects($this->never())->method('getCache')->willReturn('never called');
         $cacheExtensionInterface->expects($this->never())->method('putCache')->willReturn(true);
-
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
@@ -360,21 +318,16 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-
         $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->exactly(2))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getCache')->willReturn(false);
         $cacheExtensionInterface->expects($this->once())->method('putCache')->willReturn(true);
-
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
@@ -393,21 +346,16 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-
         $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->exactly(2))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getCache')->willReturn(false);
         $cacheExtensionInterface->expects($this->once())->method('putCache')->willReturn(false);
-
         $sampler = new HttpSampler(null, new Configuration(
-            enabled: true,
             service: 'phpunit',
             collector: 'http://localhost',
             token: '',
-            headers: [],
             tracingMode: true,
             triggerTraceEnabled: true,
-            transactionName: null,
             transactionSettings: []
         ), null, $client, $requestFactory, $cacheExtensionInterface);
         $result = $sampler->shouldSample($this->createMock(\OpenTelemetry\Context\ContextInterface::class), '', '', 0, $this->createMock(\OpenTelemetry\SDK\Common\Attribute\AttributesInterface::class), []);
