@@ -21,9 +21,6 @@
         <testsuite name="integration">
             <directory>./tests/Integration</directory>
         </testsuite>
-        <testsuite name="benchmark">
-            <directory>./tests/Benchmark</directory>
-        </testsuite>
     </testsuites>
     <source>
         <include>
