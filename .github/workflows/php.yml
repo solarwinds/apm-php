@@ -170,7 +170,7 @@ jobs:
       env:
         OTEL_LOG_LEVEL: none
         SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
-      run: vendor/bin/phpbench run --report=default
+      run: vendor-bin/phpbench/vendor/bin/phpbench run --report=default
 
     - name: Code Coverage
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
