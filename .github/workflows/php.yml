@@ -165,6 +165,7 @@ jobs:
       run: vendor/bin/phpunit --testsuite integration
 
     - name: Run phpbench (benchmark)
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       id: benchmark
       continue-on-error: ${{ matrix.experimental }}
       env:
