@@ -170,6 +170,7 @@ jobs:
       env:
         OTEL_LOG_LEVEL: none
         SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
+        XDEBUG_MODE: off
       run: vendor-bin/phpbench/vendor/bin/phpbench run --report=default
 
     - name: Code Coverage
