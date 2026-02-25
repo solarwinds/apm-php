@@ -164,6 +164,14 @@ jobs:
         SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
       run: vendor/bin/phpunit --testsuite integration
 
+    - name: Run PHPUnit (benchmark tests)
+      id: benchmark
+      continue-on-error: ${{ matrix.experimental }}
+      env:
+        OTEL_LOG_LEVEL: none
+        SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
+      run: vendor/bin/phpunit --testsuite benchmark
+
     - name: Code Coverage
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
       with:
