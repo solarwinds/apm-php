@@ -17,6 +17,7 @@ Before you begin, ensure you have:
 - [PHP 8.1+](https://www.php.net/)
 - [PECL](https://pecl.php.net/)
 - [Composer](https://getcomposer.org/)
+- [pie](https://github.com/php/pie)
 
 Check your versions:
 ```bash
@@ -46,12 +47,63 @@ Set the [collector endpoint](https://documentation.solarwinds.com/en/success_cen
 export SW_APM_COLLECTOR=<your-collector-url>
 ```
 
-## solarwinds/apm_ext installation
-
-Install [solarwinds/apm_ext](https://packagist.org/packages/solarwinds/apm_ext) for caching remote sampling settings to improve request responsiveness
+To improve request responsiveness, install [solarwinds/apm_ext](https://packagist.org/packages/solarwinds/apm_ext) to cache remote sampling settings
 ```bash
 pie install solarwinds/apm_ext
 ```
+
+To [minimize export delays](https://opentelemetry.io/docs/languages/php/exporters/#minimizing-export-delays), opentelemetry-php recommends using the Opentelemetry Collector as an [agent](https://opentelemetry.io/docs/collector/deploy/agent/).
+
+SolarWinds releases [Solarwinds Opentelemetry Collector](https://github.com/solarwinds/solarwinds-otel-collector-releases) for better integration with SolarWinds Observability (SWO) and enhances telemetry collection. You can run the Solarwinds opentelemetry collector as a sidecar or a daemon in your environment, and configure it to receive telemetry data from your application and export to SolarWinds Observability.
+
+To get started quickly, create a `config.yaml` with the following content and run the collector in a Docker container. Make sure to replace `<collector-name>`, `<endpoint>`, and `<your-ingestion-token>` with your actual values.
+```yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "localhost:4317"
+      http:
+        endpoint: "localhost:4318"
+
+processors:
+  batch:
+
+extensions:
+  solarwinds:
+    collector_name: "<collector-name>" # Required parameter e.g. "my-collector"
+    grpc: &grpc_settings
+      endpoint: "<endpoint>" # Required parameter e.g. "otel.collector.na-01.cloud.solarwinds.com:443"
+      tls:
+        insecure: false
+      headers: { "Authorization": "Bearer ${env:SOLARWINDS_TOKEN}" }
+
+exporters:
+  otlp:
+    <<: *grpc_settings
+
+service:
+  extensions: [solarwinds]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+```
+You can run the collector in a Docker container:
+```bash
+docker run -e SOLARWINDS_TOKEN="<your-ingestion-token>" -p 127.0.0.1:4317:4317 -p 127.0.0.1:4318:4318 -v ./config.yaml:/opt/default-config.yaml solarwinds/solarwinds-otel-collector:latest-verified
+```
+
+Please refer to the [Solarwinds Opentelemetry Collector documentation](https://github.com/solarwinds/solarwinds-otel-collector-releases/tree/main?tab=readme-ov-file#getting-started) and the [releases](https://github.com/solarwinds/solarwinds-otel-collector-releases/releases) for more details on configuration and deployment options.
 
 ## Example Application
 
@@ -124,7 +176,75 @@ Reload [http://localhost:8080/rolldice](http://localhost:8080/rolldice) and view
 
 <img width="616" alt="SWO" src="https://github.com/user-attachments/assets/ed312cc8-ebd7-4c4e-bce3-bac882843200" />
 
+We have automatic tracing with zero code change! Now, we continue to install the following to further optimize the performance and reduce latency.
+
+### 4. Install solarwinds/apm_ext extension to cache remote sampling settings and reduce request latency
+```bash
+pie install solarwinds/apm_ext
 ---
+and verify installation:
+```bash
+php --ri apm_ext
+```
+
+### 5. Run open-telemetry collector as a sidecar to minimize export delays
+create a `config.yaml` with the following content and run the collector in a Docker container. Make sure to replace `<collector-name>`, `<endpoint>`, and `<your-ingestion-token>` with your actual values.
+```yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "localhost:4317"
+      http:
+        endpoint: "localhost:4318"
+
+processors:
+  batch:
+
+extensions:
+  solarwinds:
+    collector_name: "<collector-name>" # Required parameter e.g. "my-collector"
+    grpc: &grpc_settings
+      endpoint: "<endpoint>" # Required parameter e.g. "otel.collector.na-01.cloud.solarwinds.com:443"
+      tls:
+        insecure: false
+      headers: { "Authorization": "Bearer ${env:SOLARWINDS_TOKEN}" }
+
+exporters:
+  otlp:
+    <<: *grpc_settings
+
+service:
+  extensions: [solarwinds]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+```
+You can run the collector in a Docker container:
+```bash
+docker run -e SOLARWINDS_TOKEN="<your-ingestion-token>" -p 127.0.0.1:4317:4317 -p 127.0.0.1:4318:4318 -v ./config.yaml:/opt/default-config.yaml solarwinds/solarwinds-otel-collector:latest-verified
+```
+
+Restart the app with tracing using different parameters to send data to the local collector:
+```bash
+env OTEL_PHP_AUTOLOAD_ENABLED=true \
+    OTEL_SERVICE_NAME=php-example \
+    OTEL_TRACES_SAMPLER=solarwinds_http \
+    OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions \
+    OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=xtrace,xtraceoptionsresponse \
+    SW_APM_SERVICE_KEY=<token>:php-example \
+    php -S localhost:8080
+```
 
 ## Custom Transaction Name
 
