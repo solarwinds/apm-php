@@ -76,8 +76,9 @@ extensions:
       endpoint: "<endpoint>" # Required parameter e.g. "otel.collector.na-01.cloud.solarwinds.com:443"
       tls:
         insecure: false
-      headers: { "Authorization": "Bearer ${env:SOLARWINDS_TOKEN}" }
-
+      headers:
+        Authorization: "Bearer ${env:SOLARWINDS_TOKEN}"
+        swi-reporter: "otel solarwinds-otel-collector"
 exporters:
   otlp:
     <<: *grpc_settings
@@ -208,8 +209,9 @@ extensions:
       endpoint: "<endpoint>" # Required parameter e.g. "otel.collector.na-01.cloud.solarwinds.com:443"
       tls:
         insecure: false
-      headers: { "Authorization": "Bearer ${env:SOLARWINDS_TOKEN}" }
-
+      headers:
+        Authorization: "Bearer ${env:SOLARWINDS_TOKEN}"
+        swi-reporter: "otel solarwinds-otel-collector"
 exporters:
   otlp:
     <<: *grpc_settings
@@ -236,7 +238,7 @@ docker run -e SOLARWINDS_TOKEN="<your-ingestion-token>" -p 127.0.0.1:4317:4317 -
 ```
 
 ### 6. Run with tracing enabled and export to local collector
-Restart the app with tracing using different parameters to send data to the local collector:
+Restart the app with tracing using the following to send data to the local collector:
 ```bash
 env OTEL_PHP_AUTOLOAD_ENABLED=true \
     OTEL_SERVICE_NAME=php-example \
