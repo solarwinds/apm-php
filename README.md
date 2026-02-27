@@ -235,6 +235,7 @@ You can run the collector in a Docker container:
 docker run -e SOLARWINDS_TOKEN="<your-ingestion-token>" -p 127.0.0.1:4317:4317 -p 127.0.0.1:4318:4318 -v ./config.yaml:/opt/default-config.yaml solarwinds/solarwinds-otel-collector:latest-verified
 ```
 
+### 6. Run with tracing enabled and export to local collector
 Restart the app with tracing using different parameters to send data to the local collector:
 ```bash
 env OTEL_PHP_AUTOLOAD_ENABLED=true \
