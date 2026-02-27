@@ -62,9 +62,9 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: "localhost:4317"
+        endpoint: 0.0.0.0:4317
       http:
-        endpoint: "localhost:4318"
+        endpoint: 0.0.0.0:4318
 
 processors:
   batch:
@@ -194,9 +194,9 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: "localhost:4317"
+        endpoint: 0.0.0.0:4317
       http:
-        endpoint: "localhost:4318"
+        endpoint: 0.0.0.0:4318
 
 processors:
   batch:
