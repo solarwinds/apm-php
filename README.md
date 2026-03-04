@@ -168,6 +168,7 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
     OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions \
     OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=xtrace,xtraceoptionsresponse \
     OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta \
+    OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram \
     OTEL_EXPORTER_OTLP_ENDPOINT=https://otel.collector.na-01.cloud.solarwinds.com:443 \
     OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer <token>" \
     SW_APM_SERVICE_KEY=<token>:php-example \
@@ -247,6 +248,7 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
     OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions \
     OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=xtrace,xtraceoptionsresponse \
     OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta \
+    OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram \
     SW_APM_SERVICE_KEY=<token>:php-example \
     php -S localhost:8080
 ```
