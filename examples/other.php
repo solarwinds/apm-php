@@ -12,6 +12,7 @@ putenv('OTEL_LOGS_EXPORTER=console');
 putenv('OTEL_LOG_LEVEL=info');
 putenv('OTEL_TRACES_SAMPLER=solarwinds_http');
 putenv('OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta');
+putenv('OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram');
 putenv('SW_APM_COLLECTOR=apm.collector.na-01.cloud.solarwinds.com');
 putenv('SW_APM_SERVICE_KEY=token:apm-php-other');
 putenv('SW_APM_TRACING_MODE=enabled');
