@@ -42,7 +42,7 @@ Set your service key (via environment variable):
 export SW_APM_SERVICE_KEY=<your-service-key>
 ```
 
-Set the [APM collector endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm?#Find) which provides sampling settings, default is `apm.collector.na-01.cloud.solarwinds.com`. Also note down the OTLP ingestion endpoint that corresponds to your tenant, e.g. `otel.collector.na-01.cloud.solarwinds.com:443`. By default, telemetry exports to a [local OTLP endpoint](https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_endpoint), see the example section below on exporting directly or through a local OpenTelemetry Collector to SolarWinds Observability.
+Set the [APM collector endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm?#Find) which provides sampling settings, default is `apm.collector.na-01.cloud.solarwinds.com`. Also note down the OTLP ingestion endpoint that corresponds to your tenant, e.g. `otel.collector.na-01.cloud.solarwinds.com:443`. By default telemetry exports to a [local OTLP endpoint](https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_endpoint), see the example section below on exporting directly or through a local OpenTelemetry Collector to SolarWinds Observability.
 ```bash
 export SW_APM_COLLECTOR=<your-apm-collector-url>
 ```
@@ -104,7 +104,7 @@ composer config allow-plugins.php-http/discovery false
 composer require solarwinds/apm guzzlehttp/guzzle open-telemetry/opentelemetry-auto-slim
 ```
 
-### 3. Run with tracing enabled
+### 3. Run with tracing enabled and export directly to SolarWinds Observability
 
 Get your `<solarwinds-api-token>` from [SolarWinds SaaS Free Trial](https://www.solarwinds.com/solarwinds-observability/registration), and find the [OTLP ingestion endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm?#Find) that corresponds to your tenant, e.g. `otel.collector.na-01.cloud.solarwinds.com:443`.
 
@@ -133,7 +133,7 @@ pie install solarwinds/apm_ext
 php --ri apm_ext
 ```
 
-### 5. Export to a local SolarWinds OpenTelemtry Collector
+### 5. Set up a local SolarWinds OpenTelemetry Collector
 
 Create a `config.yaml` file with the following content. Make sure to replace `<collector-name>` and `<solarwinds-otlp-endpoint>` with your actual values.
 ```yaml
@@ -183,7 +183,7 @@ You can run the collector in a Docker container, make sure to replace `<solarwin
 docker run -e SOLARWINDS_API_TOKEN="<solarwinds-api-token>" -p 127.0.0.1:4317:4317 -p 127.0.0.1:4318:4318 -v ./config.yaml:/opt/default-config.yaml solarwinds/solarwinds-otel-collector:latest-verified
 ```
 
-### 6. Run with tracing enabled and export to local collector
+### 6. Run with tracing enabled and export through a local collector to SolarWinds Observability
 Restart the app with tracing using the following to send data to the local collector:
 ```bash
 env OTEL_PHP_AUTOLOAD_ENABLED=true \
