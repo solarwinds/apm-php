@@ -106,9 +106,9 @@ composer require solarwinds/apm guzzlehttp/guzzle open-telemetry/opentelemetry-a
 
 ### 3. Run with tracing enabled and export directly to SolarWinds Observability
 
-Get your `<solarwinds-api-token>` from [SolarWinds SaaS Free Trial](https://www.solarwinds.com/solarwinds-observability/registration), and find the [OTLP ingestion endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm?#Find) that corresponds to your tenant, e.g. `otel.collector.na-01.cloud.solarwinds.com:443`.
+Get your `<solarwinds-token>` from [SolarWinds SaaS Free Trial](https://www.solarwinds.com/solarwinds-observability/registration), and find the [OTLP ingestion endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm?#Find) that corresponds to your tenant, e.g. `otel.collector.na-01.cloud.solarwinds.com:443`.
 
-Start the app with tracing, make sure to replace `<solarwinds-otlp-endpoint>` and `<solarwinds-api-token>` with your actual value:
+Start the app with tracing, make sure to replace `<solarwinds-otlp-endpoint>` and `<solarwinds-token>` with your actual value:
 ```bash
 env OTEL_PHP_AUTOLOAD_ENABLED=true \
     OTEL_SERVICE_NAME=php-example \
@@ -118,8 +118,8 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
     OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta \
     OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram \
     OTEL_EXPORTER_OTLP_ENDPOINT=<solarwinds-otlp-endpoint> \
-    OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer <solarwinds-api-token>" \
-    SW_APM_SERVICE_KEY=<solarwinds-api-token>:php-example \
+    OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer <solarwinds-token>" \
+    SW_APM_SERVICE_KEY=<solarwinds-token>:php-example \
     php -S localhost:8080
 ```
 
@@ -156,7 +156,7 @@ extensions:
       tls:
         insecure: false
       headers:
-        Authorization: "Bearer ${env:SOLARWINDS_API_TOKEN}"
+        Authorization: "Bearer ${env:SOLARWINDS_TOKEN}"
         swi-reporter: "otel solarwinds-otel-collector"
 exporters:
   otlp:
@@ -178,9 +178,9 @@ service:
       processors: [batch]
       exporters: [otlp]
 ```
-You can run the collector in a Docker container, make sure to replace `<solarwinds-api-token>` with your actual value:
+You can run the collector in a Docker container, make sure to replace `<solarwinds-token>` with your actual value:
 ```bash
-docker run -e SOLARWINDS_API_TOKEN="<solarwinds-api-token>" -p 127.0.0.1:4317:4317 -p 127.0.0.1:4318:4318 -v ./config.yaml:/opt/default-config.yaml solarwinds/solarwinds-otel-collector:latest-verified
+docker run -e SOLARWINDS_TOKEN="<solarwinds-token>" -p 127.0.0.1:4317:4317 -p 127.0.0.1:4318:4318 -v ./config.yaml:/opt/default-config.yaml solarwinds/solarwinds-otel-collector:latest-verified
 ```
 
 ### 6. Run with tracing enabled and export through a local collector to SolarWinds Observability
@@ -193,7 +193,7 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
     OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=xtrace,xtraceoptionsresponse \
     OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta \
     OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram \
-    SW_APM_SERVICE_KEY=<solarwinds-api-token>:php-example \
+    SW_APM_SERVICE_KEY=<solarwinds-token>:php-example \
     php -S localhost:8080
 ```
 
