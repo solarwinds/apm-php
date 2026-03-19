@@ -170,9 +170,9 @@ processors:
 
 extensions:
   solarwinds:
-    collector_name: <collector-name> # Required parameter
+    collector_name: "<collector-name>" # Required parameter e.g. "my-collector"
     grpc: &grpc_settings
-      endpoint: <solarwinds-otlp-endpoint> # Required parameter
+      endpoint: "<solarwinds-otlp-endpoint>" # Required parameter e.g. "otel.collector.na-01.cloud.solarwinds.com:443"
       tls:
         insecure: false
       headers: {"Authorization": "Bearer ${env:SOLARWINDS_TOKEN}", "swi-reporter": "otel solarwinds-otel-collector"}
