@@ -108,7 +108,7 @@ php --ri opentelemetry
 Add SolarWinds APM Library, the OTLP exporter dependency, and the Slim instrumentation. More instrumentation libraries can be found [here](https://packagist.org/packages/open-telemetry/?query=open-telemetry%2Fopentelemetry-):
 ```bash
 composer config allow-plugins.php-http/discovery false
-composer require solarwinds/apm guzzlehttp/guzzle open-telemetry/opentelemetry-auto-slim
+composer require solarwinds/apm:^9.0@alpha guzzlehttp/guzzle open-telemetry/opentelemetry-auto-slim
 ```
 
 ### 3. Run with tracing enabled and export directly to SolarWinds Observability
@@ -133,9 +133,15 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
 Reload [http://localhost:8080/rolldice](http://localhost:8080/rolldice) and make several requests, the Service and its telemetry will show up in SolarWinds Observability within a few minutes. We have automatic tracing with zero code change! Let's continue to install the following to optimize performance and reduce latency.
 
 ### 4. Install solarwinds/apm_ext extension
-
+Linux
 ```bash
 pie install solarwinds/apm_ext
+## verify installation
+php --ri apm_ext
+```
+Windows
+```bash
+php pie.phar install solarwinds/apm_ext
 ## verify installation
 php --ri apm_ext
 ```
@@ -153,37 +159,59 @@ receivers:
         endpoint: 0.0.0.0:4318
 
 processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 80
+  solarwinds/otlp:
+    collector_attributes_decoration:
+      enabled: true
+      extension: solarwinds
   batch:
 
 extensions:
   solarwinds:
-    collector_name: "<collector-name>" # Required parameter e.g. "my-collector"
+    collector_name: <collector-name> # Required parameter
     grpc: &grpc_settings
-      endpoint: "<solarwinds-otlp-endpoint>" # Required parameter e.g. "otel.collector.na-01.cloud.solarwinds.com:443"
+      endpoint: <solarwinds-otlp-endpoint> # Required parameter
       tls:
         insecure: false
-      headers:
-        Authorization: "Bearer ${env:SOLARWINDS_TOKEN}"
-        swi-reporter: "otel solarwinds-otel-collector"
+      headers: {"Authorization": "Bearer ${env:SOLARWINDS_TOKEN}", "swi-reporter": "otel solarwinds-otel-collector"}
+
 exporters:
   otlp:
     <<: *grpc_settings
 
 service:
-  extensions: [solarwinds]
+  extensions:
+    - solarwinds
   pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
-    metrics:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
+    traces/otlp:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - batch
+        - solarwinds/otlp
+      exporters:
+        - otlp
+    metrics/otlp:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - batch
+        - solarwinds/otlp
+      exporters:
+        - otlp
+    logs/otlp:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - batch
+        - solarwinds/otlp
+      exporters:
+        - otlp
 ```
 You can run the collector in a Docker container, make sure to replace `<solarwinds-token>` with your actual value:
 ```bash
