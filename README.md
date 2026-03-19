@@ -148,72 +148,16 @@ php --ri apm_ext
 
 ### 5. Set up a local SolarWinds OpenTelemetry Collector
 
-Create a `config.yaml` file with the following content. Make sure to replace `<collector-name>` and `<solarwinds-otlp-endpoint>` with your actual values.
+Create the collector configuration by copying [this example](https://github.com/solarwinds/solarwinds-otel-collector-releases/blob/main/examples/integrations/apm/config.yaml) to a file named `config.yaml` on your host. Then update the `collector_name` and `endpoint` fields in the file with your actual values, for example:
 ```yaml
-receivers:
-  otlp:
-    protocols:
-      grpc:
-        endpoint: 0.0.0.0:4317
-      http:
-        endpoint: 0.0.0.0:4318
-
-processors:
-  memory_limiter:
-    check_interval: 1s
-    limit_percentage: 80
-  solarwinds/otlp:
-    collector_attributes_decoration:
-      enabled: true
-      extension: solarwinds
-  batch:
-
 extensions:
   solarwinds:
-    collector_name: "<collector-name>" # Required parameter e.g. "my-collector"
+    collector_name: your-collector-name
     grpc: &grpc_settings
-      endpoint: "<solarwinds-otlp-endpoint>" # Required parameter e.g. "otel.collector.na-01.cloud.solarwinds.com:443"
-      tls:
-        insecure: false
-      headers: {"Authorization": "Bearer ${env:SOLARWINDS_TOKEN}", "swi-reporter": "otel solarwinds-otel-collector"}
-
-exporters:
-  otlp:
-    <<: *grpc_settings
-
-service:
-  extensions:
-    - solarwinds
-  pipelines:
-    traces/otlp:
-      receivers:
-        - otlp
-      processors:
-        - memory_limiter
-        - batch
-        - solarwinds/otlp
-      exporters:
-        - otlp
-    metrics/otlp:
-      receivers:
-        - otlp
-      processors:
-        - memory_limiter
-        - batch
-        - solarwinds/otlp
-      exporters:
-        - otlp
-    logs/otlp:
-      receivers:
-        - otlp
-      processors:
-        - memory_limiter
-        - batch
-        - solarwinds/otlp
-      exporters:
-        - otlp
+      endpoint: otel.collector.na-01.cloud.solarwinds.com:443
 ```
-You can run the collector in a Docker container, make sure to replace `<solarwinds-token>` with your actual value:
+
+Now in the same directory as `config.yaml` run the collector, making sure to replace `<solarwinds-token>` with your actual value. The command below runs it in the foreground for easy confirmation of successful startup:
 ```bash
 docker run -e SOLARWINDS_TOKEN="<solarwinds-token>" -p 127.0.0.1:4317:4317 -p 127.0.0.1:4318:4318 -v ./config.yaml:/opt/default-config.yaml solarwinds/solarwinds-otel-collector:latest-verified
 ```
