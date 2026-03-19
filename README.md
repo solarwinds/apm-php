@@ -29,7 +29,7 @@ composer -v
 
 Install the SolarWinds APM library:
 ```bash
-composer require solarwinds/apm
+composer require solarwinds/apm:^9.0@alpha
 ```
 
 Install a PSR-compatible HTTP client (required for OTLP exporter):
@@ -48,8 +48,15 @@ export SW_APM_COLLECTOR=<your-apm-collector-url>
 ```
 
 Install [solarwinds/apm_ext](https://packagist.org/packages/solarwinds/apm_ext) which caches sampling settings to reduce request latency:
+
+Linux
 ```bash
 pie install solarwinds/apm_ext
+```
+
+Windows
+```bash
+php pie.phar install solarwinds/apm_ext
 ```
 
 To [minimize export delays](https://opentelemetry.io/docs/languages/php/exporters/#minimizing-export-delays), opentelemetry-php recommends an [agent](https://opentelemetry.io/docs/collector/deploy/agent/) collector to receive the telemetry. We recommend using the [SolarWinds OpenTelemetry Collector](https://github.com/solarwinds/solarwinds-otel-collector-releases) for better integration with SolarWinds Observability. Please refer to [Solarwinds OpenTelemetry Collector documentation](https://documentation.solarwinds.com/en/success_center/observability/content/intro/otel/otel-collector.htm) for install instructions, and the example section below on configuring it to receive telemetry from the PHP application and export to SolarWinds Observability.
