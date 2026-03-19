@@ -29,7 +29,7 @@ composer -v
 
 Install the SolarWinds APM library:
 ```bash
-composer require solarwinds/apm
+composer require solarwinds/apm:^9.0@alpha
 ```
 
 Install a PSR-compatible HTTP client (required for OTLP exporter):
@@ -48,8 +48,15 @@ export SW_APM_COLLECTOR=<your-apm-collector-url>
 ```
 
 Install [solarwinds/apm_ext](https://packagist.org/packages/solarwinds/apm_ext) which caches sampling settings to reduce request latency:
+
+Linux
 ```bash
 pie install solarwinds/apm_ext
+```
+
+Windows
+```bash
+php pie.phar install solarwinds/apm_ext
 ```
 
 To [minimize export delays](https://opentelemetry.io/docs/languages/php/exporters/#minimizing-export-delays), opentelemetry-php recommends an [agent](https://opentelemetry.io/docs/collector/deploy/agent/) collector to receive the telemetry. We recommend using the [SolarWinds OpenTelemetry Collector](https://github.com/solarwinds/solarwinds-otel-collector-releases) for better integration with SolarWinds Observability. Please refer to [Solarwinds OpenTelemetry Collector documentation](https://documentation.solarwinds.com/en/success_center/observability/content/intro/otel/otel-collector.htm) for install instructions, and the example section below on configuring it to receive telemetry from the PHP application and export to SolarWinds Observability.
@@ -101,7 +108,7 @@ php --ri opentelemetry
 Add SolarWinds APM Library, the OTLP exporter dependency, and the Slim instrumentation. More instrumentation libraries can be found [here](https://packagist.org/packages/open-telemetry/?query=open-telemetry%2Fopentelemetry-):
 ```bash
 composer config allow-plugins.php-http/discovery false
-composer require solarwinds/apm guzzlehttp/guzzle open-telemetry/opentelemetry-auto-slim
+composer require solarwinds/apm:^9.0@alpha guzzlehttp/guzzle open-telemetry/opentelemetry-auto-slim
 ```
 
 ### 3. Run with tracing enabled and export directly to SolarWinds Observability
@@ -126,59 +133,31 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
 Reload [http://localhost:8080/rolldice](http://localhost:8080/rolldice) and make several requests, the Service and its telemetry will show up in SolarWinds Observability within a few minutes. We have automatic tracing with zero code change! Let's continue to install the following to optimize performance and reduce latency.
 
 ### 4. Install solarwinds/apm_ext extension
-
+Linux
 ```bash
 pie install solarwinds/apm_ext
+## verify installation
+php --ri apm_ext
+```
+Windows
+```bash
+php pie.phar install solarwinds/apm_ext
 ## verify installation
 php --ri apm_ext
 ```
 
 ### 5. Set up a local SolarWinds OpenTelemetry Collector
 
-Create a `config.yaml` file with the following content. Make sure to replace `<collector-name>` and `<solarwinds-otlp-endpoint>` with your actual values.
+Create the collector configuration by copying [this example](https://github.com/solarwinds/solarwinds-otel-collector-releases/blob/main/examples/integrations/apm/config.yaml) to a file named `config.yaml` on your host. Then update the `collector_name` and `endpoint` fields in the file with your actual values, for example:
 ```yaml
-receivers:
-  otlp:
-    protocols:
-      grpc:
-        endpoint: 0.0.0.0:4317
-      http:
-        endpoint: 0.0.0.0:4318
-
-processors:
-  batch:
-
 extensions:
   solarwinds:
-    collector_name: "<collector-name>" # Required parameter e.g. "my-collector"
+    collector_name: your-collector-name
     grpc: &grpc_settings
-      endpoint: "<solarwinds-otlp-endpoint>" # Required parameter e.g. "otel.collector.na-01.cloud.solarwinds.com:443"
-      tls:
-        insecure: false
-      headers:
-        Authorization: "Bearer ${env:SOLARWINDS_TOKEN}"
-        swi-reporter: "otel solarwinds-otel-collector"
-exporters:
-  otlp:
-    <<: *grpc_settings
-
-service:
-  extensions: [solarwinds]
-  pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
-    metrics:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
+      endpoint: otel.collector.na-01.cloud.solarwinds.com:443
 ```
-You can run the collector in a Docker container, make sure to replace `<solarwinds-token>` with your actual value:
+
+Now in the same directory as `config.yaml` run the collector, making sure to replace `<solarwinds-token>` with your actual value. The command below runs it in the foreground for easy confirmation of successful startup:
 ```bash
 docker run -e SOLARWINDS_TOKEN="<solarwinds-token>" -p 127.0.0.1:4317:4317 -p 127.0.0.1:4318:4318 -v ./config.yaml:/opt/default-config.yaml solarwinds/solarwinds-otel-collector:latest-verified
 ```
