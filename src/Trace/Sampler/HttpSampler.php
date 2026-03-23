@@ -124,14 +124,11 @@ class HttpSampler extends Sampler
         AttributesInterface $attributes,
         array $links,
     ): SamplingResult {
+        $this->logInfo('http sampler call suppression');
         $samplerContext = $parentContext->with(SamplerSuppressionContextKey::suppress(), true);
         $scope = $samplerContext->activate();
-
-        try {
-            $this->request();
-        } finally {
-            $scope->detach();
-        }
+        $this->request();
+        $scope->detach();
 
         return parent::shouldSample(...func_get_args());
     }

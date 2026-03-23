@@ -20,7 +20,7 @@ final class SamplerSuppression implements SpanSuppression
     #[\Override]
     public function isSuppressed(ContextInterface $context): bool
     {
-        $this->logInfo('isSuppressed called: ' . ($context->get($this->contextKey)? 'true' : 'false'));
+        $this->logInfo('isSuppressed is called: ' . ($context->get($this->contextKey)? 'true' : 'false'));
 
         return $context->get($this->contextKey) === true;
     }
@@ -28,6 +28,8 @@ final class SamplerSuppression implements SpanSuppression
     #[\Override]
     public function suppress(ContextInterface $context): ContextInterface
     {
+        $this->logInfo('suppress is called');
+
         return $context->with($this->contextKey, true);
     }
 }
