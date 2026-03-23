@@ -28,8 +28,8 @@ final class SamplerSuppression implements SpanSuppression
     #[\Override]
     public function suppress(ContextInterface $context): ContextInterface
     {
-        $this->logInfo('suppress is called');
+        // $this->logInfo('suppress is called');
 
-        return $context->with($this->contextKey, true);
+        return $context; //->with($this->contextKey, true);
     }
 }
