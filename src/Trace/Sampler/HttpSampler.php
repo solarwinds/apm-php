@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
+use Solarwinds\ApmPhp\Trace\SpanSuppression\SamplerSuppressionStrategy\SamplerSuppressionContextKey;
 
 /**
  * Phan seems to struggle with the variadic arguments in the latest version
@@ -123,7 +124,13 @@ class HttpSampler extends Sampler
         AttributesInterface $attributes,
         array $links,
     ): SamplingResult {
-        $this->request();
+        $scope = $parentContext->with(SamplerSuppressionContextKey::suppress(), true)->activate();
+
+        try {
+            $this->request();
+        } finally {
+            $scope->detach();
+        }
 
         return parent::shouldSample(...func_get_args());
     }
