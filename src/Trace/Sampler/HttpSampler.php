@@ -7,7 +7,6 @@ namespace Solarwinds\ApmPhp\Trace\Sampler;
 use Exception;
 use Http\Discovery\Psr17FactoryDiscovery;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
@@ -124,12 +123,7 @@ class HttpSampler extends Sampler
         AttributesInterface $attributes,
         array $links,
     ): SamplingResult {
-        $scope = HookManager::disable($parentContext)->activate();
-        try {
-            $this->request();
-        } finally {
-            $scope->detach();
-        }
+        $this->request();
 
         return parent::shouldSample(...func_get_args());
     }

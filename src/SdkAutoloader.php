@@ -95,41 +95,48 @@ class SdkAutoloader
      */
     private static function environmentBasedInitializer(Configurator $configurator): Configurator
     {
-        $propagator = (new PropagatorFactory())->create();
-        $responsePropagator = (new ResponsePropagatorFactory())->create();
-        if (Sdk::isDisabled()) {
-            //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
-            return $configurator->withPropagator($propagator)->withResponsePropagator($responsePropagator);
+        //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
+        $scope = HookManager::disable(Context::getCurrent())->activate();
+
+        try {
+            $propagator = (new PropagatorFactory())->create();
+            $responsePropagator = (new ResponsePropagatorFactory())->create();
+            if (Sdk::isDisabled()) {
+                //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
+                return $configurator->withPropagator($propagator)->withResponsePropagator($responsePropagator);
+            }
+            $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
+
+            $resource = ResourceInfoFactory::defaultResource();
+            $exporter = (new ExporterFactory())->create();
+            $meterProvider = (new MeterProviderFactory())->create($resource);
+            $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
+            $tracerProvider = (new TracerProviderBuilder())
+                ->addSpanProcessor(TransactionNameSpanProcessor::getInstance())      // Transaction Name Span Processor (Used singleton due to the transaction name pool)
+                ->addSpanProcessor(new ResponseTimeSpanProcessor($meterProvider))    // Response Time Span Processor
+                ->addSpanProcessor($spanProcessor)                                   // Otel Span Processors
+                ->setResource($resource)
+                ->setSampler((new SwoSamplerFactory($resource))->create($meterProvider))
+                ->build();
+
+            $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
+            $eventLoggerProvider = (new EventLoggerProviderFactory())->create($loggerProvider);
+
+            ShutdownHandler::register($tracerProvider->shutdown(...));
+            ShutdownHandler::register($meterProvider->shutdown(...));
+            ShutdownHandler::register($loggerProvider->shutdown(...));
+
+            return $configurator
+                ->withTracerProvider($tracerProvider)
+                ->withMeterProvider($meterProvider)
+                ->withLoggerProvider($loggerProvider)
+                ->withEventLoggerProvider($eventLoggerProvider)
+                ->withPropagator($propagator)
+                ->withResponsePropagator($responsePropagator)
+            ;
+        } finally {
+            $scope->detach();
         }
-        $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
-
-        $resource = ResourceInfoFactory::defaultResource();
-        $exporter = (new ExporterFactory())->create();
-        $meterProvider = (new MeterProviderFactory())->create($resource);
-        $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
-        $tracerProvider = (new TracerProviderBuilder())
-            ->addSpanProcessor(TransactionNameSpanProcessor::getInstance())      // Transaction Name Span Processor (Used singleton due to the transaction name pool)
-            ->addSpanProcessor(new ResponseTimeSpanProcessor($meterProvider))    // Response Time Span Processor
-            ->addSpanProcessor($spanProcessor)                                   // Otel Span Processors
-            ->setResource($resource)
-            ->setSampler((new SwoSamplerFactory($resource))->create($meterProvider))
-            ->build();
-
-        $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
-        $eventLoggerProvider = (new EventLoggerProviderFactory())->create($loggerProvider);
-
-        ShutdownHandler::register($tracerProvider->shutdown(...));
-        ShutdownHandler::register($meterProvider->shutdown(...));
-        ShutdownHandler::register($loggerProvider->shutdown(...));
-
-        return $configurator
-            ->withTracerProvider($tracerProvider)
-            ->withMeterProvider($meterProvider)
-            ->withLoggerProvider($loggerProvider)
-            ->withEventLoggerProvider($eventLoggerProvider)
-            ->withPropagator($propagator)
-            ->withResponsePropagator($responsePropagator)
-        ;
     }
 
     /**
