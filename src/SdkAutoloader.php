@@ -96,7 +96,7 @@ class SdkAutoloader
     private static function environmentBasedInitializer(Configurator $configurator): Configurator
     {
         //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
-        $scope = HookManager::disable(Context::getCurrent())->activate();
+        $scope = HookManager::disable(Configurator::createNoop()->storeInContext())->activate();
 
         try {
             $propagator = (new PropagatorFactory())->create();
