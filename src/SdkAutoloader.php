@@ -69,7 +69,7 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl()) {
             return false;
         }
-        if (Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)) {
+        if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
                 throw new RuntimeException('File-based configuration requires open-telemetry/sdk-configuration');
             }
@@ -137,7 +137,7 @@ class SdkAutoloader
      */
     private static function fileBasedInitializer(Configurator $configurator): Configurator
     {
-        $file = Configuration::getString(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE);
+        $file = Configuration::getString(Variables::OTEL_CONFIG_FILE);
         $config = SdkConfiguration::parseFile($file);
 
         //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
@@ -168,8 +168,8 @@ class SdkAutoloader
      */
     private static function registerInstrumentations(): void
     {
-        $files = Configuration::has(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
-            ? Configuration::getList(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE)
+        $files = Configuration::has(Variables::OTEL_CONFIG_FILE)
+            ? Configuration::getList(Variables::OTEL_CONFIG_FILE)
             : [];
         if (class_exists(SdkInstrumentation::class) && $files) {
             $configuration = SdkInstrumentation::parseFile($files)->create();
