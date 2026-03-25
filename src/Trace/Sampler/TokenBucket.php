@@ -45,8 +45,13 @@ class TokenBucket
         $this->tokens = min($this->tokens, $this->capacity);
     }
 
-    public function update(?float $newCapacity = null, ?float $newRate = null): void
+    public function update(?float $newCapacity = null, ?float $newRate = null, ?float $cachedTokens = null, ?float $cachedLastUsed = null): void
     {
+        // overwrite tokens and lastUsed if both are provided, otherwise calculate tokens based on current values
+        if ($cachedTokens !== null && $cachedLastUsed !== null) {
+            $this->tokens = $cachedTokens;
+            $this->lastUsed = $cachedLastUsed;
+        }
         $this->calculateTokens();
         if ($newCapacity !== null) {
             $newCapacity = max(0.0, $newCapacity);
