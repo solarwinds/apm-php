@@ -259,6 +259,9 @@ abstract class OboeSampler implements SamplerInterface
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $newAttributes);
 
             if ($bucket->consume()) {
+                // write to cache
+                $str = $this->getBucketStates();
+
                 $this->logDebug('sufficient capacity; record and sample');
                 $this->counters->getTriggeredTraceCount()->add(1, [], $parentContext);
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
@@ -301,6 +304,11 @@ abstract class OboeSampler implements SamplerInterface
             ]);
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $bucketAttributes);
             if ($bucket->consume()) {
+                // write to cache
+                $pid = getmypid();
+                $str = $this->getBucketStates();
+                $len = strlen($this->getBucketStates());
+
                 $this->logDebug('sufficient capacity; record and sample');
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
                 $s->decision = SamplingResult::RECORD_AND_SAMPLE;
@@ -342,20 +350,46 @@ abstract class OboeSampler implements SamplerInterface
             /**
              * Get bucket state from cache and converts into array
              */
-            $currentToken = 1.0;
+            $cap = 3.0;
+            $rate = 1.4;
+            $currentToken = 3.0;
             $lastUsed = microtime(true) - 1000*1000;
             $currentBucketStates = [
-                BucketType::DEFAULT->value => new BucketState($currentToken, $lastUsed),
-                BucketType::TRIGGER_RELAXED->value => new BucketState($currentToken, $lastUsed),
-                BucketType::TRIGGER_STRICT->value => new BucketState($currentToken, $lastUsed),
+                BucketType::DEFAULT->value => new BucketState($cap, $rate, $currentToken, $lastUsed),
+                BucketType::TRIGGER_RELAXED->value => new BucketState($cap, $rate, $currentToken, $lastUsed),
+                BucketType::TRIGGER_STRICT->value => new BucketState($cap, $rate, $currentToken, $lastUsed),
             ];
+            // Update bucket from cache
+            foreach ($this->buckets as $type => $bucket) {
+                $currentBucketState = $currentBucketStates[$type] ?? null;
+                if ($currentBucketState) {
+                    $bucket->update($currentBucketState->getCapacity(), $currentBucketState->getRate(), $currentBucketState->getToken(), $currentBucketState->getLastUsed());
+                }
+            }
+            // Update bucket from settings
             foreach ($this->buckets as $type => $bucket) {
                 $bucketSettings = $this->settings->buckets[$type] ?? null;
-                $currentBucketState = $currentBucketStates[$type] ?? new BucketState();
                 if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
-                    $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate(), $currentBucketState->getCurrentToken(), $currentBucketState->getLastUsed());
+                    $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
                 }
             }
         }
+    }
+
+    public function getBucketStates(): string
+    {
+        $state = [];
+        foreach ($this->buckets as $type => $bucket) {
+            $token = round($bucket->getTokens(), 2);
+            $lastUsed = round($bucket->getLastUsed() ?? microtime(true), 2);
+            $state[$type] = [
+                'capacity' => $bucket->getCapacity(),
+                'rate' => $bucket->getRate(),
+                'token' => $token,
+                'lastUsed' => $lastUsed,
+            ];
+        }
+
+        return json_encode($state);
     }
 }

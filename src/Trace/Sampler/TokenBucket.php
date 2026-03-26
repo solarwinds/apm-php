@@ -35,6 +35,11 @@ class TokenBucket
         return $this->tokens;
     }
 
+    public function getLastUsed(): ?float
+    {
+        return $this->lastUsed;
+    }
+
     private function calculateTokens(): void
     {
         $now = microtime(true);
