@@ -16,7 +16,7 @@ class SdkAutoloaderTest extends TestCase
         $_SERVER = [];
         putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=');
         putenv(Variables::OTEL_PHP_EXCLUDED_URLS . '=');
-        putenv(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE . '=');
+        putenv(Variables::OTEL_CONFIG_FILE . '=');
     }
 
     public function test_autoload_returns_false_when_disabled(): void
@@ -69,7 +69,7 @@ class SdkAutoloaderTest extends TestCase
     public function test_autoload_throws_if_config_file_set_and_class_missing(): void
     {
         putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=true');
-        putenv(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE . '=foo.yaml');
+        putenv(Variables::OTEL_CONFIG_FILE . '=foo.yaml');
         // Simulate SdkConfiguration class missing
         if (class_exists('OpenTelemetry\\Config\\SDK\\Configuration', false)) {
             $this->markTestSkipped('Cannot test missing SdkConfiguration class if it is loaded.');

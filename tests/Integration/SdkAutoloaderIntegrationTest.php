@@ -17,7 +17,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
         $_SERVER = [];
         putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=');
         putenv(Variables::OTEL_PHP_EXCLUDED_URLS . '=');
-        putenv(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE . '=');
+        putenv(Variables::OTEL_CONFIG_FILE . '=');
         $this->tempConfigFile = sys_get_temp_dir() . '/otel_test_config.yaml';
         if (file_exists($this->tempConfigFile)) {
             unlink($this->tempConfigFile);
@@ -31,7 +31,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
         }
         putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=');
         putenv(Variables::OTEL_PHP_EXCLUDED_URLS . '=');
-        putenv(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE . '=');
+        putenv(Variables::OTEL_CONFIG_FILE . '=');
     }
 
     public function test_autoload_with_environment_initialization(): void
@@ -47,7 +47,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
         // Create a minimal valid YAML config file for OpenTelemetry
         file_put_contents($this->tempConfigFile, 'instrumentation:');
         putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=true');
-        putenv(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE . '=' . $this->tempConfigFile);
+        putenv(Variables::OTEL_CONFIG_FILE . '=' . $this->tempConfigFile);
         $result = SdkAutoloader::autoload();
         $this->assertTrue($result, 'Autoload should return true when config file is present and valid.');
         // Optionally, check for side effects or global state changes here
