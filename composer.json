@@ -51,7 +51,7 @@
     "open-telemetry/api": "^1.9",
     "open-telemetry/exporter-otlp": "^1.4",
     "open-telemetry/sdk": "^1.14",
-    "open-telemetry/sdk-configuration": "^0.7",
+    "open-telemetry/sdk-configuration": "^0.7 || ^0.8",
     "open-telemetry/sem-conv": "^1.38",
     "php-http/discovery": "^1.14",
     "psr/http-client": "^1.0",
