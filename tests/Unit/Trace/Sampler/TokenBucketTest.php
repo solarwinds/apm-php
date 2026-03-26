@@ -94,4 +94,47 @@ class TokenBucketTest extends TestCase
         sleep(1);
         $this->assertFalse($bucket->consume());
     }
+
+    public function test_update_without_cached_tokens_and_last_used(): void
+    {
+        $bucket = new TokenBucket(0, 0);
+        $bucket->update(20, 2);
+        $this->assertEquals(20, $bucket->getCapacity());
+        $this->assertEquals(20, $bucket->getTokens());
+        $this->assertEquals(2, $bucket->getRate());
+    }
+    public function test_update_with_cached_tokens_and_last_used(): void
+    {
+        $bucket = new TokenBucket(0, 0);
+        $bucket->update(20, 2, 10, microtime(true));
+        $this->assertEquals(20, $bucket->getCapacity());
+        $this->assertGreaterThanOrEqual(10, $bucket->getTokens());
+        $this->assertLessThan(20, $bucket->getTokens());
+        $this->assertEquals(2, $bucket->getRate());
+    }
+
+    public function test_update_with_big_cached_tokens_and_last_used(): void
+    {
+        $bucket = new TokenBucket(0, 0);
+        $bucket->update(20, 2, 30, microtime(true));
+        $this->assertEquals(20, $bucket->getCapacity());
+        $this->assertEquals(20, $bucket->getTokens());
+        $this->assertEquals(2, $bucket->getRate());
+    }
+
+    public function test_tokens_never_exceed_capacity(): void
+    {
+        $bucket = new TokenBucket(2, 1000);
+        sleep(1);
+        $this->assertLessThanOrEqual($bucket->getCapacity(), $bucket->getTokens());
+    }
+
+    public function test_tokens_never_below_zero(): void
+    {
+        $bucket = new TokenBucket(1, 0);
+        $bucket->consume(1);
+        $this->assertEquals(0, $bucket->getTokens());
+        $bucket->consume(1);
+        $this->assertEquals(0, $bucket->getTokens());
+    }
 }

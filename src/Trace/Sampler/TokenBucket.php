@@ -9,14 +9,14 @@ class TokenBucket
     private float $capacity;
     private float $rate;
     private float $tokens;
-    private float $lastUsed;
+    private ?float $lastUsed;
 
     public function __construct(float $capacity = 0, float $rate = 0)
     {
         $this->capacity = $capacity;
         $this->rate = $rate;
         $this->tokens = $capacity;
-        $this->lastUsed = microtime(true);
+        $this->lastUsed = null;
     }
 
     public function getCapacity(): float
@@ -39,30 +39,44 @@ class TokenBucket
     private function calculateTokens(): void
     {
         $now = microtime(true);
-        $elapsed = $now - $this->lastUsed;
+        if ($this->lastUsed !== null) {
+            $elapsed = $now - $this->lastUsed;
+            $this->tokens += $elapsed * $this->rate;
+            $this->tokens = min($this->tokens, $this->capacity);
+        } else {
+            // Always full if a brand-new token bucket
+            $this->tokens = $this->capacity;
+        }
         $this->lastUsed = $now;
-        $this->tokens += $elapsed * $this->rate;
-        $this->tokens = min($this->tokens, $this->capacity);
     }
 
     public function update(?float $newCapacity = null, ?float $newRate = null, ?float $cachedTokens = null, ?float $cachedLastUsed = null): void
     {
-        // overwrite tokens and lastUsed if both are provided, otherwise calculate tokens based on current values
-        if ($cachedTokens !== null && $cachedLastUsed !== null) {
+        if ($cachedTokens !== null) {
+            $cachedTokens = max(0.0, $cachedTokens);
             $this->tokens = $cachedTokens;
-            $this->lastUsed = $cachedLastUsed;
         }
-        $this->calculateTokens();
-        if ($newCapacity !== null) {
-            $newCapacity = max(0.0, $newCapacity);
-            $diff = $newCapacity - $this->capacity;
-            $this->capacity = $newCapacity;
-            $this->tokens += $diff;
-            $this->tokens = max(0.0, $this->tokens);
+        if ($cachedLastUsed !== null) {
+            $cachedLastUsed = max(0.0, $cachedLastUsed);
+            $this->lastUsed = $cachedLastUsed;
         }
         if ($newRate !== null) {
             $newRate = max(0.0, $newRate);
             $this->rate = $newRate;
+        }
+        if ($newCapacity !== null) {
+            $newCapacity = max(0.0, $newCapacity);
+            $diff = $newCapacity - $this->capacity;
+            if ($this->lastUsed === null) {
+                // Always full if a brand-new token bucket
+                $this->tokens += $diff;
+            } else if ($this->capacity > 0) {
+                // Adjust tokens due to bucket capacity changes
+                $this->tokens += $diff;
+            }
+            $this->capacity = $newCapacity;
+            $this->tokens = min($this->tokens, $this->capacity);
+            $this->lastUsed = microtime(true);
         }
     }
 

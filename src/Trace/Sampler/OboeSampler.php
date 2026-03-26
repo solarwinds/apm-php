@@ -339,10 +339,21 @@ abstract class OboeSampler implements SamplerInterface
     {
         if ($settings->timestamp > ($this->settings?->timestamp ?? 0)) {
             $this->settings = $settings;
+            /**
+             * Get bucket state from cache and converts into array
+             */
+            $currentToken = 1.0;
+            $lastUsed = microtime(true) - 1000*1000;
+            $currentBucketStates = [
+                BucketType::DEFAULT->value => new BucketState($currentToken, $lastUsed),
+                BucketType::TRIGGER_RELAXED->value => new BucketState($currentToken, $lastUsed),
+                BucketType::TRIGGER_STRICT->value => new BucketState($currentToken, $lastUsed),
+            ];
             foreach ($this->buckets as $type => $bucket) {
                 $bucketSettings = $this->settings->buckets[$type] ?? null;
+                $currentBucketState = $currentBucketStates[$type] ?? new BucketState();
                 if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
-                    $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
+                    $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate(), $currentBucketState->getCurrentToken(), $currentBucketState->getLastUsed());
                 }
             }
         }
