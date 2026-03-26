@@ -9,14 +9,13 @@ class TokenBucket
     private float $capacity;
     private float $rate;
     private float $tokens;
-    private ?float $lastUsed;
+    private ?float $lastUsed = null;
 
     public function __construct(float $capacity = 0, float $rate = 0)
     {
         $this->capacity = $capacity;
         $this->rate = $rate;
         $this->tokens = $capacity;
-        $this->lastUsed = null;
     }
 
     public function getCapacity(): float
@@ -53,25 +52,25 @@ class TokenBucket
     public function update(?float $newCapacity = null, ?float $newRate = null, ?float $cachedTokens = null, ?float $cachedLastUsed = null): void
     {
         if ($cachedTokens !== null) {
-            $cachedTokens = max(0.0, $cachedTokens);
+            $cachedTokens = max(0, $cachedTokens);
             $this->tokens = $cachedTokens;
         }
         if ($cachedLastUsed !== null) {
-            $cachedLastUsed = max(0.0, $cachedLastUsed);
+            $cachedLastUsed = max(0, $cachedLastUsed);
             $this->lastUsed = $cachedLastUsed;
         }
         if ($newRate !== null) {
-            $newRate = max(0.0, $newRate);
+            $newRate = max(0, $newRate);
             $this->rate = $newRate;
         }
         if ($newCapacity !== null) {
-            $newCapacity = max(0.0, $newCapacity);
+            $newCapacity = max(0, $newCapacity);
             $diff = $newCapacity - $this->capacity;
             if ($this->lastUsed === null) {
                 // Always full if a brand-new token bucket
                 $this->tokens += $diff;
-            } else if ($this->capacity > 0) {
-                // Adjust tokens due to bucket capacity changes
+            } elseif ($this->capacity > 0) {
+                // Adjust tokens due to ongoing bucket capacity updates
                 $this->tokens += $diff;
             }
             $this->capacity = $newCapacity;
