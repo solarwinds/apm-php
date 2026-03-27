@@ -259,14 +259,7 @@ abstract class OboeSampler implements SamplerInterface
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $newAttributes);
 
             if ($bucket->consume()) {
-                // Write bucket state to cache
-                if ($this->cacheExtension?->isExtensionLoaded()) {
-                    if (!$this->cacheExtension->putBucketState((string) (getmypid()), $this->getBucketState())) {
-                        $this->logWarning('Failed to cache bucket state');
-                    } else {
-                        $this->logDebug('Write bucket state to cache');
-                    }
-                }
+                $this->writeBucketStateToCache((string) (getmypid()), $this->getBucketState());
                 $this->logDebug('sufficient capacity; record and sample');
                 $this->counters->getTriggeredTraceCount()->add(1, [], $parentContext);
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
@@ -309,14 +302,7 @@ abstract class OboeSampler implements SamplerInterface
             ]);
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $bucketAttributes);
             if ($bucket->consume()) {
-                // Write bucket state to cache
-                if ($this->cacheExtension?->isExtensionLoaded()) {
-                    if (!$this->cacheExtension->putBucketState((string) (getmypid()), $this->getBucketState())) {
-                        $this->logWarning('Failed to cache bucket state');
-                    } else {
-                        $this->logDebug('Write bucket state to cache');
-                    }
-                }
+                $this->writeBucketStateToCache((string) (getmypid()), $this->getBucketState());
                 $this->logDebug('sufficient capacity; record and sample');
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
                 $s->decision = SamplingResult::RECORD_AND_SAMPLE;
@@ -351,7 +337,7 @@ abstract class OboeSampler implements SamplerInterface
         return 'OboeSampler';
     }
 
-    protected function updateSettings(Settings $settings): void
+    public function updateSettings(Settings $settings): void
     {
         if ($settings->timestamp > ($this->settings?->timestamp ?? 0)) {
             $this->settings = $settings;
@@ -362,12 +348,12 @@ abstract class OboeSampler implements SamplerInterface
                 $cachedBucketStates = $this->cacheExtension->getBucketState((string) (getmypid()));
                 if ($cachedBucketStates) {
                     $this->logDebug('Got bucket states from cache');
-                    $currentBucketStates = json_decode($cachedBucketStates, true);
-                    if (is_array($currentBucketStates)) {
+                    $bucketStates = json_decode($cachedBucketStates, true);
+                    if (is_array($bucketStates)) {
                         foreach ($this->buckets as $type => $bucket) {
-                            $currentBucketState = $currentBucketStates[$type] ?? null;
-                            if ($currentBucketState) {
-                                $bucket->update($currentBucketState['capacity'], $currentBucketState['rate'], $currentBucketState['token'], $currentBucketState['lastUsed']);
+                            $bucketState = $bucketStates[$type] ?? null;
+                            if ($bucketState) {
+                                $bucket->update($bucketState['capacity'], $bucketState['rate'], $bucketState['token'], $bucketState['lastUsed']);
                             }
                         }
                     } else {
@@ -401,5 +387,16 @@ abstract class OboeSampler implements SamplerInterface
         }, $this->buckets);
 
         return json_encode($state);
+    }
+
+    public function writeBucketStateToCache(string $key, string $value): void
+    {
+        if ($this->cacheExtension?->isExtensionLoaded()) {
+            if (!$this->cacheExtension->putBucketState($key, $value)) {
+                $this->logWarning('Failed to cache bucket state [' . $key . '=' . $value . ']');
+            } else {
+                $this->logDebug('Write bucket state to cache [' . $key . '=' . $value . ']');
+            }
+        }
     }
 }
