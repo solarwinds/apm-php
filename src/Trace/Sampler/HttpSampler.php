@@ -32,9 +32,9 @@ class HttpSampler extends Sampler
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
 
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, private readonly CacheExtensionInterface $cacheExtension = new CacheExtension())
+    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, ?CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
-        parent::__construct($meterProvider, $config, $initial);
+        parent::__construct($meterProvider, $config, $initial, $cacheExtension);
 
         $this->url = $config->getCollector();
         $this->service = urlencode($config->getService());
@@ -52,7 +52,7 @@ class HttpSampler extends Sampler
     {
         try {
             // Try from cache
-            if ($this->cacheExtension->isExtensionLoaded()) {
+            if ($this->cacheExtension?->isExtensionLoaded()) {
                 $cached = $this->cacheExtension->getCache($this->url, $this->token, $this->service);
                 if ($cached !== false) {
                     $unparsed = json_decode($cached, true);
@@ -103,7 +103,7 @@ class HttpSampler extends Sampler
                 return;
             }
             // Write cache
-            if ($this->cacheExtension->isExtensionLoaded()) {
+            if ($this->cacheExtension?->isExtensionLoaded()) {
                 if (!$this->cacheExtension->putCache($this->url, $this->token, $this->service, $content)) {
                     $this->logWarning('Failed to cache sampling settings');
                 } else {

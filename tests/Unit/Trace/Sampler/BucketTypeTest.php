@@ -13,7 +13,7 @@ class BucketTypeTest extends TestCase
 {
     public function test_bucket_type_values(): void
     {
-        $this->assertEquals('', BucketType::DEFAULT->value);
+        $this->assertEquals('Default', BucketType::DEFAULT->value);
         $this->assertEquals('TriggerRelaxed', BucketType::TRIGGER_RELAXED->value);
         $this->assertEquals('TriggerStrict', BucketType::TRIGGER_STRICT->value);
     }

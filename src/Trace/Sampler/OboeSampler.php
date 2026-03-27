@@ -39,7 +39,7 @@ abstract class OboeSampler implements SamplerInterface
     private array $buckets;
     private ?Settings $settings = null;
 
-    public function __construct(?MeterProviderInterface $meterProvider = null)
+    public function __construct(?MeterProviderInterface $meterProvider = null, protected readonly ?CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
         $this->counters = new Counters($meterProvider);
         $this->buckets = [
@@ -259,9 +259,14 @@ abstract class OboeSampler implements SamplerInterface
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $newAttributes);
 
             if ($bucket->consume()) {
-                // write to cache
-                $str = $this->getBucketStates();
-
+                // Write bucket state to cache
+                if ($this->cacheExtension?->isExtensionLoaded()) {
+                    if (!$this->cacheExtension->putBucketState((string) (getmypid()), $this->getBucketState())) {
+                        $this->logWarning('Failed to cache bucket state');
+                    } else {
+                        $this->logDebug('Write bucket state to cache');
+                    }
+                }
                 $this->logDebug('sufficient capacity; record and sample');
                 $this->counters->getTriggeredTraceCount()->add(1, [], $parentContext);
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
@@ -304,11 +309,14 @@ abstract class OboeSampler implements SamplerInterface
             ]);
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $bucketAttributes);
             if ($bucket->consume()) {
-                // write to cache
-                $pid = getmypid();
-                $str = $this->getBucketStates();
-                $len = strlen($this->getBucketStates());
-
+                // Write bucket state to cache
+                if ($this->cacheExtension?->isExtensionLoaded()) {
+                    if (!$this->cacheExtension->putBucketState((string) (getmypid()), $this->getBucketState())) {
+                        $this->logWarning('Failed to cache bucket state');
+                    } else {
+                        $this->logDebug('Write bucket state to cache');
+                    }
+                }
                 $this->logDebug('sufficient capacity; record and sample');
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
                 $s->decision = SamplingResult::RECORD_AND_SAMPLE;
@@ -348,23 +356,28 @@ abstract class OboeSampler implements SamplerInterface
         if ($settings->timestamp > ($this->settings?->timestamp ?? 0)) {
             $this->settings = $settings;
             /**
-             * Get bucket state from cache and converts into array
+             * Read bucket state from cache and update
              */
-            $cap = 3.0;
-            $rate = 1.4;
-            $currentToken = 3.0;
-            $lastUsed = microtime(true) - 1000*1000;
-            $currentBucketStates = [
-                BucketType::DEFAULT->value => new BucketState($cap, $rate, $currentToken, $lastUsed),
-                BucketType::TRIGGER_RELAXED->value => new BucketState($cap, $rate, $currentToken, $lastUsed),
-                BucketType::TRIGGER_STRICT->value => new BucketState($cap, $rate, $currentToken, $lastUsed),
-            ];
-            // Update bucket from cache
-            foreach ($this->buckets as $type => $bucket) {
-                $currentBucketState = $currentBucketStates[$type] ?? null;
-                if ($currentBucketState) {
-                    $bucket->update($currentBucketState->getCapacity(), $currentBucketState->getRate(), $currentBucketState->getToken(), $currentBucketState->getLastUsed());
+            if ($this->cacheExtension?->isExtensionLoaded()) {
+                $cachedBucketStates = $this->cacheExtension->getBucketState((string) (getmypid()));
+                if ($cachedBucketStates) {
+                    $this->logDebug('Got bucket states from cache');
+                    $currentBucketStates = json_decode($cachedBucketStates, true);
+                    if (is_array($currentBucketStates)) {
+                        foreach ($this->buckets as $type => $bucket) {
+                            $currentBucketState = $currentBucketStates[$type] ?? null;
+                            if ($currentBucketState) {
+                                $bucket->update($currentBucketState['capacity'], $currentBucketState['rate'], $currentBucketState['token'], $currentBucketState['lastUsed']);
+                            }
+                        }
+                    } else {
+                        $this->logWarning('Invalid bucket states from cache');
+                    }
+                } else {
+                    $this->logDebug('No bucket states found in cache');
                 }
+            } else {
+                $this->logDebug('Cache extension not loaded; skipping cache retrieval');
             }
             // Update bucket from settings
             foreach ($this->buckets as $type => $bucket) {
@@ -376,19 +389,16 @@ abstract class OboeSampler implements SamplerInterface
         }
     }
 
-    public function getBucketStates(): string
+    public function getBucketState(): string
     {
-        $state = [];
-        foreach ($this->buckets as $type => $bucket) {
-            $token = round($bucket->getTokens(), 2);
-            $lastUsed = round($bucket->getLastUsed() ?? microtime(true), 2);
-            $state[$type] = [
+        $state = array_map(function ($bucket) {
+            return [
                 'capacity' => $bucket->getCapacity(),
                 'rate' => $bucket->getRate(),
-                'token' => $token,
-                'lastUsed' => $lastUsed,
+                'token' => round($bucket->getTokens(), 2),
+                'lastUsed' => round($bucket->getLastUsed() ?? microtime(true), 2),
             ];
-        }
+        }, $this->buckets);
 
         return json_encode($state);
     }
