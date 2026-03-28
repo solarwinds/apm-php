@@ -355,6 +355,7 @@ abstract class OboeSampler implements SamplerInterface
                 if ($settings->timestamp > ($bucket->getLastUsed() ?? 0)) {
                     if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
                         $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
+                        $this->logDebug('Settings is more recent; update for bucket type ' . $type);
                     }
                 } else {
                     $this->logDebug('Cached bucket state is newer than settings; skipping update for bucket type ' . $type);
