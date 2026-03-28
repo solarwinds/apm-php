@@ -143,6 +143,10 @@ abstract class OboeSampler implements SamplerInterface
 
             return new SamplingResult($s->decision, $s->attributes, $new_trace_state);
         } finally {
+            // Calculate the token at last
+            foreach ($this->buckets as $bucket) {
+                $bucket->calculateTokens();
+            }
             $this->writeBucketStateToCache((string) (getmypid()), $this->getBucketState());
         }
     }

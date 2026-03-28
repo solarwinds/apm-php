@@ -40,7 +40,7 @@ class TokenBucket
         return $this->lastUsed;
     }
 
-    private function calculateTokens(): void
+    public function calculateTokens(): void
     {
         $now = microtime(true);
         if ($this->lastUsed !== null) {
