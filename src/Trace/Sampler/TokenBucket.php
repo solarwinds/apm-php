@@ -54,16 +54,16 @@ class TokenBucket
         $this->lastUsed = $now;
     }
 
-    public function update(?float $newCapacity = null, ?float $newRate = null, ?float $cachedTokens = null, ?float $cachedLastUsed = null): void
+    public function updateFromCache(float $cachedCapacity, float $cachedRate, float $cachedTokens, float $cachedLastUsed): void
     {
-        if ($cachedTokens !== null) {
-            $cachedTokens = max(0, $cachedTokens);
-            $this->tokens = $cachedTokens;
-        }
-        if ($cachedLastUsed !== null) {
-            $cachedLastUsed = max(0, $cachedLastUsed);
-            $this->lastUsed = $cachedLastUsed;
-        }
+        $this->capacity = $cachedCapacity;
+        $this->rate = $cachedRate;
+        $this->tokens = $cachedTokens;
+        $this->lastUsed = $cachedLastUsed;
+    }
+
+    public function update(?float $newCapacity = null, ?float $newRate = null): void
+    {
         if ($newRate !== null) {
             $newRate = max(0, $newRate);
             $this->rate = $newRate;
@@ -74,13 +74,21 @@ class TokenBucket
             if ($this->lastUsed === null) {
                 // Always full if a brand-new token bucket
                 $this->tokens += $diff;
+                $this->tokens = min($this->tokens, $newCapacity);
+                $this->lastUsed = microtime(true);
             } elseif ($this->capacity > 0) {
                 // Adjust tokens due to ongoing bucket capacity updates
+                // First, calculate token till now
+                $now = microtime(true);
+                $elapsed = $now - $this->lastUsed;
+                $this->tokens += $elapsed * $this->rate;
+                // Second, adjust tokens based on new capacity
                 $this->tokens += $diff;
+                // Third, cap tokens to new capacity if needed
+                $this->tokens = min($this->tokens, $newCapacity);
+                $this->lastUsed = $now;
             }
             $this->capacity = $newCapacity;
-            $this->tokens = min($this->tokens, $this->capacity);
-            $this->lastUsed = microtime(true);
         }
     }
 

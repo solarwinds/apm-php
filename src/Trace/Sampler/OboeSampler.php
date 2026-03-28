@@ -352,8 +352,12 @@ abstract class OboeSampler implements SamplerInterface
             // Update bucket from settings
             foreach ($this->buckets as $type => $bucket) {
                 $bucketSettings = $this->settings->buckets[$type] ?? null;
-                if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
-                    $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
+                if ($settings->timestamp > ($bucket->getLastUsed() ?? 0)) {
+                    if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
+                        $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
+                    }
+                } else {
+                    $this->logDebug('Cached bucket state is newer than settings; skipping update for bucket type ' . $type);
                 }
             }
         }
@@ -395,7 +399,7 @@ abstract class OboeSampler implements SamplerInterface
                     foreach ($this->buckets as $type => $bucket) {
                         $bucketState = $bucketStates[$type] ?? null;
                         if ($bucketState) {
-                            $bucket->update($bucketState['capacity'], $bucketState['rate'], $bucketState['token'], $bucketState['lastUsed']);
+                            $bucket->updateFromCache($bucketState['capacity'], $bucketState['rate'], $bucketState['token'], $bucketState['lastUsed']);
                         }
                     }
                 } else {

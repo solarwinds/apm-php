@@ -103,22 +103,14 @@ class TokenBucketTest extends TestCase
         $this->assertEquals(20, $bucket->getTokens());
         $this->assertEquals(2, $bucket->getRate());
     }
+
     public function test_update_with_cached_tokens_and_last_used(): void
     {
         $bucket = new TokenBucket(0, 0);
-        $bucket->update(20, 2, 10, microtime(true));
+        $bucket->updateFromCache(20, 2, 15, microtime(true));
         $this->assertEquals(20, $bucket->getCapacity());
-        $this->assertGreaterThanOrEqual(10, $bucket->getTokens());
+        $this->assertGreaterThanOrEqual(15, $bucket->getTokens());
         $this->assertLessThan(20, $bucket->getTokens());
-        $this->assertEquals(2, $bucket->getRate());
-    }
-
-    public function test_update_with_big_cached_tokens_and_last_used(): void
-    {
-        $bucket = new TokenBucket(0, 0);
-        $bucket->update(20, 2, 30, microtime(true));
-        $this->assertEquals(20, $bucket->getCapacity());
-        $this->assertEquals(20, $bucket->getTokens());
         $this->assertEquals(2, $bucket->getRate());
     }
 
