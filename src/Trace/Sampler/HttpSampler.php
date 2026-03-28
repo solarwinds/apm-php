@@ -32,9 +32,9 @@ class HttpSampler extends Sampler
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
 
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, private readonly CacheExtensionInterface $cacheExtension = new CacheExtension())
+    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
-        parent::__construct($meterProvider, $config, $initial);
+        parent::__construct($meterProvider, $config, $initial, $cacheExtension);
 
         $this->url = $config->getCollector();
         $this->service = urlencode($config->getService());

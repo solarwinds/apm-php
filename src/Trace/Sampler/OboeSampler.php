@@ -39,7 +39,7 @@ abstract class OboeSampler implements SamplerInterface
     private array $buckets;
     private ?Settings $settings = null;
 
-    public function __construct(?MeterProviderInterface $meterProvider = null)
+    public function __construct(?MeterProviderInterface $meterProvider = null, protected readonly CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
         $this->counters = new Counters($meterProvider);
         $this->buckets = [
@@ -61,86 +61,94 @@ abstract class OboeSampler implements SamplerInterface
         AttributesInterface $attributes,
         array $links,
     ): SamplingResult {
-        $parentSpan = Span::fromContext($parentContext);
-        $s = new SampleState(
-            SamplingResult::DROP,
-            $attributes,
-            $this->getSettings($parentContext, $traceId, $spanName, $spanKind, $attributes, $links),
-            $parentSpan->getContext()->getTraceState()?->get('sw'),
-            $this->requestHeaders($parentContext, $traceId, $spanName, $spanKind, $attributes, $links),
-            null
-        );
-        $parentSpanTraceState = $parentSpan->getContext()->getTraceState()?->toString();
-        if ($parentSpanTraceState !== null && $parentSpanTraceState !== '') {
-            $swKeyAttributes = Attributes::create([
-                TRACESTATE_CAPTURE_ATTRIBUTE => $parentSpanTraceState,
-            ]);
-            $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $swKeyAttributes);
-        }
-        $this->counters->getRequestCount()->add(1, [], $parentContext);
-        if ($s->headers->XTraceOptions !== null) {
-            $parsed = TraceOptions::from($s->headers->XTraceOptions);
-            $s->traceOptions = new TraceOptionsWithResponse($parsed, new TraceOptionsResponse());
-            $this->logDebug('X-Trace-Options present ' . $s->traceOptions);
-            if ($s->headers->XTraceOptionsSignature !== null) {
-                $this->logDebug('X-Trace-Options-Signature present; validating');
-                $s->traceOptions->response->auth = TriggerTraceUtil::validateSignature(
-                    $s->headers->XTraceOptions,
-                    $s->headers->XTraceOptionsSignature,
-                    $s->settings?->signatureKey,
-                    $s->traceOptions->timestamp
-                );
-                if ($s->traceOptions->response->auth !== Auth::OK) {
-                    $this->logDebug('X-Trace-Options-Signature invalid; tracing disabled');
-                    $new_trace_state = $this->setResponseHeadersFromSampleState($s, $parentContext, $traceId, $spanName, $spanKind, $attributes, $links);
-
-                    return new SamplingResult(SamplingResult::DROP, $attributes, $new_trace_state);
-                }
-            }
-            if (!$s->traceOptions->triggerTrace) {
-                $s->traceOptions->response->triggerTrace = TriggerTrace::NOT_REQUESTED;
-            }
-            if ($s->traceOptions->swKeys !== null) {
+        try {
+            $parentSpan = Span::fromContext($parentContext);
+            $s = new SampleState(
+                SamplingResult::DROP,
+                $attributes,
+                $this->getSettings($parentContext, $traceId, $spanName, $spanKind, $attributes, $links),
+                $parentSpan->getContext()->getTraceState()?->get('sw'),
+                $this->requestHeaders($parentContext, $traceId, $spanName, $spanKind, $attributes, $links),
+                null
+            );
+            $parentSpanTraceState = $parentSpan->getContext()->getTraceState()?->toString();
+            if ($parentSpanTraceState !== null && $parentSpanTraceState !== '') {
                 $swKeyAttributes = Attributes::create([
-                    SW_KEYS_ATTRIBUTE => $s->traceOptions->swKeys,
+                    TRACESTATE_CAPTURE_ATTRIBUTE => $parentSpanTraceState,
                 ]);
                 $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $swKeyAttributes);
             }
-            $customAttributes = Attributes::create($s->traceOptions->custom);
-            $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $customAttributes);
-            if ($s->traceOptions->ignored !== []) {
-                $s->traceOptions->response->ignored = array_map(fn ($item) => is_array($item) && $item !== []? $item[0] : '', $s->traceOptions->ignored);
+            $this->counters->getRequestCount()->add(1, [], $parentContext);
+            if ($s->headers->XTraceOptions !== null) {
+                $parsed = TraceOptions::from($s->headers->XTraceOptions);
+                $s->traceOptions = new TraceOptionsWithResponse($parsed, new TraceOptionsResponse());
+                $this->logDebug('X-Trace-Options present ' . $s->traceOptions);
+                if ($s->headers->XTraceOptionsSignature !== null) {
+                    $this->logDebug('X-Trace-Options-Signature present; validating');
+                    $s->traceOptions->response->auth = TriggerTraceUtil::validateSignature(
+                        $s->headers->XTraceOptions,
+                        $s->headers->XTraceOptionsSignature,
+                        $s->settings?->signatureKey,
+                        $s->traceOptions->timestamp
+                    );
+                    if ($s->traceOptions->response->auth !== Auth::OK) {
+                        $this->logDebug('X-Trace-Options-Signature invalid; tracing disabled');
+                        $new_trace_state = $this->setResponseHeadersFromSampleState($s, $parentContext, $traceId, $spanName, $spanKind, $attributes, $links);
+
+                        return new SamplingResult(SamplingResult::DROP, $attributes, $new_trace_state);
+                    }
+                }
+                if (!$s->traceOptions->triggerTrace) {
+                    $s->traceOptions->response->triggerTrace = TriggerTrace::NOT_REQUESTED;
+                }
+                if ($s->traceOptions->swKeys !== null) {
+                    $swKeyAttributes = Attributes::create([
+                        SW_KEYS_ATTRIBUTE => $s->traceOptions->swKeys,
+                    ]);
+                    $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $swKeyAttributes);
+                }
+                $customAttributes = Attributes::create($s->traceOptions->custom);
+                $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $customAttributes);
+                if ($s->traceOptions->ignored !== []) {
+                    $s->traceOptions->response->ignored = array_map(fn ($item) => is_array($item) && $item !== [] ? $item[0] : '', $s->traceOptions->ignored);
+                }
             }
-        }
-        if (!$s->settings) {
-            $this->logDebug('settings unavailable; sampling disabled');
-            if ($s->traceOptions && $s->traceOptions->triggerTrace) {
-                $this->logDebug('trigger trace requested but unavailable');
-                $s->traceOptions->response->triggerTrace = TriggerTrace::SETTINGS_NOT_AVAILABLE;
+            if (!$s->settings) {
+                $this->logDebug('settings unavailable; sampling disabled');
+                if ($s->traceOptions && $s->traceOptions->triggerTrace) {
+                    $this->logDebug('trigger trace requested but unavailable');
+                    $s->traceOptions->response->triggerTrace = TriggerTrace::SETTINGS_NOT_AVAILABLE;
+                }
+                $new_trace_state = $this->setResponseHeadersFromSampleState($s, $parentContext, $traceId, $spanName, $spanKind, $attributes, $links);
+
+                return new SamplingResult(SamplingResult::DROP, $s->attributes, $new_trace_state);
             }
+            if (preg_match('/^[0-9a-f]{16}-[0-9a-f]{2}$/', $s->traceState ?? '')) {
+                $this->logDebug('context is valid for parent-based sampling');
+                $this->parentBasedAlgo($s, $parentContext);
+            } elseif ($s->settings->flags & Flags::SAMPLE_START->value) {
+                if ($s->traceOptions?->triggerTrace) {
+                    $this->logDebug('trigger trace requested');
+                    $this->triggerTraceAlgo($s, $parentContext);
+                } else {
+                    $this->logDebug('defaulting to dice roll');
+                    $this->diceRollAlgo($s, $parentContext);
+                }
+            } else {
+                $this->logDebug('SAMPLE_START is unset; sampling disabled');
+                $this->disabledAlgo($s);
+            }
+            $this->logDebug('final sampling state ' . $s);
             $new_trace_state = $this->setResponseHeadersFromSampleState($s, $parentContext, $traceId, $spanName, $spanKind, $attributes, $links);
 
-            return new SamplingResult(SamplingResult::DROP, $s->attributes, $new_trace_state);
-        }
-        if (preg_match('/^[0-9a-f]{16}-[0-9a-f]{2}$/', $s->traceState ?? '')) {
-            $this->logDebug('context is valid for parent-based sampling');
-            $this->parentBasedAlgo($s, $parentContext);
-        } elseif ($s->settings->flags & Flags::SAMPLE_START->value) {
-            if ($s->traceOptions?->triggerTrace) {
-                $this->logDebug('trigger trace requested');
-                $this->triggerTraceAlgo($s, $parentContext);
-            } else {
-                $this->logDebug('defaulting to dice roll');
-                $this->diceRollAlgo($s, $parentContext);
+            return new SamplingResult($s->decision, $s->attributes, $new_trace_state);
+        } finally {
+            // Calculate the token at last
+            foreach ($this->buckets as $bucket) {
+                $bucket->calculateTokens();
             }
-        } else {
-            $this->logDebug('SAMPLE_START is unset; sampling disabled');
-            $this->disabledAlgo($s);
+            $this->writeBucketStateToCache((string) (getmypid()), $this->getBucketState());
         }
-        $this->logDebug('final sampling state ' . $s);
-        $new_trace_state = $this->setResponseHeadersFromSampleState($s, $parentContext, $traceId, $spanName, $spanKind, $attributes, $links);
-
-        return new SamplingResult($s->decision, $s->attributes, $new_trace_state);
     }
 
     private function getSettings(
@@ -335,16 +343,74 @@ abstract class OboeSampler implements SamplerInterface
         return 'OboeSampler';
     }
 
-    protected function updateSettings(Settings $settings): void
+    public function updateSettings(Settings $settings): void
     {
         if ($settings->timestamp > ($this->settings?->timestamp ?? 0)) {
             $this->settings = $settings;
+            // update bucket from cache
+            $this->updateBucketStateFromCache((string) (getmypid()));
+            // Update bucket from settings
             foreach ($this->buckets as $type => $bucket) {
                 $bucketSettings = $this->settings->buckets[$type] ?? null;
-                if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
-                    $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
+                if ($settings->timestamp > ($bucket->getLastUsed() ?? 0)) {
+                    if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
+                        $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
+                        $this->logDebug('Settings is more recent; update for bucket type ' . $type);
+                    }
+                } else {
+                    $this->logDebug('Cached bucket state is newer than settings; skipping update for bucket type ' . $type);
                 }
             }
+        }
+    }
+
+    public function getBucketState(): string
+    {
+        $state = array_map(function ($bucket) {
+            return [
+                'capacity' => $bucket->getCapacity(),
+                'rate' => $bucket->getRate(),
+                'token' => round($bucket->getTokens(), 2),
+                'lastUsed' => round($bucket->getLastUsed() ?? microtime(true), 2),
+            ];
+        }, $this->buckets);
+
+        return json_encode($state);
+    }
+
+    public function writeBucketStateToCache(string $key, string $value): void
+    {
+        if ($this->cacheExtension->isExtensionLoaded()) {
+            if (!$this->cacheExtension->putBucketState($key, $value)) {
+                $this->logWarning('Failed to cache bucket state [' . $key . '=' . $value . ']');
+            } else {
+                $this->logDebug('Write bucket state to cache [' . $key . '=' . $value . ']');
+            }
+        }
+    }
+
+    public function updateBucketStateFromCache(string $key): void
+    {
+        if ($this->cacheExtension->isExtensionLoaded()) {
+            $cachedBucketStates = $this->cacheExtension->getBucketState($key);
+            if ($cachedBucketStates) {
+                $this->logDebug('Got bucket states from cache ' . $cachedBucketStates);
+                $bucketStates = json_decode($cachedBucketStates, true);
+                if (is_array($bucketStates)) {
+                    foreach ($this->buckets as $type => $bucket) {
+                        $bucketState = $bucketStates[$type] ?? null;
+                        if ($bucketState) {
+                            $bucket->updateFromCache($bucketState['capacity'], $bucketState['rate'], $bucketState['token'], $bucketState['lastUsed']);
+                        }
+                    }
+                } else {
+                    $this->logWarning('Invalid bucket states from cache');
+                }
+            } else {
+                $this->logDebug('No bucket states found in cache');
+            }
+        } else {
+            $this->logDebug('Cache extension not loaded; skipping cache retrieval');
         }
     }
 }

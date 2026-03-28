@@ -13,6 +13,7 @@ class CacheExtension implements CacheExtensionInterface
 {
     use LogsMessagesTrait;
 
+    #[\Override]
     public function isExtensionLoaded(): bool
     {
         if (!extension_loaded('apm_ext')) {
@@ -23,7 +24,7 @@ class CacheExtension implements CacheExtensionInterface
 
         return true;
     }
-
+    #[\Override]
     public function getCache(string $collector, string $token, string $serviceName): string|false
     {
         if (function_exists('\Solarwinds\Cache\get')) {
@@ -34,12 +35,35 @@ class CacheExtension implements CacheExtensionInterface
         return false;
     }
 
+    #[\Override]
     public function putCache(string $collector, string $token, string $serviceName, string $settings): bool
     {
         if (function_exists('\Solarwinds\Cache\put')) {
             return \Solarwinds\Cache\put($collector, $token, $serviceName, $settings);
         }
         $this->logWarning('\Solarwinds\Cache\put function from apm_ext does not exist');
+
+        return false;
+    }
+
+    #[\Override]
+    public function getBucketState(string $pid): string|false
+    {
+        if (function_exists('\Solarwinds\Cache\getBucketState')) {
+            return \Solarwinds\Cache\getBucketState($pid);
+        }
+        $this->logWarning('\Solarwinds\Cache\getBucketState function from apm_ext does not exist');
+
+        return false;
+    }
+
+    #[\Override]
+    public function putBucketState(string $pid, string $bucketState): bool
+    {
+        if (function_exists('\Solarwinds\Cache\putBucketState')) {
+            return \Solarwinds\Cache\putBucketState($pid, $bucketState);
+        }
+        $this->logWarning('\Solarwinds\Cache\putBucketState function from apm_ext does not exist');
 
         return false;
     }
