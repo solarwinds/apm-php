@@ -393,7 +393,7 @@ abstract class OboeSampler implements SamplerInterface
         if ($this->cacheExtension->isExtensionLoaded()) {
             $cachedBucketStates = $this->cacheExtension->getBucketState($key);
             if ($cachedBucketStates) {
-                $this->logDebug('Got bucket states from cache');
+                $this->logDebug('Got bucket states from cache ' . $cachedBucketStates);
                 $bucketStates = json_decode($cachedBucketStates, true);
                 if (is_array($bucketStates)) {
                     foreach ($this->buckets as $type => $bucket) {
