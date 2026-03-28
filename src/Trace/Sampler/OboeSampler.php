@@ -341,30 +341,8 @@ abstract class OboeSampler implements SamplerInterface
     {
         if ($settings->timestamp > ($this->settings?->timestamp ?? 0)) {
             $this->settings = $settings;
-            /**
-             * Read bucket state from cache and update
-             */
-            if ($this->cacheExtension?->isExtensionLoaded()) {
-                $cachedBucketStates = $this->cacheExtension->getBucketState((string) (getmypid()));
-                if ($cachedBucketStates) {
-                    $this->logDebug('Got bucket states from cache');
-                    $bucketStates = json_decode($cachedBucketStates, true);
-                    if (is_array($bucketStates)) {
-                        foreach ($this->buckets as $type => $bucket) {
-                            $bucketState = $bucketStates[$type] ?? null;
-                            if ($bucketState) {
-                                $bucket->update($bucketState['capacity'], $bucketState['rate'], $bucketState['token'], $bucketState['lastUsed']);
-                            }
-                        }
-                    } else {
-                        $this->logWarning('Invalid bucket states from cache');
-                    }
-                } else {
-                    $this->logDebug('No bucket states found in cache');
-                }
-            } else {
-                $this->logDebug('Cache extension not loaded; skipping cache retrieval');
-            }
+            // update bucket from cache
+            $this->updateBucketStateFromCache((string) (getmypid()));
             // Update bucket from settings
             foreach ($this->buckets as $type => $bucket) {
                 $bucketSettings = $this->settings->buckets[$type] ?? null;
@@ -397,6 +375,31 @@ abstract class OboeSampler implements SamplerInterface
             } else {
                 $this->logDebug('Write bucket state to cache [' . $key . '=' . $value . ']');
             }
+        }
+    }
+
+    public function updateBucketStateFromCache(string $key): void
+    {
+        if ($this->cacheExtension?->isExtensionLoaded()) {
+            $cachedBucketStates = $this->cacheExtension->getBucketState($key);
+            if ($cachedBucketStates) {
+                $this->logDebug('Got bucket states from cache');
+                $bucketStates = json_decode($cachedBucketStates, true);
+                if (is_array($bucketStates)) {
+                    foreach ($this->buckets as $type => $bucket) {
+                        $bucketState = $bucketStates[$type] ?? null;
+                        if ($bucketState) {
+                            $bucket->update($bucketState['capacity'], $bucketState['rate'], $bucketState['token'], $bucketState['lastUsed']);
+                        }
+                    }
+                } else {
+                    $this->logWarning('Invalid bucket states from cache');
+                }
+            } else {
+                $this->logDebug('No bucket states found in cache');
+            }
+        } else {
+            $this->logDebug('Cache extension not loaded; skipping cache retrieval');
         }
     }
 }
