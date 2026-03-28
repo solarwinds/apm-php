@@ -39,7 +39,7 @@ abstract class OboeSampler implements SamplerInterface
     private array $buckets;
     private ?Settings $settings = null;
 
-    public function __construct(?MeterProviderInterface $meterProvider = null, protected readonly ?CacheExtensionInterface $cacheExtension = new CacheExtension())
+    public function __construct(?MeterProviderInterface $meterProvider = null, protected readonly CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
         $this->counters = new Counters($meterProvider);
         $this->buckets = [
@@ -369,7 +369,7 @@ abstract class OboeSampler implements SamplerInterface
 
     public function writeBucketStateToCache(string $key, string $value): void
     {
-        if ($this->cacheExtension?->isExtensionLoaded()) {
+        if ($this->cacheExtension->isExtensionLoaded()) {
             if (!$this->cacheExtension->putBucketState($key, $value)) {
                 $this->logWarning('Failed to cache bucket state [' . $key . '=' . $value . ']');
             } else {
@@ -380,7 +380,7 @@ abstract class OboeSampler implements SamplerInterface
 
     public function updateBucketStateFromCache(string $key): void
     {
-        if ($this->cacheExtension?->isExtensionLoaded()) {
+        if ($this->cacheExtension->isExtensionLoaded()) {
             $cachedBucketStates = $this->cacheExtension->getBucketState($key);
             if ($cachedBucketStates) {
                 $this->logDebug('Got bucket states from cache');

@@ -156,7 +156,7 @@ abstract class Sampler extends OboeSampler
     private bool $triggerMode;
     private array $transactionSettings = [];
 
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, mixed $initial = null, ?CacheExtensionInterface $cacheExtension = new CacheExtension())
+    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, mixed $initial = null, CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
         parent::__construct($meterProvider, $cacheExtension);
 

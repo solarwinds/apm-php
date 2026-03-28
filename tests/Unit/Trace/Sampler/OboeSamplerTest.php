@@ -42,7 +42,7 @@ class TestOboeSampler extends OboeSampler
     private readonly RequestHeaders $requestHeaders;
     private ?ResponseHeaders $responseHeaders = null;
 
-    public function __construct(?MeterProviderInterface $meterProvider, ?Settings $settings, LocalSettings $localSettings, RequestHeaders $requestHeaders, ?CacheExtensionInterface $cacheExtension = new CacheExtension())
+    public function __construct(?MeterProviderInterface $meterProvider, ?Settings $settings, LocalSettings $localSettings, RequestHeaders $requestHeaders, CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
         parent::__construct($meterProvider, $cacheExtension);
         $this->localSettings = $localSettings;
