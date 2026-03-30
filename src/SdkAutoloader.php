@@ -51,7 +51,7 @@ use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 use RuntimeException;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\TransactionNameSpanProcessor;
-use Solarwinds\ApmPhp\Trace\SpanSuppression\SamplerSuppressionStrategy\SamplerSuppressionStrategy;
+use Solarwinds\ApmPhp\Trace\SpanSuppression\ManualSuppressionStrategy\ManualSuppressionStrategy;
 use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 use Throwable;
 
@@ -113,7 +113,7 @@ class SdkAutoloader
             ->addSpanProcessor(new ResponseTimeSpanProcessor($meterProvider))    // Response Time Span Processor
             ->addSpanProcessor($spanProcessor)                                   // Otel Span Processors
             ->setResource($resource)
-            ->setSpanSuppressionStrategy(new SamplerSuppressionStrategy())
+            ->setSpanSuppressionStrategy(new ManualSuppressionStrategy())
             ->setSampler((new SwoSamplerFactory($resource))->create($meterProvider))
             ->build();
 

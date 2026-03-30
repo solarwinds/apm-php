@@ -2,16 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp\Trace\SpanSuppression\SamplerSuppressionStrategy;
+namespace Solarwinds\ApmPhp\Trace\SpanSuppression\ManualSuppressionStrategy;
 
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
 
-final class SamplerSuppressor implements SpanSuppressor
+/**
+ * @experimental
+ */
+final class ManualSuppressor implements SpanSuppressor
 {
     #[\Override]
     public function resolveSuppression(int $spanKind, array $attributes): SpanSuppression
     {
-        return new SamplerSuppression(SamplerSuppressionContextKey::suppress());
+        static $suppression = new ManualSuppression(ManualSuppressionContextKey::Suppress);
+
+        return $suppression;
     }
 }
