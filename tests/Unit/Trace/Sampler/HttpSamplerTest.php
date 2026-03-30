@@ -263,7 +263,7 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
         $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
-        $cacheExtensionInterface->expects($this->exactly(4))->method('isExtensionLoaded')->willReturn(true);
+        $cacheExtensionInterface->expects($this->exactly(3))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->exactly(1))->method('getCache')->willReturn('');
         $cacheExtensionInterface->expects($this->exactly(1))->method('putCache')->willReturn(true);
         $sampler = new HttpSampler(null, new Configuration(
@@ -291,7 +291,7 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
         $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
-        $cacheExtensionInterface->expects($this->exactly(4))->method('isExtensionLoaded')->willReturn(false);
+        $cacheExtensionInterface->expects($this->exactly(3))->method('isExtensionLoaded')->willReturn(false);
         $cacheExtensionInterface->expects($this->never())->method('getCache')->willReturn('never called');
         $cacheExtensionInterface->expects($this->never())->method('putCache')->willReturn(true);
         $sampler = new HttpSampler(null, new Configuration(
@@ -319,7 +319,7 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
         $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
-        $cacheExtensionInterface->expects($this->exactly(4))->method('isExtensionLoaded')->willReturn(true);
+        $cacheExtensionInterface->expects($this->exactly(3))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getCache')->willReturn(false);
         $cacheExtensionInterface->expects($this->once())->method('putCache')->willReturn(true);
         $sampler = new HttpSampler(null, new Configuration(
@@ -347,7 +347,7 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
         $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
-        $cacheExtensionInterface->expects($this->exactly(4))->method('isExtensionLoaded')->willReturn(true);
+        $cacheExtensionInterface->expects($this->exactly(3))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getCache')->willReturn(false);
         $cacheExtensionInterface->expects($this->once())->method('putCache')->willReturn(false);
         $sampler = new HttpSampler(null, new Configuration(
