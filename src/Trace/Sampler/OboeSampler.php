@@ -362,11 +362,12 @@ abstract class OboeSampler implements SamplerInterface
     {
         $state = array_map(function ($bucket) {
             return [
+                // Respect SWO HTTP getSettings Endpoint for capacity and rate
                 'capacity' => $bucket->getCapacity(),
                 'rate' => $bucket->getRate(),
-                // Round 2 decimal places token and lastUsed
+                // Round 2 decimal places for token
                 'token' => round($bucket->getTokens(), 2),
-                'lastUsed' => round($bucket->getLastUsed() ?? microtime(true), 2),
+                'lastUsed' => $bucket->getLastUsed() ?? microtime(true),
             ];
         }, $this->buckets);
 
