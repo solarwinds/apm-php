@@ -364,6 +364,7 @@ abstract class OboeSampler implements SamplerInterface
             return [
                 'capacity' => $bucket->getCapacity(),
                 'rate' => $bucket->getRate(),
+                // Round 2 decimal places token and lastUsed
                 'token' => round($bucket->getTokens(), 2),
                 'lastUsed' => round($bucket->getLastUsed() ?? microtime(true), 2),
             ];

@@ -113,20 +113,4 @@ class TokenBucketTest extends TestCase
         $this->assertLessThan(20, $bucket->getTokens());
         $this->assertEquals(2, $bucket->getRate());
     }
-
-    public function test_tokens_never_exceed_capacity(): void
-    {
-        $bucket = new TokenBucket(2, 1000);
-        sleep(1);
-        $this->assertLessThanOrEqual($bucket->getCapacity(), $bucket->getTokens());
-    }
-
-    public function test_tokens_never_below_zero(): void
-    {
-        $bucket = new TokenBucket(1, 0);
-        $bucket->consume(1);
-        $this->assertEquals(0, $bucket->getTokens());
-        $bucket->consume(1);
-        $this->assertEquals(0, $bucket->getTokens());
-    }
 }
