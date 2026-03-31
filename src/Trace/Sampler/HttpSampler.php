@@ -7,6 +7,7 @@ namespace Solarwinds\ApmPhp\Trace\Sampler;
 use Exception;
 use Http\Discovery\Psr17FactoryDiscovery;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
@@ -31,6 +32,7 @@ class HttpSampler extends Sampler
     private string $hostname;
     private ClientInterface $client;
     private RequestFactoryInterface $requestFactory;
+    private ContextInterface $requestContext;
 
     public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, private readonly CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
@@ -44,12 +46,14 @@ class HttpSampler extends Sampler
             'timeout' => 10,
         ]);
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
+        $this->requestContext = Context::getCurrent();
 
         self::logInfo('Starting HTTP sampler');
     }
 
     private function request(): void
     {
+        $scope = $this->requestContext->activate();
         try {
             // Try from cache
             if ($this->cacheExtension->isExtensionLoaded()) {
@@ -112,6 +116,8 @@ class HttpSampler extends Sampler
             }
         } catch (Exception $e) {
             $this->logWarning('Unexpected error occurred: ' . $e->getMessage());
+        } finally {
+            $scope->detach();
         }
     }
 
