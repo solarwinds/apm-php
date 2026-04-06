@@ -54,6 +54,7 @@ class HttpSampler extends Sampler
     private function request(): void
     {
         $scope = $this->requestContext->activate();
+
         try {
             // Try from cache
             if ($this->cacheExtension->isExtensionLoaded()) {
