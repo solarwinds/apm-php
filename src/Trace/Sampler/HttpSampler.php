@@ -46,6 +46,7 @@ class HttpSampler extends Sampler
             'timeout' => 10,
         ]);
         $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
+        // Save the context during SDK initialization (where no-op SDK components are added)
         $this->requestContext = Context::getCurrent();
 
         self::logInfo('Starting HTTP sampler');
@@ -53,6 +54,7 @@ class HttpSampler extends Sampler
 
     private function request(): void
     {
+        // Activate the SDK initialization context (No-op) to suppress span creations
         $scope = $this->requestContext->activate();
 
         try {

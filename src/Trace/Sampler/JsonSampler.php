@@ -7,6 +7,7 @@ namespace Solarwinds\ApmPhp\Trace\Sampler;
 use Exception;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -22,15 +23,21 @@ class JsonSampler extends Sampler
     use LogsMessagesTrait;
 
     private string $path;
+    private ContextInterface $requestContext;
 
     public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, string $path = '/tmp/solarwinds-apm-settings.json')
     {
         parent::__construct($meterProvider, $config);
         $this->path = $path;
+        // Save the context during SDK initialization (where no-op SDK components are added)
+        $this->requestContext = Context::getCurrent();
     }
 
     private function request(): void
     {
+        // Activate the SDK initialization context (No-op) to suppress span creations
+        $scope = $this->requestContext->activate();
+
         try {
             if (!file_exists($this->path)) {
                 $this->logError('Settings file does not exist ' . $this->path, ['path' => $this->path]);
@@ -56,6 +63,8 @@ class JsonSampler extends Sampler
             $this->logError('json_decode error', ['path' => $this->path, 'error' => $ex->getMessage()]);
         } catch (Exception $e) {
             $this->logError('JsonSampler exception', ['path' => $this->path, 'error' => $e->getMessage()]);
+        } finally {
+            $scope->detach();
         }
     }
 
