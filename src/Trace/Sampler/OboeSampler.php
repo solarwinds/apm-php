@@ -346,7 +346,7 @@ abstract class OboeSampler implements SamplerInterface
             // Update bucket from settings
             foreach ($this->buckets as $type => $bucket) {
                 $bucketSettings = $this->settings->buckets[$type] ?? null;
-                if ($settings->timestamp > ($bucket->getLastUsed() ?? 0)) {
+                if ($settings->timestamp > (int)($bucket->getLastUsed() ?? 0)) {
                     if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
                         $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
                         $this->logDebug('Settings is more recent; update for bucket type ' . $type);
@@ -405,8 +405,8 @@ abstract class OboeSampler implements SamplerInterface
         }
 
         return [
-            'capacity' => (int) $bucketState['capacity'],
-            'rate' => (int) $bucketState['rate'],
+            'capacity' => (float) $bucketState['capacity'],
+            'rate' => (float) $bucketState['rate'],
             'token' => (float) $bucketState['token'],
             'lastUsed' => (float) $bucketState['lastUsed'],
         ];
