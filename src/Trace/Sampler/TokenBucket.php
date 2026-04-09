@@ -76,8 +76,9 @@ class TokenBucket
                 $this->tokens += $diff;
                 $this->tokens = min($this->tokens, $newCapacity);
                 $this->lastUsed = microtime(true);
-            } elseif ($this->capacity > 0 && $this->capacity !== $newCapacity) {
-                // Adjust tokens due to ongoing bucket capacity updates
+            } elseif ($this->capacity !== $newCapacity) {
+                // Adjust tokens due to ongoing bucket capacity updates,
+                // including re-enabling a previously used bucket from 0 capacity.
                 // First, calculate token till now
                 $now = microtime(true);
                 $elapsed = $now - $this->lastUsed;
