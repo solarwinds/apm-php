@@ -371,7 +371,13 @@ abstract class OboeSampler implements SamplerInterface
             ];
         }, $this->buckets);
 
-        return json_encode($state);
+        try {
+            return json_encode($state, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            $this->logWarning('Failed to encode bucket state: ' . $e->getMessage());
+
+            return '{}';
+        }
     }
 
     public function writeBucketStateToCache(string $key, string $value): void
