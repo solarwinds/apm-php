@@ -88,6 +88,7 @@ class TokenBucket
                 $this->tokens += $diff;
                 // Third, cap tokens to new capacity if needed
                 $this->tokens = min($this->tokens, $newCapacity);
+                // Forth, raise tokens to 0 if needed
                 $this->tokens = max(0, $this->tokens);
                 $this->lastUsed = $now;
             }
