@@ -1382,7 +1382,7 @@ class OboeSamplerTest extends TestCase
         $cacheExtensionInterface->expects($this->once())->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getBucketState')->with($this->equalTo('test-key'))->willReturn('{"Default":{"capacity":2,"rate":1,"token":1,"lastUsed":1774549154.72},"TriggerRelaxed":{"capacity":20,"rate":1,"token":20,"lastUsed":1774549154.72},"TriggerStrict":{"capacity":6,"rate":0.1,"token":6,"lastUsed":1774549154.72}}');
         $sampler = new TestOboeSampler(null, null, new LocalSettings(null, true), $this->makeRequestHeaders([]), $cacheExtensionInterface);
-        // Should call putBucketState on the mock
+        // Should call getBucketState on the mock
         $sampler->updateBucketStateFromCache('test-key');
     }
 }
