@@ -25,6 +25,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Solarwinds\ApmPhp\Trace\Sampler\BucketSettings;
 use Solarwinds\ApmPhp\Trace\Sampler\BucketType;
+use Solarwinds\ApmPhp\Trace\Sampler\CacheExtension;
+use Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface;
 use Solarwinds\ApmPhp\Trace\Sampler\Flags;
 use Solarwinds\ApmPhp\Trace\Sampler\LocalSettings;
 use Solarwinds\ApmPhp\Trace\Sampler\OboeSampler;
@@ -40,9 +42,9 @@ class TestOboeSampler extends OboeSampler
     private readonly RequestHeaders $requestHeaders;
     private ?ResponseHeaders $responseHeaders = null;
 
-    public function __construct(?MeterProviderInterface $meterProvider, ?Settings $settings, LocalSettings $localSettings, RequestHeaders $requestHeaders)
+    public function __construct(?MeterProviderInterface $meterProvider, ?Settings $settings, LocalSettings $localSettings, RequestHeaders $requestHeaders, CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
-        parent::__construct($meterProvider);
+        parent::__construct($meterProvider, $cacheExtension);
         $this->localSettings = $localSettings;
         $this->requestHeaders = $requestHeaders;
         if ($settings !== null) {
@@ -1343,5 +1345,44 @@ class OboeSamplerTest extends TestCase
 
         $this->assertEquals(SamplingResult::DROP, $sample->getDecision());
         $this->assertSame(1, $metrics['trace.service.request_count'] ?? 0);
+    }
+
+    public function test_get_bucket_state_returns_expected_json(): void
+    {
+        $sampler = new TestOboeSampler(null, null, new LocalSettings(null, true), $this->makeRequestHeaders([]));
+        // getBucketState returns JSON for all buckets (DEFAULT, TRIGGER_RELAXED, TRIGGER_STRICT)
+        $json = $sampler->getBucketState();
+        $data = json_decode($json, true);
+        $this->assertIsArray($data);
+        // Check keys for all expected bucket types
+        $this->assertArrayHasKey(BucketType::DEFAULT->value, $data); // DEFAULT
+        $this->assertArrayHasKey(BucketType::TRIGGER_RELAXED->value, $data); // TRIGGER_RELAXED
+        $this->assertArrayHasKey(BucketType::TRIGGER_STRICT->value, $data); // TRIGGER_STRICT
+        foreach ($data as $bucket) {
+            $this->assertArrayHasKey('capacity', $bucket);
+            $this->assertArrayHasKey('rate', $bucket);
+            $this->assertArrayHasKey('token', $bucket);
+            $this->assertArrayHasKey('lastUsed', $bucket);
+        }
+    }
+
+    public function test_write_bucket_state_to_cache_calls_cache_extension(): void
+    {
+        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface->expects($this->once())->method('isExtensionLoaded')->willReturn(true);
+        $cacheExtensionInterface->expects($this->once())->method('putBucketState')->with($this->equalTo('test-key'), $this->equalTo('test-value'))->willReturn(true);
+        $sampler = new TestOboeSampler(null, null, new LocalSettings(null, true), $this->makeRequestHeaders([]), $cacheExtensionInterface);
+        // Should call putBucketState on the mock
+        $sampler->writeBucketStateToCache('test-key', 'test-value');
+    }
+
+    public function test_update_bucket_state_from_cache_calls_cache_extension(): void
+    {
+        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface->expects($this->once())->method('isExtensionLoaded')->willReturn(true);
+        $cacheExtensionInterface->expects($this->once())->method('getBucketState')->with($this->equalTo('test-key'))->willReturn('{"Default":{"capacity":2,"rate":1,"token":1,"lastUsed":1774549154.72},"TriggerRelaxed":{"capacity":20,"rate":1,"token":20,"lastUsed":1774549154.72},"TriggerStrict":{"capacity":6,"rate":0.1,"token":6,"lastUsed":1774549154.72}}');
+        $sampler = new TestOboeSampler(null, null, new LocalSettings(null, true), $this->makeRequestHeaders([]), $cacheExtensionInterface);
+        // Should call getBucketState on the mock
+        $sampler->updateBucketStateFromCache('test-key');
     }
 }

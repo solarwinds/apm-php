@@ -39,7 +39,7 @@ abstract class OboeSampler implements SamplerInterface
     private array $buckets;
     private ?Settings $settings = null;
 
-    public function __construct(?MeterProviderInterface $meterProvider = null)
+    public function __construct(?MeterProviderInterface $meterProvider = null, protected readonly CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
         $this->counters = new Counters($meterProvider);
         $this->buckets = [
@@ -109,7 +109,7 @@ abstract class OboeSampler implements SamplerInterface
             $customAttributes = Attributes::create($s->traceOptions->custom);
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $customAttributes);
             if ($s->traceOptions->ignored !== []) {
-                $s->traceOptions->response->ignored = array_map(fn ($item) => is_array($item) && $item !== []? $item[0] : '', $s->traceOptions->ignored);
+                $s->traceOptions->response->ignored = array_map(fn ($item) => is_array($item) && $item !== [] ? $item[0] : '', $s->traceOptions->ignored);
             }
         }
         if (!$s->settings) {
@@ -259,6 +259,7 @@ abstract class OboeSampler implements SamplerInterface
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $newAttributes);
 
             if ($bucket->consume()) {
+                $this->writeBucketStateToCache((string) (getmypid()), $this->getBucketState());
                 $this->logDebug('sufficient capacity; record and sample');
                 $this->counters->getTriggeredTraceCount()->add(1, [], $parentContext);
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
@@ -301,6 +302,7 @@ abstract class OboeSampler implements SamplerInterface
             ]);
             $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $bucketAttributes);
             if ($bucket->consume()) {
+                $this->writeBucketStateToCache((string) (getmypid()), $this->getBucketState());
                 $this->logDebug('sufficient capacity; record and sample');
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
                 $s->decision = SamplingResult::RECORD_AND_SAMPLE;
@@ -335,16 +337,105 @@ abstract class OboeSampler implements SamplerInterface
         return 'OboeSampler';
     }
 
-    protected function updateSettings(Settings $settings): void
+    public function updateSettings(Settings $settings): void
     {
         if ($settings->timestamp > ($this->settings?->timestamp ?? 0)) {
             $this->settings = $settings;
+            // update bucket from cache
+            $this->updateBucketStateFromCache((string) (getmypid()));
+            // Update bucket from settings
             foreach ($this->buckets as $type => $bucket) {
                 $bucketSettings = $this->settings->buckets[$type] ?? null;
-                if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
-                    $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
+                if ($settings->timestamp > (int) ($bucket->getLastUsed() ?? 0)) {
+                    if ($bucketSettings !== null && is_a($bucketSettings, BucketSettings::class)) {
+                        $bucket->update($bucketSettings->getCapacity(), $bucketSettings->getRate());
+                        $this->logDebug('Settings is more recent; update for bucket type ' . $type);
+                    }
+                } else {
+                    $this->logDebug('Cached bucket state is newer than settings; skipping update for bucket type ' . $type);
                 }
             }
+        }
+    }
+
+    public function getBucketState(): string
+    {
+        $state = array_map(function ($bucket) {
+            return [
+                // Respect SWO HTTP getSettings Endpoint for capacity and rate
+                'capacity' => $bucket->getCapacity(),
+                'rate' => $bucket->getRate(),
+                // Round 2 decimal places for token
+                'token' => round($bucket->getTokens(), 2),
+                'lastUsed' => $bucket->getLastUsed() ?? microtime(true),
+            ];
+        }, $this->buckets);
+
+        try {
+            return json_encode($state, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            $this->logWarning('Failed to encode bucket state: ' . $e->getMessage());
+
+            return '{}';
+        }
+    }
+
+    public function writeBucketStateToCache(string $key, string $value): void
+    {
+        if ($this->cacheExtension->isExtensionLoaded()) {
+            if (!$this->cacheExtension->putBucketState($key, $value)) {
+                $this->logWarning('Failed to cache bucket state [' . $key . '=' . $value . ']');
+            } else {
+                $this->logDebug('Write bucket state to cache [' . $key . '=' . $value . ']');
+            }
+        }
+    }
+
+    private function normalizeBucketStateFromCache(mixed $bucketState): ?array
+    {
+        if (!is_array($bucketState)) {
+            return null;
+        }
+
+        $requiredKeys = ['capacity', 'rate', 'token', 'lastUsed'];
+        foreach ($requiredKeys as $requiredKey) {
+            if (!array_key_exists($requiredKey, $bucketState) || !is_numeric($bucketState[$requiredKey])) {
+                return null;
+            }
+        }
+
+        return [
+            'capacity' => (float) $bucketState['capacity'],
+            'rate' => (float) $bucketState['rate'],
+            'token' => (float) $bucketState['token'],
+            'lastUsed' => (float) $bucketState['lastUsed'],
+        ];
+    }
+
+    public function updateBucketStateFromCache(string $key): void
+    {
+        if ($this->cacheExtension->isExtensionLoaded()) {
+            $cachedBucketStates = $this->cacheExtension->getBucketState($key);
+            if ($cachedBucketStates !== false) {
+                $this->logDebug('Got bucket states from cache ' . $cachedBucketStates);
+                $bucketStates = json_decode($cachedBucketStates, true);
+                if (is_array($bucketStates)) {
+                    foreach ($this->buckets as $type => $bucket) {
+                        $bucketState = $this->normalizeBucketStateFromCache($bucketStates[$type] ?? null);
+                        if ($bucketState !== null) {
+                            $bucket->updateFromCache($bucketState['capacity'], $bucketState['rate'], $bucketState['token'], $bucketState['lastUsed']);
+                        } elseif (array_key_exists($type, $bucketStates)) {
+                            $this->logWarning('Invalid bucket state from cache for bucket type ' . $type);
+                        }
+                    }
+                } else {
+                    $this->logWarning('Invalid bucket states from cache');
+                }
+            } else {
+                $this->logDebug('No bucket states found in cache');
+            }
+        } else {
+            $this->logDebug('Cache extension not loaded; skipping cache retrieval');
         }
     }
 }
