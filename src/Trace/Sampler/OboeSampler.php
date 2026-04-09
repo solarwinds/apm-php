@@ -385,18 +385,41 @@ abstract class OboeSampler implements SamplerInterface
         }
     }
 
+    private function normalizeBucketStateFromCache(mixed $bucketState): ?array
+    {
+        if (!is_array($bucketState)) {
+            return null;
+        }
+
+        $requiredKeys = ['capacity', 'rate', 'token', 'lastUsed'];
+        foreach ($requiredKeys as $requiredKey) {
+            if (!array_key_exists($requiredKey, $bucketState) || !is_numeric($bucketState[$requiredKey])) {
+                return null;
+            }
+        }
+
+        return [
+            'capacity' => (int) $bucketState['capacity'],
+            'rate' => (int) $bucketState['rate'],
+            'token' => (float) $bucketState['token'],
+            'lastUsed' => (float) $bucketState['lastUsed'],
+        ];
+    }
+
     public function updateBucketStateFromCache(string $key): void
     {
         if ($this->cacheExtension->isExtensionLoaded()) {
             $cachedBucketStates = $this->cacheExtension->getBucketState($key);
-            if ($cachedBucketStates) {
+            if ($cachedBucketStates !== false) {
                 $this->logDebug('Got bucket states from cache ' . $cachedBucketStates);
                 $bucketStates = json_decode($cachedBucketStates, true);
                 if (is_array($bucketStates)) {
                     foreach ($this->buckets as $type => $bucket) {
-                        $bucketState = $bucketStates[$type] ?? null;
-                        if ($bucketState) {
+                        $bucketState = $this->normalizeBucketStateFromCache($bucketStates[$type] ?? null);
+                        if ($bucketState !== null) {
                             $bucket->updateFromCache($bucketState['capacity'], $bucketState['rate'], $bucketState['token'], $bucketState['lastUsed']);
+                        } elseif (array_key_exists($type, $bucketStates)) {
+                            $this->logWarning('Invalid bucket state from cache for bucket type ' . $type);
                         }
                     }
                 } else {
