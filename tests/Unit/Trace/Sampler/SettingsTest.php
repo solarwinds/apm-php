@@ -157,7 +157,7 @@ class SettingsTest extends TestCase
         $this->assertSame(7, $data['sampleRate']);
         $this->assertSame(SampleSource::LocalDefault->value, $data['sampleSource']);
         $this->assertSame(0x1234, $data['flags']);
-        $this->assertSame(['a', 'b'], $data['buckets']);
+        $this->assertSame('0=a,1=b', $data['buckets']);
         $this->assertNull($data['signatureKey']);
         $this->assertSame(111, $data['timestamp']);
         $this->assertSame(222, $data['ttl']);
@@ -177,7 +177,7 @@ class SettingsTest extends TestCase
         $json = (string) $settings;
         $data = json_decode($json, true);
         $this->assertSame('', $data['signatureKey']);
-        $this->assertSame([], $data['buckets']);
+        $this->assertSame('', $data['buckets']);
     }
 
     public function test_merge_with_all_flags_and_edge_cases(): void
