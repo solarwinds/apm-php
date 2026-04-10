@@ -108,7 +108,7 @@ class TokenBucket
         return false;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf('TokenBucket(capacity=%.2f, rate=%.2f)', $this->capacity, $this->rate);
     }

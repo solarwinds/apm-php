@@ -10,7 +10,7 @@ class TraceOptionsResponse
     public ?TriggerTrace $triggerTrace = null;
     public ?array $ignored = null;
 
-    public function __toString()
+    public function __toString(): string
     {
         $kvs = [
             'auth' => $this->auth?->value,
