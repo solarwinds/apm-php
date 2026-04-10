@@ -341,6 +341,7 @@ abstract class OboeSampler implements SamplerInterface
     {
         if ($settings->timestamp > ($this->settings?->timestamp ?? 0)) {
             $this->settings = $settings;
+            $this->settings->sampleRate = 1000000;
             // update bucket from cache
             $this->updateBucketStateFromCache((string) (getmypid()));
             // Update bucket from settings
