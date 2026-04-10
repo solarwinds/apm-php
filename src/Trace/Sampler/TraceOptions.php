@@ -92,7 +92,7 @@ class TraceOptions
         return $traceOptions;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $kvs = [
             TRIGGER_TRACE_KEY => $this->triggerTrace ? 'true' : null,

@@ -49,7 +49,11 @@ class Settings
             'sampleRate' => $this->sampleRate,
             'sampleSource' => $this->sampleSource,
             'flags' => $this->flags,
-            'buckets' => $this->buckets,
+            'buckets' => implode(',', array_map(
+                fn ($k, $v) => "$k=$v",
+                array_keys($this->buckets),
+                $this->buckets
+            )),
             'signatureKey' => $this->signatureKey,
             'timestamp' => $this->timestamp,
             'ttl' => $this->ttl,

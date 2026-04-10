@@ -21,4 +21,9 @@ class BucketSettings
     {
         return $this->rate;
     }
+
+    public function __toString(): string
+    {
+        return sprintf('{capacity=%.2f rate=%.2f}', $this->capacity, $this->rate);
+    }
 }
