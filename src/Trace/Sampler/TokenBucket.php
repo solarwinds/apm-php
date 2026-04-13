@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Trace\Sampler;
 
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+
 class TokenBucket
 {
+    use LogsMessagesTrait;
     private float $capacity;
     private float $rate;
     private float $tokens;
@@ -101,15 +104,17 @@ class TokenBucket
         $this->calculateTokens();
         if ($this->tokens >= $tokens) {
             $this->tokens -= $tokens;
+            $this->logDebug('Consumed ' . $tokens . ' token (' . round($this->tokens / $this->capacity * 100, 2) . '% remaining)');
 
             return true;
         }
+        $this->logDebug('Token consumption failed: requested=' . $tokens . ', available=' . $this->tokens . ', capacity=' . $this->capacity);
 
         return false;
     }
 
     public function __toString(): string
     {
-        return sprintf('TokenBucket(capacity=%.2f, rate=%.2f)', $this->capacity, $this->rate);
+        return sprintf('TokenBucket(capacity=%.2f, rate=%.2f, token=%.2f)', $this->capacity, $this->rate, $this->tokens);
     }
 }
