@@ -104,11 +104,7 @@ class TokenBucket
         $this->calculateTokens();
         if ($this->tokens >= $tokens) {
             $this->tokens -= $tokens;
-            if ($this->capacity > 0) {
-                $this->logDebug('Consumed ' . $tokens . ' token (' . round($this->tokens / $this->capacity * 100, 2) . '% remaining)');
-            } else {
-                $this->logDebug('Consumed ' . $tokens . ' token (' . $this->tokens . ' remaining)');
-            }
+            $this->logDebug('Consumed ' . $tokens . ' token (' . round($this->tokens / $this->capacity * 100, 2) . '% remaining)');
 
             return true;
         }
