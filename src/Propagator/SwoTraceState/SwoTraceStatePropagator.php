@@ -18,8 +18,6 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
 {
     public const TRACESTATE = 'tracestate';
     const SW = 'sw';
-    const IS_SAMPLED = '01';
-    const NOT_SAMPLED = '00';
 
     public const FIELDS = [
         self::TRACESTATE,
@@ -40,7 +38,7 @@ class SwoTraceStatePropagator implements TextMapPropagatorInterface
         if (!$spanContext->isValid()) {
             return;
         }
-        $swTraceState = $spanContext->getSpanId() . '-' . ($spanContext->isSampled() ? self::IS_SAMPLED : self::NOT_SAMPLED);
+        $swTraceState = sprintf('%s-%02x', $spanContext->getSpanId(), $spanContext->getTraceFlags());
         $traceState = $spanContext->getTraceState();
         if ($traceState === null) {
             $traceState = new TraceState();

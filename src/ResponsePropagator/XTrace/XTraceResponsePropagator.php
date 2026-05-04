@@ -16,8 +16,6 @@ use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
  */
 class XTraceResponsePropagator implements ResponsePropagatorInterface
 {
-    const IS_SAMPLED = '01';
-    const NOT_SAMPLED = '00';
     const SUPPORTED_VERSION = '00';
     const X_TRACE = 'X-Trace';
     private static ?self $instance = null;
@@ -52,12 +50,13 @@ class XTraceResponsePropagator implements ResponsePropagatorInterface
             return;
         }
 
-        $traceId = $spanContext->getTraceId();
-        $spanId = $spanContext->getSpanId();
-
-        $samplingFlag = $spanContext->isSampled() ? self::IS_SAMPLED : self::NOT_SAMPLED;
-
-        $header = self::SUPPORTED_VERSION . '-' . $traceId . '-' . $spanId . '-' . $samplingFlag;
+        $header = sprintf(
+            '%02x-%s-%s-%02x',
+            self::SUPPORTED_VERSION,
+            $spanContext->getTraceId(),
+            $spanContext->getSpanId(),
+            $spanContext->getTraceFlags(),
+        );
         $setter->set($carrier, self::X_TRACE, $header);
     }
 }
