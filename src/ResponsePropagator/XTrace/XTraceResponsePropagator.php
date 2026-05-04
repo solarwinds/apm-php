@@ -16,7 +16,7 @@ use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
  */
 class XTraceResponsePropagator implements ResponsePropagatorInterface
 {
-    const SUPPORTED_VERSION = '00';
+    const SUPPORTED_VERSION = 0x00;
     const X_TRACE = 'X-Trace';
     private static ?self $instance = null;
 
