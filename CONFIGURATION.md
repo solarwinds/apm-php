@@ -139,7 +139,7 @@ use OpenTelemetry\Context\Context;
 
 $logger->pushProcessor(function ($record) {
   $spanContext = Span::fromContext(Context::getCurrent())->getContext();
-  $record['message'] .= ' trace_id='.$spanContext->getTraceId() . ' span_id=' . $spanContext->getSpanId() . ' trace_flags=' . ($spanContext->getTraceFlags() ? '01' : '00');
+  $record['message'] .= sprintf(' trace_id=%s span_id=%s trace_flags=%02x', $spanContext->getTraceId(), $spanContext->getSpanId(), $spanContext->getTraceFlags());
   return $record;
 });
 ```
