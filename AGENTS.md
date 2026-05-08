@@ -22,6 +22,7 @@ Use this flow to get productive quickly in a local development environment.
 Common local workflow commands:
 
 ```bash
+make install
 make test
 make all-checks
 ```
