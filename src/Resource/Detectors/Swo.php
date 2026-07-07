@@ -37,7 +37,7 @@ final class Swo implements ResourceDetectorInterface
             self::SW_DATA_MODULE => 'apm',
             self::SW_APM_VERSION => InstalledVersions::getPrettyVersion(self::PACKAGIST_COMPOSER_NAME) ?? 'unknown',
             // OTEL_SERVICE_NAME takes precedence over $service part of SW_APM_SERVICE_KEY
-            ResourceAttributes::SERVICE_NAME => $otelServiceName ?? $swServiceName ?? 'unknown_service',
+            // ResourceAttributes::SERVICE_NAME => $otelServiceName ?? $swServiceName ?? 'unknown_service',
         ];
 
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
