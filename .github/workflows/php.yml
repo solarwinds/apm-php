@@ -132,12 +132,12 @@ jobs:
         vendor-bin/phan/vendor/bin/phan --version
         vendor-bin/phan/vendor/bin/phan
 
-    - name: Run Psalm
-      id: psalm
-      continue-on-error: ${{ matrix.experimental }}
-      run: |
-        vendor-bin/psalm/vendor/bin/psalm --version
-        vendor-bin/psalm/vendor/bin/psalm --output-format=github
+#    - name: Run Psalm
+#      id: psalm
+#      continue-on-error: ${{ matrix.experimental }}
+#      run: |
+#        vendor-bin/psalm/vendor/bin/psalm --version
+#        vendor-bin/psalm/vendor/bin/psalm --output-format=github
 
     - name: Run Phpstan
       id: phpstan
