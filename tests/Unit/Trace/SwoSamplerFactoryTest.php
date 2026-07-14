@@ -126,6 +126,14 @@ class SwoSamplerFactoryTest extends TestCase
         $this->assertEquals([], $config->getTransactionSettings());
     }
 
+    public function test_get_solarwinds_configuration_http_with_invalid_service_key_format(): void
+    {
+        $serviceKey = 'token1234';
+        $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
+        $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
+        $this->assertEquals('token1234', $config->getToken());
+    }
+
     public function test_get_solarwinds_configuration_http_default_resources(): void
     {
         $localEnvSetup = false;
