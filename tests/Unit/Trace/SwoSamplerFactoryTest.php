@@ -120,8 +120,9 @@ class SwoSamplerFactoryTest extends TestCase
             $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
             $serviceKey = 'token1234:myservice';
             $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
+            $factoryWithDefaultResource = new SwoSamplerFactory();
             $this->assertEquals('unknown_service', $config->getService()); // Due to emptyResource()
-            $this->assertEquals('myservice', (new SwoSamplerFactory())->getSolarwindsConfiguration(true, $serviceKey)->getService());
+            $this->assertEquals('myservice', $factoryWithDefaultResource->getSolarwindsConfiguration(true, $serviceKey)->getService());
             $this->assertEquals('https://apm.collector.na-01.cloud.solarwinds.com', $config->getCollector());
             $this->assertEquals('token1234', $config->getToken());
             $this->assertTrue($config->getTracingMode());
