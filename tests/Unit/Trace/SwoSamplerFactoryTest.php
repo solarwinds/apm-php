@@ -115,15 +115,21 @@ class SwoSamplerFactoryTest extends TestCase
 
     public function test_get_solarwinds_configuration_http(): void
     {
-        $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
-        $serviceKey = 'token1234:myservice';
-        $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
-        $this->assertEquals('unknown_service', $config->getService()); // Due to emptyResource()
-        $this->assertEquals('https://apm.collector.na-01.cloud.solarwinds.com', $config->getCollector());
-        $this->assertEquals('token1234', $config->getToken());
-        $this->assertTrue($config->getTracingMode());
-        $this->assertTrue($config->isTriggerTraceEnabled());
-        $this->assertEquals([], $config->getTransactionSettings());
+        \putenv('SW_APM_SERVICE_KEY=token1234:myservice');
+        try {
+            $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
+            $serviceKey = 'token1234:myservice';
+            $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
+            $this->assertEquals('unknown_service', $config->getService()); // Due to emptyResource()
+            $this->assertEquals('myservice', (new SwoSamplerFactory())->getSolarwindsConfiguration(true, $serviceKey)->getService());
+            $this->assertEquals('https://apm.collector.na-01.cloud.solarwinds.com', $config->getCollector());
+            $this->assertEquals('token1234', $config->getToken());
+            $this->assertTrue($config->getTracingMode());
+            $this->assertTrue($config->isTriggerTraceEnabled());
+            $this->assertEquals([], $config->getTransactionSettings());
+        } finally {
+            \putenv('SW_APM_SERVICE_KEY');
+        }
     }
 
     public function test_get_solarwinds_configuration_json(): void
