@@ -115,21 +115,26 @@ class SwoSamplerFactoryTest extends TestCase
 
     public function test_get_solarwinds_configuration_http(): void
     {
+        $serviceKey = 'token1234:myservice';
+        $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
+        $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
+        $this->assertEquals('unknown_service', $config->getService());
+        $this->assertEquals('https://apm.collector.na-01.cloud.solarwinds.com', $config->getCollector());
+        $this->assertEquals('token1234', $config->getToken());
+        $this->assertTrue($config->getTracingMode());
+        $this->assertTrue($config->isTriggerTraceEnabled());
+        $this->assertEquals([], $config->getTransactionSettings());
+    }
+
+    public function test_get_solarwinds_configuration_http_default_resources(): void
+    {
         \putenv('SW_APM_SERVICE_KEY=token1234:myservice');
 
         try {
-            $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
             $serviceKey = 'token1234:myservice';
+            $factory = new SwoSamplerFactory();
             $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
-            $factoryWithDefaultResource = new SwoSamplerFactory();
-            $configWithDefaultResource = $factoryWithDefaultResource->getSolarwindsConfiguration(true, $serviceKey);
-            $this->assertEquals('unknown_service', $config->getService());
-            $this->assertEquals('myservice', $configWithDefaultResource->getService());
-            $this->assertEquals('https://apm.collector.na-01.cloud.solarwinds.com', $config->getCollector());
-            $this->assertEquals('token1234', $config->getToken());
-            $this->assertTrue($config->getTracingMode());
-            $this->assertTrue($config->isTriggerTraceEnabled());
-            $this->assertEquals([], $config->getTransactionSettings());
+            $this->assertEquals('myservice', $config->getService());
         } finally {
             \putenv('SW_APM_SERVICE_KEY');
         }
