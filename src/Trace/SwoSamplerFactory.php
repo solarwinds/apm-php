@@ -18,7 +18,7 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
-use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\SemConv\Attributes\ServiceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
@@ -54,12 +54,9 @@ class SwoSamplerFactory
                 : self::DEFAULT_APM_COLLECTOR)
             : '';
         $token = '';
-        $service = 'unknown_service';
         if ($isHttp && $serviceKey) {
-            [$token, $service] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
+            $token = explode(self::SERVICE_KEY_DELIMITER, $serviceKey, 2)[0];
         }
-        $otelServiceName = Configuration::has(Env::OTEL_SERVICE_NAME) ? Configuration::getString(Env::OTEL_SERVICE_NAME) : null;
-        $resourceAttributeServiceName = $this->resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME);
         $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRACING_MODE)) === 'enabled';
         $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRIGGER_TRACE)) === 'enabled';
         $transactionSettingsFile = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_SETTINGS_FILE)
@@ -99,7 +96,7 @@ class SwoSamplerFactory
         }
 
         return new SolarwindsConfiguration(
-            service: $otelServiceName ?? $resourceAttributeServiceName ?? $service,
+            service: $this->resource->getAttributes()->get(ServiceAttributes::SERVICE_NAME) ?? 'unknown_service',
             collector: $isHttp ? 'https://' . $collector : '',
             token: $token,
             tracingMode: $tracingMode,

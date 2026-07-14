@@ -115,15 +115,43 @@ class SwoSamplerFactoryTest extends TestCase
 
     public function test_get_solarwinds_configuration_http(): void
     {
-        $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
         $serviceKey = 'token1234:myservice';
+        $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
         $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
-        $this->assertEquals('myservice', $config->getService());
+        $this->assertEquals('unknown_service', $config->getService());
         $this->assertEquals('https://apm.collector.na-01.cloud.solarwinds.com', $config->getCollector());
         $this->assertEquals('token1234', $config->getToken());
         $this->assertTrue($config->getTracingMode());
         $this->assertTrue($config->isTriggerTraceEnabled());
         $this->assertEquals([], $config->getTransactionSettings());
+    }
+
+    public function test_get_solarwinds_configuration_http_with_invalid_service_key_format(): void
+    {
+        $serviceKey = 'token1234';
+        $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
+        $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
+        $this->assertEquals('token1234', $config->getToken());
+    }
+
+    public function test_get_solarwinds_configuration_http_default_resources(): void
+    {
+        $localEnvSetup = false;
+        if (!\getenv('SW_APM_SERVICE_KEY')) {
+            \putenv('SW_APM_SERVICE_KEY=token1234:apm-php-unittest');
+            $localEnvSetup = true;
+        }
+
+        try {
+            $serviceKey = 'token1234:apm-php-unittest';
+            $factory = new SwoSamplerFactory();
+            $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
+            $this->assertEquals('apm-php-unittest', $config->getService());
+        } finally {
+            if ($localEnvSetup) {
+                \putenv('SW_APM_SERVICE_KEY');
+            }
+        }
     }
 
     public function test_get_solarwinds_configuration_json(): void

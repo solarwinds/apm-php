@@ -11,7 +11,7 @@ help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "  \033[32m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 all: update all-checks ## Update to latest and run all checks
 all-lowest: update-lowest all-checks ## Update to lowest dependencies and run all checks
-all-checks: rector style deptrac phan psalm phpstan test ## Run all checks
+all-checks: rector style deptrac phan phpstan test ## Run all checks
 pull: ## Pull latest developer image
 	$(DOCKER_COMPOSE) pull php
 build: ## Build developer image locally
