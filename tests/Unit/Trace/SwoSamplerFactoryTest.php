@@ -116,6 +116,7 @@ class SwoSamplerFactoryTest extends TestCase
     public function test_get_solarwinds_configuration_http(): void
     {
         \putenv('SW_APM_SERVICE_KEY=token1234:myservice');
+
         try {
             $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
             $serviceKey = 'token1234:myservice';
