@@ -128,15 +128,21 @@ class SwoSamplerFactoryTest extends TestCase
 
     public function test_get_solarwinds_configuration_http_default_resources(): void
     {
-        \putenv('SW_APM_SERVICE_KEY=token1234:myservice');
+        $localEnvSetup = false;
+        if (!\getenv('SW_APM_SERVICE_KEY')) {
+            \putenv('SW_APM_SERVICE_KEY=token1234:apm-php-unittest');
+            $localEnvSetup = true;
+        }
 
         try {
             $serviceKey = 'token1234:myservice';
             $factory = new SwoSamplerFactory();
             $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
-            $this->assertEquals('myservice', $config->getService());
+            $this->assertEquals('apm-php-unittest', $config->getService());
         } finally {
-            \putenv('SW_APM_SERVICE_KEY');
+            if ($localEnvSetup) {
+                \putenv('SW_APM_SERVICE_KEY');
+            }
         }
     }
 
