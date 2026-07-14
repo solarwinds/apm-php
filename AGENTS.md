@@ -52,17 +52,17 @@ Reference: [README.md](./README.md)
 
 These targets are defined in [Makefile](./Makefile) and are the primary contributor workflow.
 
-| Command              | Purpose                                                                                  |
-|----------------------|------------------------------------------------------------------------------------------|
-| `make test`          | Run unit tests                                                                           |
-| `make test-coverage` | Run tests and generate coverage report                                                   |
-| `make style`         | Run PHP-CS-Fixer style checks/fixes                                                      |
-| `make phpstan`       | Run PHPStan static analysis                                                              |
-| `make psalm`         | Run Psalm static analysis                                                                |
-| `make phan`          | Run Phan static analysis                                                                 |
-| `make deptrac`       | Run architectural dependency checks                                                      |
-| `make rector`        | Run Rector in dry-run mode                                                               |
-| `make all-checks`    | Run full quality gate (`rector`, `style`, `deptrac`, `phan`, `psalm`, `phpstan`, `test`) |
+| Command              | Purpose                                                                         |
+|----------------------|---------------------------------------------------------------------------------|
+| `make test`          | Run unit tests                                                                  |
+| `make test-coverage` | Run tests and generate coverage report                                          |
+| `make style`         | Run PHP-CS-Fixer style checks/fixes                                             |
+| `make phpstan`       | Run PHPStan static analysis                                                     |
+| `make psalm`         | Run Psalm static analysis                                                       |
+| `make phan`          | Run Phan static analysis                                                        |
+| `make deptrac`       | Run architectural dependency checks                                             |
+| `make rector`        | Run Rector in dry-run mode                                                      |
+| `make all-checks`    | Run full quality gate (`rector`, `style`, `deptrac`, `phan`, `phpstan`, `test`) |
 
 ## Integration Paths
 
