@@ -55,7 +55,7 @@ class SwoSamplerFactory
             : '';
         $token = '';
         if ($isHttp && $serviceKey) {
-            [$token,] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
+            $token = explode(self::SERVICE_KEY_DELIMITER, $serviceKey, 2)[0];
         }
         $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRACING_MODE)) === 'enabled';
         $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRIGGER_TRACE)) === 'enabled';
