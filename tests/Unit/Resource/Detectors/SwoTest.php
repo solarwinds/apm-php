@@ -49,7 +49,7 @@ class SwoTest extends TestCase
         $this->setEnvironmentVariable(Swo::ENV_WEBSITE_RESOURCE_GROUP_KEY, 'resource-group');
         $this->setEnvironmentVariable(Swo::ENV_WEBSITE_OWNER_NAME_KEY, 'subscription-id');
 
-        $resource = (new swo())->getResource();
+        $resource = (new Swo())->getResource();
 
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
