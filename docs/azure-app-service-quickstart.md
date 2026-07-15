@@ -95,9 +95,9 @@ Set `SOLARWINDS_TOKEN` in Azure App Service environment so sidecar config can re
 
 ### Setup a sidecar container in Azure App Service
 
-![Deployment Center](docs/images/deployment-center.png "Deployment Center")
+![Deployment Center](images/deployment-center.png "Deployment Center")
 
-![Edit container](docs/images/edit-container.png "Edit container")
+![Edit container](images/edit-container.png "Edit container")
 
 Mount `/home/site/swotel/config.yaml` to `/opt/default-config.yaml` in the sidecar container, and set `SOLARWINDS_TOKEN` in the sidecar environment.
 
