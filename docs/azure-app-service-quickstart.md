@@ -1,25 +1,44 @@
 # Azure App Service Quickstart (PHP + SolarWinds APM)
 
-This guide documents a working setup for running `solarwinds/apm` on Azure App Service for Linux with a SolarWinds OpenTelemetry Collector sidecar.
+This guide describes a working pattern for running `solarwinds/apm` on Azure App Service for Linux with a SolarWinds OpenTelemetry Collector sidecar.
 
-## Why this setup is different on Azure App Service
+## Why this setup is Azure-specific
 
-App Service containers can be replaced during platform operations. Any custom files stored outside `/home` are not guaranteed to persist.
-Store extensions, `.ini` files, and collector config under `/home`.
+App Service containers are replaceable. Files outside `/home` are not guaranteed to persist.
 
-## 1. Regular PHP App Service setup
+Keep these under `/home`:
+
+- extension binaries (`.so`)
+- PHP config files (`.ini`)
+- collector config (`config.yaml`)
+
+## 1. Regular PHP App Service
 
 ### Prerequisites
 
 - Azure App Service for PHP
 - SSH access to the app container
-- `solarwinds/apm` installed in your PHP app's `composer.json`
-- `composer` and `pie` available in container shell (to install C extensions and manage dependencies)
-- App settings access in Azure Portal
+- `solarwinds/apm` added to your app `composer.json`
+- `composer` and `pie` available in the container shell
+- Azure Portal access to App Settings and Sidecars
 
-### Persist extensions under `/home` via ssh
+### Step 1: Install extensions and persist them in `/home`
 
-Install apm_ext and opentelemetry extensions using `pie` command, then copy them to a persistent path. Uninstall the original extensions, and configure PHP to load them from `/home/site/ext`.:
+Install extensions with `pie`, copy them to a persistent directory, then uninstall the package-managed copies:
+
+```bash
+pie install open-telemetry/ext-opentelemetry
+pie install solarwinds/apm_ext
+
+mkdir -p /home/site/ext
+cp "$(php -r "echo ini_get('extension_dir');")/opentelemetry.so" /home/site/ext/
+cp "$(php -r "echo ini_get('extension_dir');")/apm_ext.so" /home/site/ext/
+
+pie uninstall solarwinds/apm_ext
+pie uninstall open-telemetry/ext-opentelemetry
+```
+
+Expected persistent layout:
 
 ```text
 /home/site/ext/
@@ -27,27 +46,16 @@ Install apm_ext and opentelemetry extensions using `pie` command, then copy them
   opentelemetry.so
 ```
 
-Example:
+### Step 2: Create `.ini` files in `/home`
 
-```bash
-pie install open-telemetry/ext-opentelemetry
-pie install solarwinds/apm_ext
-mkdir -p /home/site/ext
-# copy .so files into /home/site/ext
-cp $(php -r "echo ini_get('extension_dir');")/opentelemetry.so /home/site/ext/
-cp $(php -r "echo ini_get('extension_dir');")/apm_ext.so /home/site/ext/
-pie uninstall solarwinds/apm_ext
-pie uninstall open-telemetry/ext-opentelemetry
-```
-
-### Persist `.ini` files under `/home`
+Create:
 
 ```text
 /home/site/ini/apm_ext.ini
 /home/site/ini/opentelemetry.ini
 ```
 
-With absolute paths:
+Use absolute paths:
 
 ```ini
 ; /home/site/ini/apm_ext.ini
@@ -59,51 +67,53 @@ extension=/home/site/ext/apm_ext.so
 extension=/home/site/ext/opentelemetry.so
 ```
 
-### Configure PHP to scan custom ini path
+### Step 3: Include `/home/site/ini` in `PHP_INI_SCAN_DIR`
 
-Set `PHP_INI_SCAN_DIR` in Azure App Service Settings to include `/home/site/ini` (along with the default scan dir).
+In Azure App Settings:
 
 ```text
 PHP_INI_SCAN_DIR=/usr/local/etc/php/conf.d:/home/site/ini
 ```
 
-## 2. Run SolarWinds OTel Collector as sidecar
+## 2. Add SolarWinds OTel Collector sidecar
 
-Run `swotel` collector as an App Service sidecar container.
+### Step 1: Store collector config in `/home`
 
-### Persist collector config under `/home`
+Use the SolarWinds collector [example config](https://github.com/solarwinds/solarwinds-otel-collector-releases/blob/main/examples/integrations/apm/config.yaml) and save it as:
 
-Store the following [configuration](https://github.com/solarwinds/solarwinds-otel-collector-releases/blob/main/examples/integrations/apm/config.yaml) in `/home/site/swotel/config.yaml`:
+```text
+/home/site/swotel/config.yaml
+```
 
-Fill in the `collector_name` and `endpoint` values:
+Set at least:
 
-Example:
 ```yaml
 extensions:
   solarwinds:
-    collector_name: <your-azure-app-azure-collector> # Required parameter
-    grpc: &grpc_settings
-      endpoint: https://otel.collector.na-01.cloud.solarwinds.com:443 # Required parameter
+    collector_name: <your-collector-name>
+    grpc:
+      endpoint: https://otel.collector.na-01.cloud.solarwinds.com:443
       tls:
         insecure: false
       headers: {"Authorization": "Bearer ${env:SOLARWINDS_TOKEN}", "swi-reporter": "otel solarwinds-otel-collector"}
 ```
 
-### Required token for sidecar
+### Step 2: Configure sidecar container
 
-Set `SOLARWINDS_TOKEN` in Azure App Service environment so sidecar config can reference it.
+In Sidecar settings:
 
-### Setup a sidecar container in Azure App Service
+- mount `/home/site/swotel/config.yaml` to `/opt/default-config.yaml`
+- set sidecar env var `SOLARWINDS_TOKEN`
+
+Azure sidecar currently exposes only one port. Use **OTLP/HTTP on 4318**.
 
 ![Deployment Center](images/deployment-center.png "Deployment Center")
 
 ![Edit container](images/edit-container.png "Edit container")
 
-Mount `/home/site/swotel/config.yaml` to `/opt/default-config.yaml` in the sidecar container, and set `SOLARWINDS_TOKEN` in the sidecar environment.
+## 3. App Service environment variables
 
-## 3. Typical app environment variables
-
-Set the usual `apm-php` / OpenTelemetry variables in App Settings, such as:
+Set the application env vars in Azure App Settings:
 
 - `SW_APM_SERVICE_KEY`
 - `SW_APM_COLLECTOR`
@@ -112,27 +122,30 @@ Set the usual `apm-php` / OpenTelemetry variables in App Settings, such as:
 - `OTEL_TRACES_SAMPLER=solarwinds_http`
 - `OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions`
 - `OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=xtrace,xtraceoptionsresponse`
+- `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318`
+- `OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf`
 - `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta`
 - `OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram`
 
+## 4. Restart and validate
 
-## 4. Validation checklist
+After applying settings, restart App Service and verify:
 
-- `php --ri opentelemetry` shows extension loaded.
-- `php --ri apm_ext` shows extension loaded.
-- Swotel collector sidecar is healthy from collector logs.
-- Azure App Service traces appear in SolarWinds Observability.
+- `php --ri opentelemetry` shows extension loaded
+- `php --ri apm_ext` shows extension loaded
+- sidecar logs show healthy collector startup
+- traces appear in SolarWinds Observability
 
-## 5. WordPress setup (Azure App Service image)
+## 5. WordPress variant (stretch goal)
 
-For `appsvc/wordpress-debian-php`, setup is mostly identical, with two differences:
+For `appsvc/wordpress-debian-php`, setup is the same except for two differences:
 
-1. **OpenTelemetry C extension is already included**
-   No manual `opentelemetry.so` installation is needed.
-2. **Instrumentation is injected without modifying WordPress app code**
-   Create a separate Composer project (for example `/home/site/otel`) and preload its autoloader using `auto_prepend_file`.
+1. `opentelemetry` extension is preinstalled in the base image.
+2. Instrumentation is injected without changing WordPress app code.
 
-### Example instrumentation project `composer.json`
+### Step 1: Create a separate instrumentation project
+
+Example `composer.json` (for example under `/home/site/otel`):
 
 ```json
 {
@@ -154,11 +167,11 @@ For `appsvc/wordpress-debian-php`, setup is mostly identical, with two differenc
 }
 ```
 
-### WordPress prepend ini
+### Step 2: Prepend autoloader via ini
 
 ```ini
-; e.g. /home/site/ini/otel-autoload.ini
+; /home/site/ini/otel-autoload.ini
 auto_prepend_file=/home/site/otel/vendor/autoload.php
 ```
 
-Everything else stays the same: persist custom artifacts under `/home`, use `PHP_INI_SCAN_DIR`, run `swotel` sidecar.
+Then keep the same `/home` persistence and sidecar pattern used for the regular PHP setup.
