@@ -85,7 +85,7 @@ Use the SolarWinds collector [example config](https://github.com/solarwinds/sola
 /home/site/swotel/config.yaml
 ```
 
-Set at least:
+Set `collector_name` and `endpoint`:
 
 ```yaml
 extensions:
@@ -103,9 +103,7 @@ extensions:
 In Sidecar settings:
 
 - mount `/home/site/swotel/config.yaml` to `/opt/default-config.yaml`
-- set sidecar env var `SOLARWINDS_TOKEN`
-
-Azure sidecar currently exposes only one port. Use **OTLP/HTTP on 4318**.
+- set sidecar env var `SOLARWINDS_TOKEN` in Azure App Settings and reference it in the sidecar container env var `SOLARWINDS_TOKEN`
 
 ![Deployment Center](images/deployment-center.png "Deployment Center")
 
@@ -117,13 +115,12 @@ Set the application env vars in Azure App Settings:
 
 - `SW_APM_SERVICE_KEY`
 - `SW_APM_COLLECTOR`
+- `SOLARWINDS_TOKEN`
 - `OTEL_SERVICE_NAME`
 - `OTEL_PHP_AUTOLOAD_ENABLED=true`
 - `OTEL_TRACES_SAMPLER=solarwinds_http`
 - `OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions`
 - `OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=xtrace,xtraceoptionsresponse`
-- `OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318`
-- `OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf`
 - `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta`
 - `OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram`
 
@@ -136,14 +133,14 @@ After applying settings, restart App Service and verify:
 - sidecar logs show healthy collector startup
 - traces appear in SolarWinds Observability
 
-## 5. WordPress variant (stretch goal)
+## 5. WordPress variant (Azure App Service for WordPress)
 
 For `appsvc/wordpress-debian-php`, setup is the same except for two differences:
 
 1. `opentelemetry` extension is preinstalled in the base image.
 2. Instrumentation is injected without changing WordPress app code.
 
-### Step 1: Create a separate instrumentation project
+### Step 1: Create a separate instrumentation project and run `composer install` in it.
 
 Example `composer.json` (for example under `/home/site/otel`):
 
