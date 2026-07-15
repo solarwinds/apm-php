@@ -48,12 +48,12 @@ Expected persistent layout:
 
 ### Step 2: Create `.ini` files in `/home`
 
-Create:
+Create the directory and these files:
 
-```text
-/home/site/ini/apm_ext.ini
-/home/site/ini/opentelemetry.ini
-```
+    mkdir -p /home/site/ini
+
+    /home/site/ini/apm_ext.ini
+    /home/site/ini/opentelemetry.ini
 
 Use absolute paths:
 
