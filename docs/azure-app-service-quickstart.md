@@ -92,7 +92,7 @@ extensions:
   solarwinds:
     collector_name: <your-collector-name>
     grpc:
-      endpoint: https://otel.collector.na-01.cloud.solarwinds.com:443
+      endpoint: otel.collector.na-01.cloud.solarwinds.com:443
       tls:
         insecure: false
       headers: {"Authorization": "Bearer ${env:SOLARWINDS_TOKEN}", "swi-reporter": "otel solarwinds-otel-collector"}
