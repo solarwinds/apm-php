@@ -31,8 +31,8 @@ pie install open-telemetry/ext-opentelemetry
 pie install solarwinds/apm_ext
 
 mkdir -p /home/site/ext
-cp "$(php -r "echo ini_get('extension_dir');")/opentelemetry.so" /home/site/ext/
-cp "$(php -r "echo ini_get('extension_dir');")/apm_ext.so" /home/site/ext/
+cp "$(php -r 'echo ini_get("extension_dir");')/opentelemetry.so" /home/site/ext/
+cp "$(php -r 'echo ini_get("extension_dir");')/apm_ext.so" /home/site/ext/
 
 pie uninstall solarwinds/apm_ext
 pie uninstall open-telemetry/ext-opentelemetry
