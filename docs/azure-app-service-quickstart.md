@@ -50,10 +50,12 @@ Expected persistent layout:
 
 Create the directory and these files:
 
-    mkdir -p /home/site/ini
+```text
+mkdir -p /home/site/ini
 
-    /home/site/ini/apm_ext.ini
-    /home/site/ini/opentelemetry.ini
+/home/site/ini/apm_ext.ini
+/home/site/ini/opentelemetry.ini
+```
 
 Use absolute paths:
 
@@ -81,9 +83,11 @@ PHP_INI_SCAN_DIR=/usr/local/etc/php/conf.d:/home/site/ini
 
 Use the SolarWinds collector [example config](https://github.com/solarwinds/solarwinds-otel-collector-releases/blob/main/examples/integrations/apm/config.yaml) and save it as:
 
-    mkdir -p /home/site/swotel
+```text
+mkdir -p /home/site/swotel
 
-    /home/site/swotel/config.yaml
+/home/site/swotel/config.yaml
+```
 
 Set `collector_name` and `endpoint`:
 
