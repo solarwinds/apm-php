@@ -114,7 +114,6 @@ In Sidecar settings:
 Set the application env vars in Azure App Settings:
 
 - `SW_APM_SERVICE_KEY`
-- `SW_APM_COLLECTOR`
 - `SOLARWINDS_TOKEN`
 - `OTEL_SERVICE_NAME`
 - `OTEL_PHP_AUTOLOAD_ENABLED=true`
