@@ -202,6 +202,9 @@ Thanks to all contributors:
 ## Troubleshooting
 For troubleshooting, refer to the [Troubleshooting Guide](./TROUBLESHOOTING.md).
 
+## Azure App Service Deployment
+For Azure App Service deployment, see the [Azure App Service Quickstart](./docs/azure-app-service-quickstart.md).
+
 ## License
 
 Apache-2.0. See [LICENSE](./LICENSE) for details.
