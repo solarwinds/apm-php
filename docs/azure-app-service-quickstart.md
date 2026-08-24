@@ -113,7 +113,7 @@ Now create the sidecar. This can be done in the Azure portal under Deployment Ce
 - Image and tag is `solarwinds/solarwinds-otel-collector:latest`
 - Port is 4318.
 - Environment variables allow access to the `SOLARWINDS_TOKEN` app setting.
-- Volumn mounts path `/home/site/swotel/config.yaml` to the container path `/opt/default-config.yaml` as read-only.
+- Volume mounts path `/home/site/swotel/config.yaml` to the container path `/opt/default-config.yaml` as read-only.
 
 ![Deployment Center](images/deployment-center.png "Deployment Center")
 
