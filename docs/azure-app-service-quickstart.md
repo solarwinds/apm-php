@@ -127,15 +127,6 @@ Set these app setting environment variables to enable the extensions and auto-in
 | PHP_INI_SCAN_DIR  | `/usr/local/etc/php/conf.d:/home/site/ini` based on the [example](#install-the-opentelemetry-and-solarwinds-apm-extensions) extension INI file path. |
 | OTEL_PHP_AUTOLOAD_ENABLED | `true` |
 
-# Restart and validate
-
-After the install, configure and enable steps are done, restart the App Service and verify:
-
-- `php --ri opentelemetry` shows the OpenTelemetry extension loaded.
-- `php --ri apm_ext` shows the SolarWinds APM extension loaded.
-- Sidecar logs show healthy collector startup.
-- After the app handles a few requests, telemetry appear in SolarWinds Observability.
-
 # WordPress App Service
 
 Auto-instrumentation depends on Composer which WordPress does not use. We'll demonstrate using PHP's [auto_prepend_file](https://www.php.net/manual/en/ini.core.php#ini.auto-prepend-file) directive to bootstrap from a separate project that contains the instrumentation dependencies.
@@ -184,4 +175,11 @@ Follow the same steps from [this section](#install-the-opentelemetry-and-solarwi
 
 > [!NOTE] The OpenTelemetry extension is preinstalled in the `appsvc/wordpress-debian-php:8.4` WordPress image. Check with `php --ri opentelemetry`, if present you can skip installing it under `/home`.
 
-Restart and validate.
+# Restart and validate
+
+After the install, configure and enable steps are done, restart the App Service and verify:
+
+- `php --ri opentelemetry` shows the OpenTelemetry extension loaded.
+- `php --ri apm_ext` shows the SolarWinds APM extension loaded.
+- Sidecar logs show healthy collector startup.
+- After the app handles a few requests, telemetry appear in SolarWinds Observability.
