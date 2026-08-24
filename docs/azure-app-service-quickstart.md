@@ -1,6 +1,6 @@
 # Azure App Service Quickstart
 
-This guide describes a working pattern to set up SolarWinds APM for a standard PHP project that uses Composer, and for WordPress on App Service. Only App Service on Linxux is supported.
+This guide describes a working pattern to set up SolarWinds APM for a standard PHP project that uses Composer, and for WordPress on App Service. Only App Service on Linux is supported.
 
 > [!IMPORTANT]
 > In App Service, files outside the `/home` directory are not guaranteed to persist. Keep these under `/home`:
