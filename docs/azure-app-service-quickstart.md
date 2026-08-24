@@ -121,7 +121,7 @@ Now create the sidecar. This can be done in the Azure portal under Deployment Ce
 
 ## Enable
 
-Set these app setting environment variables to enable the extensions and auto-instruemntation:
+Set these app setting environment variables to enable the extensions and auto-instrumentation:
 
 | Name | Value |
 | ---- | ----- |
