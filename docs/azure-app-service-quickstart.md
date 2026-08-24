@@ -39,13 +39,14 @@ composer require solarwinds/apm:^9.0@alpha guzzlehttp/guzzle
 
 For a deployment scenario where build automation is disabled, e.g. deploy via custom container image, your application must include all the installed dependencies in the container or deployable artifact.
 
-### Install the OpenTelemetry and SolarWinds APM extensions
+## Install the OpenTelemetry and SolarWinds APM extensions
 
 Add these extensions under the `/home` directory. The steps below demonstrate one way to do this, see https://learn.microsoft.com/en-us/azure/app-service/configure-language-php?pivots=platform-linux#enable-php-extensions for the full details.
 
-> [!NOTE] The steps below should be performed in an SSH session in the app container.
+> [!NOTE]
+> The steps below should be performed in an SSH session in the app container.
 
-Install extensions with `pie`, then copy them to a persistent directory:
+Install extensions with `pie`, then copy them to `/home/site/wwwroot/bin`:
 
 ```bash
 pie install open-telemetry/ext-opentelemetry
@@ -124,7 +125,7 @@ Set these app setting environment variables to enable the extensions and auto-in
 
 | Name | Value |
 | ---- | ----- |
-| PHP_INI_SCAN_DIR  | `/usr/local/etc/php/conf.d:/home/site/ini` based on the [example](#install-the-opentelemetry-and-solarwinds-apm-extensions) extension INI file path. |
+| PHP_INI_SCAN_DIR  | `/usr/local/etc/php/conf.d:/home/site/ini`. This adds the path used in the [example](#install-the-opentelemetry-and-solarwinds-apm-extensions). |
 | OTEL_PHP_AUTOLOAD_ENABLED | `true` |
 
 # WordPress App Service
@@ -133,9 +134,8 @@ Auto-instrumentation depends on Composer which WordPress does not use. We'll dem
 
 ## Create a separate instrumentation project and install its dependencies
 
-> [!NOTE] The steps below should be performed in an SSH session in the WordPress app container.
-
-Install [Composer](https://getcomposer.org/) if it is not available.
+> [!NOTE]
+> The steps below should be performed in an SSH session in the WordPress app container, and require [Composer](https://getcomposer.org/) to be available.
 
 Create a directory under `/home` (e.g. `/home/site/instrument`) to keep the separate project and add a `composer.json` file with the following content:
 
@@ -173,7 +173,8 @@ echo 'auto_prepend_file=/home/site/instrument/vendor/autoload.php' > /home/site/
 
 Follow the same steps from [this section](#install-the-opentelemetry-and-solarwinds-apm-extensions) onward to complete the rest of the setup.
 
-> [!NOTE] The OpenTelemetry extension is preinstalled in the `appsvc/wordpress-debian-php:8.4` WordPress image. Check with `php --ri opentelemetry`, if present you can skip installing it under `/home`.
+> [!NOTE]
+> The OpenTelemetry extension is preinstalled in the `appsvc/wordpress-debian-php:8.4` WordPress image. Check with `php --ri opentelemetry`, if present you can skip installing it under `/home`.
 
 # Restart and validate
 
