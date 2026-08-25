@@ -177,7 +177,7 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
 ```
 
 ## Example for Azure App Service
-To set up SoarWinds APM in an Azure App Service deployment, see the [Azure App Service Quickstart](./docs/azure-app-service-quickstart.md).
+To set up SolarWinds APM in an Azure App Service deployment, see the [Azure App Service Quickstart](./docs/azure-app-service-quickstart.md).
 
 ## Custom Transaction Name
 
