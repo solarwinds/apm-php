@@ -17,7 +17,7 @@ Before you begin, ensure you have:
 - [PHP 8.1+](https://www.php.net/)
 - [PECL](https://pecl.php.net/)
 - [Composer](https://getcomposer.org/)
-- [pie](https://github.com/php/pie)
+- [PIE](https://github.com/php/pie)
 
 Check your versions:
 ```bash
@@ -100,7 +100,7 @@ Visit [http://localhost:8080/rolldice](http://localhost:8080/rolldice) to test.
 
 ### 2. Add zero-code instrumentation
 
-Install the OpenTelemetry PHP extension ([instructions](https://opentelemetry.io/docs/zero-code/php/#install-the-opentelemetry-extension)) and verify:
+Install the OpenTelemetry PHP extension ([instructions](https://opentelemetry.io/docs/zero-code/php/auto#install-the-opentelemetry-extension)) and verify:
 ```bash
 php --ri opentelemetry
 ```
@@ -176,6 +176,9 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
     php -S localhost:8080
 ```
 
+## Example for Azure App Service
+To set up SolarWinds APM in an Azure App Service deployment, see the [Azure App Service Quickstart](./docs/azure-app-service-quickstart.md).
+
 ## Custom Transaction Name
 
 Set a custom transaction name at the beginning of your application:
@@ -200,6 +203,7 @@ Thanks to all contributors:
 </a>
 
 ## Troubleshooting
+
 For troubleshooting, refer to the [Troubleshooting Guide](./TROUBLESHOOTING.md).
 
 ## License
