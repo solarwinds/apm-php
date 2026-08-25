@@ -183,4 +183,4 @@ After the install, configure and enable steps are done, restart the App Service 
 - `php --ri opentelemetry` shows the OpenTelemetry extension loaded.
 - `php --ri apm_ext` shows the SolarWinds APM extension loaded.
 - Sidecar logs show healthy collector startup.
-- After the app handles a few requests, telemetry appear in SolarWinds Observability.
+- After the app handles a few requests, telemetry appears in SolarWinds Observability.
