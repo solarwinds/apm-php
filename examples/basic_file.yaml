@@ -26,6 +26,17 @@ propagator:
 tracer_provider:
   sampler:
     solarwinds_json:
+      tracing_mode: true
+      trigger_tracing_enabled: true
+      transaction_settings:
+        - tracing: "enabled"
+          regex: "/^.*$/"
+        - tracing: "disabled"
+          regex: "/.*health.*/"
+        - tracing: "disabled"
+          regex: "/.*metrics.*/"
+      path: "/tmp/solarwinds-apm-settings.json"
+
 #    parent_based:
 #      root:
 #        always_on:

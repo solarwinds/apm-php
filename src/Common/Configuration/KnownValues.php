@@ -14,4 +14,5 @@ interface KnownValues
     public const VALUE_XTRACE = 'xtrace';
     public const VALUE_XTRACEOPTIONSRESPONSE = 'xtraceoptionsresponse';
     public const VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE = 'xtrace_options_response';
+    public const VALUE_SAMPLER_SOLARWINDS_JSON_DEFAULT_PATH = '/tmp/solarwinds-apm-settings.json';
 }
