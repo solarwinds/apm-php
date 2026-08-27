@@ -78,7 +78,8 @@
     },
     "spi": {
       "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsHttp"
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsHttp",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsJson"
       ]
     }
   }

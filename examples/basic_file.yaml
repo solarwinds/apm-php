@@ -11,12 +11,12 @@ resource:
       - process:
       - composer:
 
-distribution:
-  solarwinds:
-    agent.serviceKey: "<token>:<service-name>"
-    agent.collector: "apm.collector.cloud.solarwinds.com"
-    agent.logging:
-      level: info
+#distribution:
+#  solarwinds:
+#    agent.serviceKey: "<token>:<service-name>"
+#    agent.collector: "apm.collector.cloud.solarwinds.com"
+#    agent.logging:
+#      level: info
 
 propagator:
   composite:
@@ -25,7 +25,7 @@ propagator:
 
 tracer_provider:
   sampler:
-    solarwinds_http:
+    solarwinds_json:
 #    parent_based:
 #      root:
 #        always_on:
