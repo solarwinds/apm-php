@@ -75,6 +75,11 @@
       "bin-links": false,
       "target-directory": "vendor-bin",
       "forward-command": true
+    },
+    "spi": {
+      "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsHttp"
+      ]
     }
   }
 }

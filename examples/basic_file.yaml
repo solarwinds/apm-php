@@ -1,0 +1,51 @@
+file_format: "1.0-rc.2"
+
+resource:
+  # Read resource attributes from the OTEL_RESOURCE_ATTRIBUTES environment variable.
+  # This aligns well with the OpenTelemetry Operator and other deployment methods.
+  attributes_list: ${OTEL_RESOURCE_ATTRIBUTES}
+  detection/development: # /development properties may not be supported in all SDKs
+    detectors:
+      - service: # will add "service.instance.id" and "service.name" from the OTEL_SERVICE_NAME env var
+      - host:
+      - process:
+      - composer:
+
+distribution:
+  solarwinds:
+    agent.serviceKey: "<token>:<service-name>"
+    agent.collector: "apm.collector.cloud.solarwinds.com"
+    agent.logging:
+      level: info
+
+propagator:
+  composite:
+    - tracecontext:
+    - baggage:
+
+tracer_provider:
+  sampler:
+    solarwinds_http:
+#    parent_based:
+#      root:
+#        always_on:
+  processors:
+    - batch:
+        exporter:
+          console:
+
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          console:
+#instrumentation/development:
+#  java:
+#    solarwinds:
+#    # java specific configs
