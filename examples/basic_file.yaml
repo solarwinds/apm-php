@@ -32,7 +32,9 @@ response_propagator/development:
 
 tracer_provider:
   sampler:
-    solarwinds_json:
+    solarwinds_http:
+      service_key: "<token>:<service-name>"
+      collector: "apm.collector.cloud.solarwinds.com"
       tracing_mode: true
       trigger_tracing_enabled: true
       transaction_settings:
@@ -42,7 +44,18 @@ tracer_provider:
           regex: "/.*health.*/"
         - tracing: "disabled"
           regex: "/.*metrics.*/"
-      path: "/tmp/solarwinds-apm-settings.json"
+
+#    solarwinds_json:
+#      path: "/tmp/solarwinds-apm-settings.json"
+#      tracing_mode: true
+#      trigger_tracing_enabled: true
+#      transaction_settings:
+#        - tracing: "enabled"
+#          regex: "/^.*$/"
+#        - tracing: "disabled"
+#          regex: "/.*health.*/"
+#        - tracing: "disabled"
+#          regex: "/.*metrics.*/"
 
 #    parent_based:
 #      root:

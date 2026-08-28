@@ -37,17 +37,17 @@ final class SamplerSolarwindsJson implements ComponentProvider
         $node = $builder->arrayNode('solarwinds_json');
         $node
             ->children()
-            ->booleanNode('tracing_mode')->defaultTrue()->end()
-            ->booleanNode('trigger_tracing_enabled')->defaultTrue()->end()
-            ->arrayNode('transaction_settings')
-                ->arrayPrototype()
-                    ->children()
-                        ->scalarNode('tracing')->isRequired()->cannotBeEmpty()->validate()->always(SwoValidation::ensureEnabledDisabled())->end()->end()
-                        ->scalarNode('regex')->defaultNull()->validate()->always(Validation::ensureRegexPattern())->end()->end()
+                ->scalarNode('path')->defaultValue(KnownValues::VALUE_SAMPLER_SOLARWINDS_JSON_DEFAULT_PATH)->validate()->always(Validation::ensureString())->end()->end()
+                ->booleanNode('tracing_mode')->defaultTrue()->end()
+                ->booleanNode('trigger_tracing_enabled')->defaultTrue()->end()
+                ->arrayNode('transaction_settings')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('tracing')->isRequired()->cannotBeEmpty()->validate()->always(SwoValidation::ensureEnabledDisabled())->end()->end()
+                            ->scalarNode('regex')->defaultNull()->validate()->always(Validation::ensureRegexPattern())->end()->end()
+                        ->end()
                     ->end()
                 ->end()
-            ->end()
-            ->scalarNode('path')->defaultValue(KnownValues::VALUE_SAMPLER_SOLARWINDS_JSON_DEFAULT_PATH)->validate()->always(Validation::ensureString())->end()->end()
             ->end()
         ;
         return $node;

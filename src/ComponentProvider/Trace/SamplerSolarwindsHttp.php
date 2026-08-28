@@ -8,8 +8,10 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
+use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 use Solarwinds\ApmPhp\ComponentProvider\Validation\Validation as SwoValidation;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -26,7 +28,12 @@ final class SamplerSolarwindsHttp implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        $config = new Configuration(service:'unknown_service', collector:$properties['collector'], token:explode(':', $properties['service_key'], 2)[0], tracingMode: $properties['tracing_mode'], triggerTraceEnabled: $properties['trigger_tracing_enabled'], transactionSettings: $properties['transaction_settings']);
+        $list = $context->getExtension(ResourceInfo::class);
+
+        $config = new Configuration(service:'', collector:$properties['collector'], token:explode(':', $properties['service_key'], 2)[0], tracingMode: $properties['tracing_mode'], triggerTraceEnabled: $properties['trigger_tracing_enabled'], transactionSettings: $properties['transaction_settings']);
+
+
+
         return new HttpSampler($context->meterProvider, $config);
     }
 
@@ -37,7 +44,7 @@ final class SamplerSolarwindsHttp implements ComponentProvider
         $node
             ->children()
                 ->scalarNode('service_key')->isRequired()->cannotBeEmpty()->validate()->always(SwoValidation::ensureServiceKey())->end()->end()
-                ->scalarNode('collector')->defaultValue("apm.collector.na-01.cloud.solarwinds.com")->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('collector')->defaultValue(KnownValues::VALUE_SAMPLER_SOLARWINDS_HTTP_DEFAULT_APM_COLLECTOR)->validate()->always(Validation::ensureString())->end()->end()
                 ->booleanNode('tracing_mode')->defaultTrue()->end()
                 ->booleanNode('trigger_tracing_enabled')->defaultTrue()->end()
                 ->arrayNode('transaction_settings')
