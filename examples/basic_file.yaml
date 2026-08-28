@@ -20,8 +20,15 @@ resource:
 
 propagator:
   composite:
-    - tracecontext:
     - baggage:
+    - tracecontext:
+    - swotracestate:
+    - xtraceoptions:
+
+response_propagator/development:
+  composite:
+    - xtrace:
+    - xtraceoptionsresponse:
 
 tracer_provider:
   sampler:
