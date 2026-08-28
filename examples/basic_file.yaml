@@ -50,6 +50,10 @@ meter_provider:
     - periodic:
         exporter:
           console:
+#          otlp_http:
+#            endpoint: "http://localhost:4318/v1/metrics"
+#            default_histogram_aggregation: "base2_exponential_bucket_histogram"
+#            temporality_preference: "delta"
 
 logger_provider:
   processors:
