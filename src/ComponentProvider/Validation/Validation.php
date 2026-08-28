@@ -31,4 +31,21 @@ final class Validation
             return $value;
         };
     }
+
+    public static function ensureServiceKey(): Closure
+    {
+        return static function (mixed $value): ?string {
+            if ($value === null) {
+                return null;
+            }
+            if (!is_string($value)) {
+                throw new InvalidArgumentException('must be of type string');
+            }
+
+            if (!preg_match('/^([^:]+):([^:]+)$/', $value)) {
+                throw new InvalidArgumentException('must match the service key pattern');
+            }
+            return $value;
+        };
+    }
 }
