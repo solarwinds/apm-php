@@ -32,18 +32,46 @@ response_propagator/development:
 
 tracer_provider:
   sampler:
-    solarwinds_http:
-      service_key: "<token>:<service-name>"
-      collector: "apm.collector.cloud.solarwinds.com"
-      tracing_mode: true
-      trigger_tracing_enabled: true
-      transaction_settings:
-        - tracing: "enabled"
-          regex: "/^.*$/"
-        - tracing: "disabled"
-          regex: "/.*health.*/"
-        - tracing: "disabled"
-          regex: "/.*metrics.*/"
+    parent_based:
+      root:
+        solarwinds_http:
+          service_key: "<token>:<service-name>"
+          collector: "apm.collector.cloud.solarwinds.com"
+          tracing_mode: true
+          trigger_tracing_enabled: true
+          transaction_settings:
+            - tracing: "enabled"
+              regex: "/^.*$/"
+            - tracing: "disabled"
+              regex: "/.*health.*/"
+            - tracing: "disabled"
+              regex: "/.*metrics.*/"
+      remote_parent_sampled:
+        solarwinds_http:
+          service_key: "<token>:<service-name>"
+          collector: "apm.collector.cloud.solarwinds.com"
+          tracing_mode: true
+          trigger_tracing_enabled: true
+          transaction_settings:
+            - tracing: "enabled"
+              regex: "/^.*$/"
+            - tracing: "disabled"
+              regex: "/.*health.*/"
+            - tracing: "disabled"
+              regex: "/.*metrics.*/"
+      remote_parent_not_sampled:
+        solarwinds_http:
+          service_key: "<token>:<service-name>"
+          collector: "apm.collector.cloud.solarwinds.com"
+          tracing_mode: true
+          trigger_tracing_enabled: true
+          transaction_settings:
+            - tracing: "enabled"
+              regex: "/^.*$/"
+            - tracing: "disabled"
+              regex: "/.*health.*/"
+            - tracing: "disabled"
+              regex: "/.*metrics.*/"
 
 #    solarwinds_json:
 #      path: "/tmp/solarwinds-apm-settings.json"
@@ -57,9 +85,6 @@ tracer_provider:
 #        - tracing: "disabled"
 #          regex: "/.*metrics.*/"
 
-#    parent_based:
-#      root:
-#        always_on:
   processors:
     - batch:
         exporter:
@@ -80,7 +105,9 @@ logger_provider:
     - batch:
         exporter:
           console:
-#instrumentation/development:
-#  java:
+#
+instrumentation/development:
+  php:
 #    solarwinds:
-#    # java specific configs
+#      something: true
+     # php specific configs
