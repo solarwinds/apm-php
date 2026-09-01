@@ -78,10 +78,16 @@
     },
     "spi": {
       "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorK8s",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorSwo",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorUams",
+
         "Solarwinds\\ApmPhp\\ComponentProvider\\Propagator\\PropagatorSwoTraceState",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Propagator\\PropagatorXTraceOptions",
+
         "Solarwinds\\ApmPhp\\ComponentProvider\\ResponsePropagator\\ResponsePropagatorXTrace",
         "Solarwinds\\ApmPhp\\ComponentProvider\\ResponsePropagator\\ResponsePropagatorXTraceOptionsResponse",
+
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsHttp",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsJson",
 
