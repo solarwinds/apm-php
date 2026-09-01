@@ -1,0 +1,117 @@
+file_format: "1.0-rc.2"
+
+disabled: ${OTEL_SDK_DISABLED:-false}
+
+resource:
+  attributes:
+    - name: service.name
+      value: ${OTEL_SERVICE_NAME:-unknown_otel_service}
+  # Read resource attributes from the OTEL_RESOURCE_ATTRIBUTES environment variable.
+  # This aligns well with the OpenTelemetry Operator and other deployment methods.
+  attributes_list: ${OTEL_RESOURCE_ATTRIBUTES}
+  detection/development: # /development properties may not be supported in all SDKs
+    detectors:
+      - k8s:
+          pod_namespace: "namespace"
+          pod_uid: "abc123"
+          pod_name: 1234
+      - swo:
+      - uams:
+      - service: # will add "service.instance.id" and "service.name" from the OTEL_SERVICE_NAME env var
+      - host:
+      - process:
+      - composer:
+
+# Sampler is unable to see distribution
+# distribution:
+#  solarwinds:
+#    collector: "abcde"
+##    agent.serviceKey: "<token>:<service-name>"
+##    agent.collector: "apm.collector.cloud.solarwinds.com"
+##    agent.logging:
+##      level: info
+
+propagator:
+  composite:
+    - baggage:
+    - tracecontext:
+    - swotracestate:
+    - xtraceoptions:
+
+response_propagator/development:
+  composite:
+    - xtrace:
+    - xtraceoptionsresponse:
+
+tracer_provider:
+  sampler:
+    parent_based:
+      root:
+        solarwinds_http:
+          service_key: "<token>:<service-name>"
+          collector: "apm.collector.cloud.solarwinds.com"
+          tracing_mode: true
+          trigger_tracing_enabled: true
+          transaction_settings:
+            - tracing: "enabled"
+              regex: "/^.*$/"
+            - tracing: "disabled"
+              regex: "/.*health.*/"
+            - tracing: "disabled"
+              regex: "/.*metrics.*/"
+      remote_parent_sampled:
+        solarwinds_http:
+          service_key: "<token>:<service-name>"
+          collector: "apm.collector.cloud.solarwinds.com"
+          tracing_mode: true
+          trigger_tracing_enabled: true
+          transaction_settings:
+            - tracing: "enabled"
+              regex: "/^.*$/"
+            - tracing: "disabled"
+              regex: "/.*health.*/"
+            - tracing: "disabled"
+              regex: "/.*metrics.*/"
+      remote_parent_not_sampled:
+        solarwinds_http:
+          service_key: "<token>:<service-name>"
+          collector: "apm.collector.cloud.solarwinds.com"
+          tracing_mode: true
+          trigger_tracing_enabled: true
+          transaction_settings:
+            - tracing: "enabled"
+              regex: "/^.*$/"
+            - tracing: "disabled"
+              regex: "/.*health.*/"
+            - tracing: "disabled"
+              regex: "/.*metrics.*/"
+
+  processors:
+    - batch:
+        exporter:
+          console:
+#          otlp_http:
+#            endpoint: "http://localhost:4318/v1/traces"
+
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+#          otlp_http:
+#            endpoint: "http://localhost:4318/v1/metrics"
+#            default_histogram_aggregation: "base2_exponential_bucket_histogram"
+#            temporality_preference: "delta"
+
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          console:
+
+#instrumentation/development:
+#  php:
+#    # this section means to pass fuzz:buzz to solarwinds instrumentation library in opentelemetry-php-contrib.
+#    # Sampler is unable to see instrumentation/development section
+#    solarwinds:
+#      fuzz: "buzz"

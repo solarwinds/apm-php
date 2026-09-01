@@ -12,6 +12,7 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
+use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 
 /**
  * Phan seems to struggle with the variadic arguments in the latest version
@@ -25,7 +26,7 @@ class JsonSampler extends Sampler
     private string $path;
     private ContextInterface $requestContext;
 
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, string $path = '/tmp/solarwinds-apm-settings.json')
+    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, string $path = KnownValues::VALUE_SAMPLER_SOLARWINDS_JSON_DEFAULT_PATH)
     {
         parent::__construct($meterProvider, $config);
         $this->path = $path;
