@@ -1,6 +1,11 @@
 file_format: "1.0-rc.2"
 
+disabled: ${OTEL_SDK_DISABLED:-false}
+
 resource:
+  attributes:
+    - name: service.name
+      value: ${OTEL_SERVICE_NAME:-unknown_otel_service}
   # Read resource attributes from the OTEL_RESOURCE_ATTRIBUTES environment variable.
   # This aligns well with the OpenTelemetry Operator and other deployment methods.
   attributes_list: ${OTEL_RESOURCE_ATTRIBUTES}
@@ -12,13 +17,13 @@ resource:
       - composer:
 
 # Sampler is unable to see distribution
-distribution:
-  solarwinds:
-    collector: "abcde"
-#    agent.serviceKey: "<token>:<service-name>"
-#    agent.collector: "apm.collector.cloud.solarwinds.com"
-#    agent.logging:
-#      level: info
+# distribution:
+#  solarwinds:
+#    collector: "abcde"
+##    agent.serviceKey: "<token>:<service-name>"
+##    agent.collector: "apm.collector.cloud.solarwinds.com"
+##    agent.logging:
+##      level: info
 
 propagator:
   composite:
@@ -98,9 +103,9 @@ logger_provider:
         exporter:
           console:
 
-instrumentation/development:
-  php:
-    # this section means to pass fuzz:buzz to solarwinds instrumentation library in opentelemetry-php-contrib.
-    # Sampler is unable to see instrumentation/development section
-    solarwinds:
-      fuzz: "buzz"
+#instrumentation/development:
+#  php:
+#    # this section means to pass fuzz:buzz to solarwinds instrumentation library in opentelemetry-php-contrib.
+#    # Sampler is unable to see instrumentation/development section
+#    solarwinds:
+#      fuzz: "buzz"
