@@ -83,7 +83,11 @@
         "Solarwinds\\ApmPhp\\ComponentProvider\\ResponsePropagator\\ResponsePropagatorXTrace",
         "Solarwinds\\ApmPhp\\ComponentProvider\\ResponsePropagator\\ResponsePropagatorXTraceOptionsResponse",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsHttp",
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsJson"
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsJson",
+
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Distribution\\DistributionSolarwinds",
+
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Instrumentation\\InstrumentationSolarwinds"
       ]
     }
   }

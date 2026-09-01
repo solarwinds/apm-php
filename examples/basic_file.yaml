@@ -11,8 +11,9 @@ resource:
       - process:
       - composer:
 
-#distribution:
-#  solarwinds:
+distribution:
+  solarwinds:
+    collector: "abcde"
 #    agent.serviceKey: "<token>:<service-name>"
 #    agent.collector: "apm.collector.cloud.solarwinds.com"
 #    agent.logging:
@@ -108,6 +109,6 @@ logger_provider:
 #
 instrumentation/development:
   php:
-#    solarwinds:
-#      something: true
-     # php specific configs
+    # this section means to pass fuzz:buzz to solarwinds instrumentation library in opentelemetry-php-contrib.
+    solarwinds:
+      fuzz: "buzz"
