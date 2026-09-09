@@ -43,6 +43,10 @@ response_propagator/development:
     - xtrace:
     - xtraceoptionsresponse:
 
+exporters:
+  otlp_http: &otlp_http-exporter
+    endpoint: "http://localhost:4318"
+
 tracer_provider:
   sampler:
     parent_based:
@@ -93,8 +97,7 @@ tracer_provider:
     - batch:
         exporter:
           console:
-#          otlp_http:
-#            endpoint: "http://localhost:4318/v1/traces"
+#          otlp_http: *otlp_http-exporter
 
 meter_provider:
   readers:
@@ -102,7 +105,7 @@ meter_provider:
         exporter:
           console:
 #          otlp_http:
-#            endpoint: "http://localhost:4318/v1/metrics"
+#            <<: *otlp_http-exporter
 #            default_histogram_aggregation: "base2_exponential_bucket_histogram"
 #            temporality_preference: "delta"
 
@@ -111,3 +114,4 @@ logger_provider:
     - batch:
         exporter:
           console:
+#          otlp_http: *otlp_http-exporter
