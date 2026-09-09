@@ -11,8 +11,8 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
-use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 use Solarwinds\ApmPhp\ComponentProvider\Validation\Validation as SwoValidation;
+use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -27,7 +27,8 @@ final class SamplerSolarwindsJson implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        $config = new Configuration(service:"", collector:"", token:"", tracingMode: $properties['tracing_mode'], triggerTraceEnabled: $properties['trigger_tracing_enabled'], transactionSettings: $properties['transaction_settings']);
+        $config = new Configuration(service:'', collector:'', token:'', tracingMode: $properties['tracing_mode'], triggerTraceEnabled: $properties['trigger_tracing_enabled'], transactionSettings: $properties['transaction_settings']);
+
         return new JsonSampler($context->meterProvider, $config, $properties['path']);
     }
 
@@ -50,6 +51,7 @@ final class SamplerSolarwindsJson implements ComponentProvider
                 ->end()
             ->end()
         ;
+
         return $node;
     }
 }

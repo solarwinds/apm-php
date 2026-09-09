@@ -28,6 +28,7 @@ final class Validation
             if (!in_array($value, ['enabled', 'disabled'], true)) {
                 throw new InvalidArgumentException('must be either "enabled" or "disabled"');
             }
+
             return $value;
         };
     }
@@ -45,6 +46,7 @@ final class Validation
             if (!preg_match('/^([^:]+):([^:]+)$/', $value)) {
                 throw new InvalidArgumentException('must match the service key pattern');
             }
+
             return $value;
         };
     }

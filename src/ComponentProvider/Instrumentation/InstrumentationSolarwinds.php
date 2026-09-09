@@ -9,9 +9,6 @@ use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\InstrumentationConfiguration;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
-use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use Solarwinds\ApmPhp\ComponentProvider\Validation\Validation as SwoValidation;
-use Solarwinds\ApmPhp\Propagator\SwoTraceState\SwoTraceStatePropagator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 

@@ -24,13 +24,21 @@ final class K8s implements ResourceDetectorInterface
     private const UID_REGEX = '/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/i';
     private string $namespaceFile;
     private string $mountInfoFile;
-
+    private ?string $pod_name;
+    private ?string $pod_uid;
+    private ?string $pod_namespace;
     public function __construct(
+        ?string $pod_name = null,
+        ?string $pod_uid = null,
+        ?string $pod_namespace = null,
         ?string $namespaceFile = null,
         ?string $mountInfoFile = null,
     ) {
         $this->namespaceFile = $namespaceFile ?? (PHP_OS_FAMILY === 'Windows' ? self::NAMESPACE_FILE_WINDOWS : self::NAMESPACE_FILE_LINUX);
         $this->mountInfoFile = $mountInfoFile ?? self::MOUNTINFO_FILE;
+        $this->pod_name = $pod_name;
+        $this->pod_uid = $pod_uid;
+        $this->pod_namespace = $pod_namespace;
     }
 
     /**
@@ -72,6 +80,12 @@ final class K8s implements ResourceDetectorInterface
             return $env;
         }
 
+        if ($this->pod_name !== null) {
+            $this->logDebug('Read pod name from configuration');
+
+            return $this->pod_name;
+        }
+
         return php_uname('n');
     }
 
@@ -82,6 +96,12 @@ final class K8s implements ResourceDetectorInterface
             $this->logDebug('Read pod UID from environment variable');
 
             return $env;
+        }
+
+        if ($this->pod_uid !== null) {
+            $this->logDebug('Read pod UID from configuration');
+
+            return $this->pod_uid;
         }
 
         if (PHP_OS_FAMILY === 'Windows') {
@@ -139,6 +159,13 @@ final class K8s implements ResourceDetectorInterface
 
             return $env;
         }
+
+        if ($this->pod_namespace !== null) {
+            $this->logDebug('Read pod namespace from configuration');
+
+            return $this->pod_namespace;
+        }
+
         if (!file_exists($this->namespaceFile)) {
             $this->logDebug('Namespace file not found');
 
