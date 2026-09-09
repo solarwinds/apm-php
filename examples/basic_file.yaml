@@ -47,48 +47,29 @@ exporters:
   otlp_http: &otlp_http-exporter
     endpoint: "http://localhost:4318"
 
+samplers:
+  solarwinds_http: &solarwinds_http-sampler
+    service_key: "<token>:<service-name>"
+    collector: "apm.collector.na-01.cloud.solarwinds.com"
+    tracing_mode: true
+    trigger_tracing_enabled: true
+    transaction_settings:
+      - tracing: "enabled"
+        regex: "/^.*$/"
+      - tracing: "disabled"
+        regex: "/.*health.*/"
+      - tracing: "disabled"
+        regex: "/.*metrics.*/"
+
 tracer_provider:
   sampler:
     parent_based:
       root:
-        solarwinds_http:
-          service_key: "<token>:<service-name>"
-          collector: "apm.collector.na-01.cloud.solarwinds.com"
-          tracing_mode: true
-          trigger_tracing_enabled: true
-          transaction_settings:
-            - tracing: "enabled"
-              regex: "/^.*$/"
-            - tracing: "disabled"
-              regex: "/.*health.*/"
-            - tracing: "disabled"
-              regex: "/.*metrics.*/"
+        solarwinds_http: *solarwinds_http-sampler
       remote_parent_sampled:
-        solarwinds_http:
-          service_key: "<token>:<service-name>"
-          collector: "apm.collector.na-01.cloud.solarwinds.com"
-          tracing_mode: true
-          trigger_tracing_enabled: true
-          transaction_settings:
-            - tracing: "enabled"
-              regex: "/^.*$/"
-            - tracing: "disabled"
-              regex: "/.*health.*/"
-            - tracing: "disabled"
-              regex: "/.*metrics.*/"
+        solarwinds_http: *solarwinds_http-sampler
       remote_parent_not_sampled:
-        solarwinds_http:
-          service_key: "<token>:<service-name>"
-          collector: "apm.collector.na-01.cloud.solarwinds.com"
-          tracing_mode: true
-          trigger_tracing_enabled: true
-          transaction_settings:
-            - tracing: "enabled"
-              regex: "/^.*$/"
-            - tracing: "disabled"
-              regex: "/.*health.*/"
-            - tracing: "disabled"
-              regex: "/.*metrics.*/"
+        solarwinds_http: *solarwinds_http-sampler
 
   processors:
     - transaction_name:
