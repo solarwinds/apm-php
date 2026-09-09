@@ -87,6 +87,9 @@ tracer_provider:
               regex: "/.*metrics.*/"
 
   processors:
+    - transaction_name:
+        name: "I-am-transaction-name"
+    - response_time:
     - batch:
         exporter:
           console:
