@@ -94,8 +94,6 @@
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorTransactionName",
 
         "Solarwinds\\ApmPhp\\ComponentProvider\\Distribution\\DistributionSolarwinds",
-
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Instrumentation\\InstrumentationSolarwinds"
       ]
     }
   }
