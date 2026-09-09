@@ -26,19 +26,19 @@ final class K8s implements ResourceDetectorInterface
     private string $mountInfoFile;
     private ?string $pod_name;
     private ?string $pod_uid;
-    private ?string $pod_namespace;
+    private ?string $namespace;
     public function __construct(
+        ?string $namespace = null,
         ?string $pod_name = null,
         ?string $pod_uid = null,
-        ?string $pod_namespace = null,
         ?string $namespaceFile = null,
         ?string $mountInfoFile = null,
     ) {
         $this->namespaceFile = $namespaceFile ?? (PHP_OS_FAMILY === 'Windows' ? self::NAMESPACE_FILE_WINDOWS : self::NAMESPACE_FILE_LINUX);
         $this->mountInfoFile = $mountInfoFile ?? self::MOUNTINFO_FILE;
+        $this->namespace = $namespace;
         $this->pod_name = $pod_name;
         $this->pod_uid = $pod_uid;
-        $this->pod_namespace = $pod_namespace;
     }
 
     /**
@@ -160,10 +160,10 @@ final class K8s implements ResourceDetectorInterface
             return $env;
         }
 
-        if ($this->pod_namespace !== null) {
+        if ($this->namespace !== null) {
             $this->logDebug('Read pod namespace from configuration');
 
-            return $this->pod_namespace;
+            return $this->namespace;
         }
 
         if (!file_exists($this->namespaceFile)) {

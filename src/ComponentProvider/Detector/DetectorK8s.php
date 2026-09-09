@@ -26,7 +26,7 @@ final class DetectorK8s implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): ResourceDetectorInterface
     {
-        return new K8s(pod_name: $properties['pod_name'] ?? null, pod_uid: $properties['pod_uid'] ?? null, pod_namespace: $properties['pod_namespace'] ?? null, namespaceFile: null, mountInfoFile: null);
+        return new K8s(pod_name: $properties['pod_name'] ?? null, pod_uid: $properties['pod_uid'] ?? null, namespace: $properties['namespace'] ?? null, namespaceFile: null, mountInfoFile: null);
     }
 
     #[\Override]
@@ -35,7 +35,7 @@ final class DetectorK8s implements ComponentProvider
         $node = $builder->arrayNode('k8s');
         $node
             ->children()
-                ->scalarNode('pod_namespace')->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('namespace')->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('pod_uid')->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('pod_name')->validate()->always(Validation::ensureString())->end()->end()
             ->end()
