@@ -93,7 +93,7 @@
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorResponseTime",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorTransactionName",
 
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Distribution\\DistributionSolarwinds",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Distribution\\DistributionSolarwinds"
       ]
     }
   }

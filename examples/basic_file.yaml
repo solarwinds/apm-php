@@ -111,10 +111,3 @@ logger_provider:
     - batch:
         exporter:
           console:
-
-#instrumentation/development:
-#  php:
-#    # this section means to pass fuzz:buzz to solarwinds instrumentation library in opentelemetry-php-contrib.
-#    # Sampler is unable to see instrumentation/development section
-#    solarwinds:
-#      fuzz: "buzz"
