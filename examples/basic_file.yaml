@@ -49,7 +49,7 @@ tracer_provider:
       root:
         solarwinds_http:
           service_key: "<token>:<service-name>"
-          collector: "apm.collector.cloud.solarwinds.com"
+          collector: "apm.collector.na-01.cloud.solarwinds.com"
           tracing_mode: true
           trigger_tracing_enabled: true
           transaction_settings:
@@ -62,7 +62,7 @@ tracer_provider:
       remote_parent_sampled:
         solarwinds_http:
           service_key: "<token>:<service-name>"
-          collector: "apm.collector.cloud.solarwinds.com"
+          collector: "apm.collector.na-01.cloud.solarwinds.com"
           tracing_mode: true
           trigger_tracing_enabled: true
           transaction_settings:
@@ -75,7 +75,7 @@ tracer_provider:
       remote_parent_not_sampled:
         solarwinds_http:
           service_key: "<token>:<service-name>"
-          collector: "apm.collector.cloud.solarwinds.com"
+          collector: "apm.collector.na-01.cloud.solarwinds.com"
           tracing_mode: true
           trigger_tracing_enabled: true
           transaction_settings:
