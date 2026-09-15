@@ -5,51 +5,56 @@ disabled: ${OTEL_SDK_DISABLED:-false}
 resource:
   attributes:
     - name: service.name
-      value: ${OTEL_SERVICE_NAME:-unknown_otel_service}
-  # Read resource attributes from the OTEL_RESOURCE_ATTRIBUTES environment variable.
-  # This aligns well with the OpenTelemetry Operator and other deployment methods.
+      value: php-basic-file
   attributes_list: ${OTEL_RESOURCE_ATTRIBUTES}
   detection/development: # /development properties may not be supported in all SDKs
     detectors:
-      - composer:
-      - host:
-      - process:
-      - k8s:
-#          namespace: "namespace"
-#          pod_uid: "abc123"
-#          pod_name: "1234"
-      - swo:
-      - uams:
-      - service: # will add "service.instance.id" and "service.name" from the OTEL_SERVICE_NAME env var
-
-# Sampler is unable to see distribution
-# distribution:
-#  solarwinds:
-#    collector: "abcde"
-##    agent.serviceKey: "<token>:<service-name>"
-##    agent.collector: "apm.collector.cloud.solarwinds.com"
-##    agent.logging:
-##      level: info
+      - composer:        # from otel
+      - host:            # from otel
+      - process:         # from otel
+      - k8s:             # swo k8s detector
+          namespace: "k8s-namespace"
+          pod_uid: "k8s-uid"
+          pod_name: "k8s-name"
+      - swo:             # swo SW_APM_SERVICE_KEY detector
+      - uams:            # uams client detector
+      - service:         # from otel
 
 propagator:
   composite:
-    - baggage:
-    - tracecontext:
-    - swotracestate:
-    - xtraceoptions:
+    - baggage:           # from otel
+    - tracecontext:      # from otel
+    - swotracestate:     # swo trace state propagator
+    - xtraceoptions:     # swo xtrace options propagator
 
 response_propagator/development:
   composite:
-    - xtrace:
-    - xtraceoptionsresponse:
+    - xtrace:            # swo xtrace response
+    - xtraceoptionsresponse: # swo xtrace options response
 
+# Define exporter for reference later
 exporters:
-  otlp_http: &otlp_http-exporter
-    endpoint: "http://localhost:4318"
+  otlp_http/traces: &traces-exporter
+    endpoint: "https://otel.collector.na-01.cloud.solarwinds.com:443/v1/traces"
+    headers:
+      - name: "Authorization"
+        value: "Bearer <token>"
+  otlp_http/metrics: &metrics-exporter
+    endpoint: "https://otel.collector.na-01.cloud.solarwinds.com:443/v1/metrics"
+    headers:
+      - name: "Authorization"
+        value: "Bearer <token>"
+  otlp_http/logs: &logs-exporter
+    endpoint: "https://otel.collector.na-01.cloud.solarwinds.com:443/v1/logs"
+    headers:
+      - name: "Authorization"
+        value: "Bearer <token>"
+    # endpoint: "http://localhost:4318"
 
+# Define sampler for reference later
 samplers:
   solarwinds_http: &solarwinds_http-sampler
-    service_key: "<token>:<service-name>"
+    service_key: "<token>:php-basic-file"
     collector: "apm.collector.na-01.cloud.solarwinds.com"
     tracing_mode: true
     trigger_tracing_enabled: true
@@ -72,27 +77,27 @@ tracer_provider:
         solarwinds_http: *solarwinds_http-sampler
 
   processors:
-    - transaction_name:
-        name: "I-am-transaction-name"
-    - response_time:
+    - transaction_name:        # swo transaction name span processor
+        name: "I-am-transaction"
+    - response_time:           # swo response time span processor
     - batch:
         exporter:
-          console:
-#          otlp_http: *otlp_http-exporter
+          otlp_http: *traces-exporter
+          # console:
 
 meter_provider:
   readers:
     - periodic:
         exporter:
-          console:
-#          otlp_http:
-#            <<: *otlp_http-exporter
-#            default_histogram_aggregation: "base2_exponential_bucket_histogram"
-#            temporality_preference: "delta"
+          otlp_http:
+            <<: *metrics-exporter
+            default_histogram_aggregation: "base2_exponential_bucket_histogram"
+            temporality_preference: "delta"
+          # console:
 
 logger_provider:
   processors:
     - batch:
         exporter:
-          console:
-#          otlp_http: *otlp_http-exporter
+          otlp_http: *logs-exporter
+          # console:
