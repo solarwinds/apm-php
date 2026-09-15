@@ -20,6 +20,7 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SemConv\Attributes\ServiceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
+use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
@@ -31,7 +32,6 @@ class SwoSamplerFactory
     private const SOLARWINDS_PREFIX = 'solarwinds';
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
     private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
-    private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
     private const SERVICE_KEY_DELIMITER = ':';
     private const SERVICE_KEY_PATTERN = '/^([^:]+):([^:]+)$/';
     private ResourceInfo $resource;
@@ -51,7 +51,7 @@ class SwoSamplerFactory
         $collector = $isHttp
             ? (Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
                 ? Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR)
-                : self::DEFAULT_APM_COLLECTOR)
+                : KnownValues::VALUE_SAMPLER_SOLARWINDS_HTTP_DEFAULT_APM_COLLECTOR)
             : '';
         $token = '';
         if ($isHttp && $serviceKey) {
