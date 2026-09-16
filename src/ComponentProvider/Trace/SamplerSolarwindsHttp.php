@@ -42,12 +42,6 @@ final class SamplerSolarwindsHttp implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        //        $n = $builder->arrayNode('distribution');
-        //        $n->children()
-        //            ->scalarNode('collector')->isRequired()->cannotBeEmpty()->validate()->always(Validation::ensureString())->end()->end()
-        //            ->end()
-        //            ;
-        //        return $n;
         $node = $builder->arrayNode('solarwinds_http');
         $node
             ->children()
