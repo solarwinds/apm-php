@@ -8,25 +8,24 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
-use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
-
 use Solarwinds\ApmPhp\Resource\Detectors\K8s;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * @implements ComponentProvider<ResourceDetectorInterface>
+ * @implements ComponentProvider<mixed>
  */
 final class DetectorK8s implements ComponentProvider
 {
     /**
-     * @param array{} $properties
-     * @return ResourceDetectorInterface
+     * @param array $properties
+     * @param Context $context
+     * @return mixed
      */
     #[\Override]
-    public function createPlugin(array $properties, Context $context): ResourceDetectorInterface
+    public function createPlugin(array $properties, Context $context): mixed
     {
-        return new K8s(pod_name: $properties['pod_name'] ?? null, pod_uid: $properties['pod_uid'] ?? null, namespace: $properties['namespace'] ?? null, namespaceFile: null, mountInfoFile: null);
+        return new K8s(namespace: $properties['namespace'] ?? null, pod_name: $properties['pod_name'] ?? null, pod_uid: $properties['pod_uid'] ?? null, namespaceFile: null, mountInfoFile: null);
     }
 
     #[\Override]
