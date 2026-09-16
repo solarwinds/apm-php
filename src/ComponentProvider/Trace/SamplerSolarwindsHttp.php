@@ -8,12 +8,10 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
-use OpenTelemetry\SDK\Common\Distribution\DistributionRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
-use Solarwinds\ApmPhp\Common\Distribution\ApmPhpDistribution;
 use Solarwinds\ApmPhp\ComponentProvider\Validation\Validation as SwoValidation;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -30,14 +28,6 @@ final class SamplerSolarwindsHttp implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        // Unable to do that as the properties here only contains the child of solarwinds_http
-        //        $distributionProperties = new DistributionRegistry();
-        //        foreach ($properties['distribution'] as $distributionConfiguration) {
-        //            $distributionProperties->add($distributionConfiguration->create($context));
-        //        }
-        //
-        //        $distributionConfiguration = $distributionProperties->getDistributionConfiguration(ApmPhpDistribution::class) ?? new ApmPhpDistribution();
-
         $service_key = $properties['service_key'];
         $arr = explode(':', (string) $service_key, 2);
         $token = $arr[0];

@@ -91,9 +91,7 @@
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsHttp",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsJson",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorResponseTime",
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorTransactionName",
-
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Distribution\\DistributionSolarwinds"
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorTransactionName"
       ]
     }
   }
