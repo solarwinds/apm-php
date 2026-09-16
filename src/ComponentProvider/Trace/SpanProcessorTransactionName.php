@@ -35,6 +35,7 @@ final class SpanProcessorTransactionName implements ComponentProvider
             ->scalarNode('name')->validate()->always(Validation::ensureString())->end()->end()
             ->end()
         ;
+
         return $node;
     }
 }
