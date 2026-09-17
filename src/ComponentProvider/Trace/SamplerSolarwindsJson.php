@@ -30,9 +30,9 @@ final class SamplerSolarwindsJson implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        $config = new Configuration(service:'', collector:'', token:'', tracingMode: $properties['tracing_mode'], triggerTraceEnabled: $properties['trigger_tracing_enabled'], transactionSettings: $properties['transaction_settings']);
+        $config = new Configuration(service:'', collector:'', token:'', tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
 
-        return new JsonSampler($context->meterProvider, $config, $properties['path']);
+        return new JsonSampler($context->meterProvider, $config, $properties['path'] ?? KnownValues::VALUE_SAMPLER_SOLARWINDS_JSON_DEFAULT_PATH);
     }
 
     #[\Override]

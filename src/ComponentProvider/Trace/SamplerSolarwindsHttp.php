@@ -32,12 +32,19 @@ final class SamplerSolarwindsHttp implements ComponentProvider
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
         $service_key = $properties['service_key'] ?? null;
-        $arr = explode(':', (string) $service_key, 2);
-        $token = $arr[0];
-        $service_name = $arr[1];
+        $token = "";
+        $service_name = null;
+        if (is_string($service_key)) {
+            $arr = explode(':', (string) $service_key, 2);
+            $token = $arr[0];
+            $service_name = $arr[1];
+        }
         $list = $context->getExtension(ResourceInfo::class);
-        $service_name_from_resource = $list->getAttributes()->get('service.name');
-        $config = new Configuration(service:$service_name_from_resource??$service_name??'unknown_service:php', collector:'https://' . $properties['collector'], token:$token, tracingMode: $properties['tracing_mode'], triggerTraceEnabled: $properties['trigger_tracing_enabled'], transactionSettings: $properties['transaction_settings']);
+        $service_name_from_resource = null;
+        if ($list instanceof ResourceInfo) {
+            $service_name_from_resource = $list->getAttributes()->get('service.name');
+        }
+        $config = new Configuration(service:$service_name_from_resource??$service_name??'unknown_service:php', collector:'https://' . ($properties['collector'] ?? KnownValues::VALUE_SAMPLER_SOLARWINDS_HTTP_DEFAULT_APM_COLLECTOR), token:$token, tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
 
         return new HttpSampler($context->meterProvider, $config);
     }
