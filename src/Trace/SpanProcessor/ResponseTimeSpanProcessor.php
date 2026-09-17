@@ -9,7 +9,7 @@ use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
-use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;

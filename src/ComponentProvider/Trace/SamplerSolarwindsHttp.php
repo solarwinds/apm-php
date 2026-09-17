@@ -24,6 +24,8 @@ final class SamplerSolarwindsHttp implements ComponentProvider
 {
     /**
      * @param array{} $properties
+     * @param Context $context
+     * @return SamplerInterface
      */
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface

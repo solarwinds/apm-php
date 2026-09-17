@@ -7,7 +7,6 @@ namespace Solarwinds\ApmPhp\ComponentProvider\Validation;
 use Closure;
 use InvalidArgumentException;
 use function is_string;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
  * Provides validation closures for {@see NodeDefinition}s.

@@ -18,6 +18,9 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class SpanProcessorResponseTime implements ComponentProvider
 {
     /**
+     * @param array{} $properties
+     * @param Context $context
+     * @return SpanProcessorInterface
      */
     #[\Override]
     public function createPlugin(array $properties, Context $context): SpanProcessorInterface

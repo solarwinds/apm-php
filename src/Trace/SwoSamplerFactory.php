@@ -10,7 +10,7 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
-use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;

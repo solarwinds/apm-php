@@ -19,11 +19,14 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class SpanProcessorTransactionName implements ComponentProvider
 {
     /**
+     * @param array{} $properties
+     * @param Context $context
+     * @return SpanProcessorInterface
      */
     #[\Override]
     public function createPlugin(array $properties, Context $context): SpanProcessorInterface
     {
-        return TransactionNameSpanProcessor::getInstance($properties['name']);
+        return TransactionNameSpanProcessor::getInstance(isset($properties['name']) ? $properties['name'] : null);
     }
 
     #[\Override]

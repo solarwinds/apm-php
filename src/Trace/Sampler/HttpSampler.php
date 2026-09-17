@@ -11,7 +11,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
-use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;

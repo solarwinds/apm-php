@@ -7,22 +7,23 @@ namespace Solarwinds\ApmPhp\ComponentProvider\Detector;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use Solarwinds\ApmPhp\Resource\Detectors\Uams;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * @implements ComponentProvider<mixed>
+ * @implements ComponentProvider<ResourceDetectorInterface>
  */
 final class DetectorUams implements ComponentProvider
 {
     /**
      * @param array{} $properties
      * @param Context $context
-     * @return mixed
+     * @return ResourceDetectorInterface
      */
     #[\Override]
-    public function createPlugin(array $properties, Context $context): mixed
+    public function createPlugin(array $properties, Context $context): ResourceDetectorInterface
     {
         return new Uams();
     }

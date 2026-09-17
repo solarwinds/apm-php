@@ -20,6 +20,8 @@ final class PropagatorSwoTraceState implements ComponentProvider
 {
     /**
      * @param array{} $properties
+     * @param Context $context
+     * @return TextMapPropagatorInterface
      */
     #[\Override]
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface

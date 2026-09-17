@@ -19,6 +19,8 @@ final class ResponsePropagatorXTraceOptionsResponse implements ComponentProvider
 {
     /**
      * @param array{} $properties
+     * @param Context $context
+     * @return ResponsePropagatorInterface
      */
     #[\Override]
     public function createPlugin(array $properties, Context $context): ResponsePropagatorInterface
