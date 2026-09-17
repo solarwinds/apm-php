@@ -191,10 +191,8 @@ class SamplerTest extends TestCase
             'flags' => 'OVERRIDE',
         ]);
         $this->AssertNotNull($result);
-        if ($result !== null) {
-            $this->assertArrayHasKey('settings', $result);
-            $this->assertInstanceOf(Settings::class, $result['settings']);
-        }
+        $this->assertArrayHasKey('settings', $result);
+        $this->assertInstanceOf(Settings::class, $result['settings']);
     }
 
     public function test_respects_enabled_settings_when_no_config_or_transaction_settings(): void

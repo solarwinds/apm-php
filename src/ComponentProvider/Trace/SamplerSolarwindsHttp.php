@@ -35,7 +35,7 @@ final class SamplerSolarwindsHttp implements ComponentProvider
         $token = '';
         $service_name = null;
         if (is_string($service_key)) {
-            $arr = explode(':', (string) $service_key, 2);
+            $arr = explode(':', $service_key, 2);
             $token = $arr[0];
             $service_name = $arr[1];
         }
