@@ -32,7 +32,7 @@ final class SamplerSolarwindsHttp implements ComponentProvider
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
         $service_key = $properties['service_key'] ?? null;
-        $token = "";
+        $token = '';
         $service_name = null;
         if (is_string($service_key)) {
             $arr = explode(':', (string) $service_key, 2);
