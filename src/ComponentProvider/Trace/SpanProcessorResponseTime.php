@@ -18,6 +18,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class SpanProcessorResponseTime implements ComponentProvider
 {
     /**
+     * @phan-suppress PhanParamSignatureMismatch
      * @param array{} $properties
      * @param Context $context
      * @return SpanProcessorInterface

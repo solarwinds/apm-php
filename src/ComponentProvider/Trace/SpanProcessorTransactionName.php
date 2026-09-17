@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class SpanProcessorTransactionName implements ComponentProvider
 {
     /**
+     * @phan-suppress PhanParamSignatureMismatch
      * @param array{} $properties
      * @param Context $context
      * @return SpanProcessorInterface
@@ -26,7 +27,7 @@ final class SpanProcessorTransactionName implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SpanProcessorInterface
     {
-        return TransactionNameSpanProcessor::getInstance(isset($properties['name']) ? $properties['name'] : null);
+        return TransactionNameSpanProcessor::getInstance($properties['name'] ?? null);
     }
 
     #[\Override]

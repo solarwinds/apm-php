@@ -18,6 +18,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class ResponsePropagatorXTraceOptionsResponse implements ComponentProvider
 {
     /**
+     * @phan-suppress PhanParamSignatureMismatch
      * @param array{} $properties
      * @param Context $context
      * @return ResponsePropagatorInterface

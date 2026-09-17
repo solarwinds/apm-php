@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class PropagatorXTraceOptions implements ComponentProvider
 {
     /**
+     * @phan-suppress PhanParamSignatureMismatch
      * @param array{} $properties
      * @param Context $context
      * @return TextMapPropagatorInterface

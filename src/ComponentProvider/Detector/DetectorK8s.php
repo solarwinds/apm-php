@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class DetectorK8s implements ComponentProvider
 {
     /**
+     * @phan-suppress PhanParamSignatureMismatch
      * @param array $properties
      * @param Context $context
      * @return ResourceDetectorInterface

@@ -22,7 +22,10 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class SamplerSolarwindsJson implements ComponentProvider
 {
     /**
+     * @phan-suppress PhanParamSignatureMismatch
      * @param array{} $properties
+     * @param Context $context
+     * @return SamplerInterface
      */
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface

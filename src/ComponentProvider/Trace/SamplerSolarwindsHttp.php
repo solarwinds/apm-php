@@ -23,6 +23,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class SamplerSolarwindsHttp implements ComponentProvider
 {
     /**
+     * @phan-suppress PhanParamSignatureMismatch
      * @param array{} $properties
      * @param Context $context
      * @return SamplerInterface
@@ -30,7 +31,7 @@ final class SamplerSolarwindsHttp implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        $service_key = $properties['service_key'];
+        $service_key = $properties['service_key'] ?? null;
         $arr = explode(':', (string) $service_key, 2);
         $token = $arr[0];
         $service_name = $arr[1];
