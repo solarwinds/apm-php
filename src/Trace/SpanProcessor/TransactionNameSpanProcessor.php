@@ -25,9 +25,9 @@ class TransactionNameSpanProcessor extends NoopSpanProcessor implements SpanProc
     private static ?SpanProcessorInterface $instance = null;
     private ?string $envTransactionName;
 
-    public function __construct()
+    public function __construct(?string $name = null)
     {
-        $this->envTransactionName = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_NAME) ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_NAME) : null;
+        $this->envTransactionName = Configuration::has(SolarwindsEnv::SW_APM_TRANSACTION_NAME) ? Configuration::getString(SolarwindsEnv::SW_APM_TRANSACTION_NAME) : $name ?? null;
 
         $this->pool = new TransactionNamePool(
             self::TRANSACTION_NAME_POOL_MAX,
@@ -36,10 +36,10 @@ class TransactionNameSpanProcessor extends NoopSpanProcessor implements SpanProc
             self::TRANSACTION_NAME_DEFAULT
         );
     }
-    public static function getInstance(): SpanProcessorInterface
+    public static function getInstance(?string $name = null): SpanProcessorInterface
     {
         if (null === self::$instance) {
-            self::$instance = new self();
+            self::$instance = new self($name);
         }
 
         return self::$instance;
