@@ -38,9 +38,9 @@
     "open-telemetry/dev-tools": "^0.2",
     "phpspec/prophecy": "^1.22",
     "phpspec/prophecy-phpunit": "^2",
-    "phpstan/phpstan": "^1.12",
-    "phpstan/phpstan-mockery": "^1.1",
-    "phpstan/phpstan-phpunit": "^1.4",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-mockery": "^2.0",
+    "phpstan/phpstan-phpunit": "^2.0",
     "phpunit/phpunit": "^10 || ^11",
     "ramsey/uuid": "^3.0 || ^4.0"
   },
@@ -75,6 +75,24 @@
       "bin-links": false,
       "target-directory": "vendor-bin",
       "forward-command": true
+    },
+    "spi": {
+      "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorK8s",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorSwo",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorUams",
+
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Propagator\\PropagatorSwoTraceState",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Propagator\\PropagatorXTraceOptions",
+
+        "Solarwinds\\ApmPhp\\ComponentProvider\\ResponsePropagator\\ResponsePropagatorXTrace",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\ResponsePropagator\\ResponsePropagatorXTraceOptionsResponse",
+
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsHttp",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSolarwindsJson",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorResponseTime",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorTransactionName"
+      ]
     }
   }
 }
