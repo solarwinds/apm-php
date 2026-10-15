@@ -63,7 +63,7 @@ final class SamplerSolarwindsHttp implements ComponentProvider
                     ->arrayPrototype()
                         ->children()
                             ->scalarNode('tracing')->isRequired()->cannotBeEmpty()->validate()->always(SwoValidation::ensureEnabledDisabled())->end()->end()
-                            ->scalarNode('regex')->defaultNull()->validate()->always(Validation::ensureRegexPattern())->end()->end()
+                            ->scalarNode('regex')->isRequired()->cannotBeEmpty()->validate()->always(Validation::ensureRegexPattern())->end()->end()
                         ->end()
                     ->end()
                 ->end()
