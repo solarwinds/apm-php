@@ -22,8 +22,8 @@ $child1 = $tracer->spanBuilder('GET /posts/:id')
     ->setSpanKind(SpanKind::KIND_SERVER)
     ->startSpan();
 $child1Scope = $child1->activate();
-$child1->setAttribute('http.method"', 'GET');
-$child1->setAttribute('http.route"', '/posts/:id');
+$child1->setAttribute('http.method', 'GET');
+$child1->setAttribute('http.route', '/posts/:id');
 $child1->setAttribute('http.url', 'http://localhost:8080/posts/123');
 $child1->setAttribute('http.status_code', 200);
 
