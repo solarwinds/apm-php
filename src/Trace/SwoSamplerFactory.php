@@ -22,8 +22,8 @@ use OpenTelemetry\SemConv\Attributes\ServiceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
 use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
-use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
-use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\SwoHttpSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\SwoJsonSampler;
 
 class SwoSamplerFactory
 {
@@ -127,9 +127,8 @@ class SwoSamplerFactory
                                 : null;
                             if ($serviceKey && preg_match(self::SERVICE_KEY_PATTERN, $serviceKey)) {
                                 $configuration = $this->getSolarwindsConfiguration(true, $serviceKey);
-                                $http = new HttpSampler($meterProvider, $configuration);
 
-                                return new ParentBased($http, $http, $http);
+                                return new SwoHttpSampler($meterProvider, $configuration);
                             }
                             self::logWarning('SW_APM_SERVICE_KEY is not correctly formatted. Falling back to AlwaysOffSampler.');
 
@@ -142,9 +141,8 @@ class SwoSamplerFactory
                     }
                 case self::VALUE_SOLARWINDS_JSON:
                     $configuration = $this->getSolarwindsConfiguration(false);
-                    $json = new JsonSampler($meterProvider, $configuration);
 
-                    return new ParentBased($json, $json, $json);
+                    return new SwoJsonSampler($meterProvider, $configuration);
             }
         }
 
