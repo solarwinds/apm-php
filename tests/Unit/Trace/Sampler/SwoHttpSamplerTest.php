@@ -30,7 +30,7 @@ class SwoHttpSamplerTest extends TestCase
             requestFactory: $this->createMock(RequestFactoryInterface::class),
         );
 
-        $this->assertSame('ParentBased+HTTP Sampler (collector.test)', $sampler->getDescription());
+        $this->assertSame('ParentBased+HTTP Sampler (apm.collector.na-01.cloud.solarwinds.com)', $sampler->getDescription());
     }
 
     public function test_should_sample_uses_http_sampler_result(): void
@@ -44,7 +44,7 @@ class SwoHttpSamplerTest extends TestCase
 
         $requestFactory->expects($this->once())
             ->method('createRequest')
-            ->with('GET', 'http://collector.test/v1/settings/test+service/' . urlencode(gethostname()))
+            ->with('GET', 'https://apm.collector.na-01.cloud.solarwinds.com/v1/settings/test+service/' . urlencode(gethostname()))
             ->willReturn($request);
 
         $response = $this->createMock(ResponseInterface::class);
@@ -96,7 +96,7 @@ class SwoHttpSamplerTest extends TestCase
     {
         return new Configuration(
             service: 'test service',
-            collector: 'http://collector.test',
+            collector: 'https://apm.collector.na-01.cloud.solarwinds.com',
             token: 'test-token',
             tracingMode: true,
             triggerTraceEnabled: true,

@@ -19,7 +19,7 @@ class SwoJsonSamplerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->path = tempnam(sys_get_temp_dir(), 'swo-json-sampler-');
+        $this->path = tempnam(sys_get_temp_dir(), 'swo-json-sampler-test-');
     }
 
     protected function tearDown(): void
