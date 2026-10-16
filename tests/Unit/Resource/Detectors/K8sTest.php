@@ -32,7 +32,7 @@ class K8sTest extends TestCase
         $this->setEnvironmentVariable(Variables::SW_K8S_POD_UID, $envUid);
         $this->setEnvironmentVariable(Variables::SW_K8S_POD_NAME, $envName);
 
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
 
         $this->assertEquals(ResourceInfo::create(Attributes::create([
             'k8s.namespace.name' => $envNamespace,
@@ -76,7 +76,7 @@ class K8sTest extends TestCase
 627 758 0:150 / /proc/scsi ro,relatime - tmpfs tmpfs ro,context="system_u:object_r:data_t:s0:c171,c852"
 628 765 0:151 / /sys/firmware ro,relatime - tmpfs tmpfs ro,context="system_u:object_r:data_t:s0:c171,c852"
 EOT);
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
 
         $expectedAttributes = [
             'k8s.namespace.name' => $fileNamespace,
@@ -135,7 +135,7 @@ EOT);
         $this->setEnvironmentVariable(Variables::SW_K8S_POD_UID, $envUid);
         $this->setEnvironmentVariable(Variables::SW_K8S_POD_NAME, $envName);
 
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
 
         $this->assertEquals(ResourceInfo::create(Attributes::create([
             'k8s.namespace.name' => $envNamespace,
@@ -185,7 +185,7 @@ EOT);
         $this->setEnvironmentVariable(Variables::SW_K8S_POD_UID, $envUid);
         $this->setEnvironmentVariable(Variables::SW_K8S_POD_NAME, $envName);
 
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
 
         $this->assertEquals(ResourceInfoFactory::emptyResource(), $resource);
 
@@ -199,7 +199,7 @@ EOT);
         $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_missing_');
         @unlink($namespaceFile);
         @unlink($mountFile);
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
         $this->assertEquals(ResourceInfoFactory::emptyResource()->getAttributes(), $resource->getAttributes());
     }
 
@@ -209,7 +209,7 @@ EOT);
         file_put_contents($namespaceFile, 'test');
         chmod($namespaceFile, 0000);
         $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_unreadable_');
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
         $this->assertEquals(ResourceInfoFactory::emptyResource(), $resource);
         chmod($namespaceFile, 0644);
         unlink($namespaceFile);
@@ -220,7 +220,7 @@ EOT);
         $namespaceFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('namespace_empty_');
         file_put_contents($namespaceFile, '');
         $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_empty_');
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
         $this->assertEquals('', $resource->getAttributes()->toArray()['k8s.namespace.name'] ?? 'null');
         unlink($namespaceFile);
     }
@@ -231,7 +231,7 @@ EOT);
         file_put_contents($namespaceFile, 'testnamespace');
         $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_uid_missing_');
         @unlink($mountFile);
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
         $this->assertArrayNotHasKey('k8s.pod.uid', $resource->getAttributes()->toArray());
         unlink($namespaceFile);
     }
@@ -242,7 +242,7 @@ EOT);
         file_put_contents($namespaceFile, 'testnamespace');
         $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_uid2_');
         file_put_contents($mountFile, "invalid line\n123 456 0:1 / notkube\n789 012 0:2 /kube-but-no-uid\n");
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
         $this->assertArrayNotHasKey('k8s.pod.uid', $resource->getAttributes()->toArray());
         unlink($namespaceFile);
         unlink($mountFile);
@@ -255,7 +255,7 @@ EOT);
         $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_uid3_');
         $uid = '123e4567-e89b-12d3-a456-426614174000';
         file_put_contents($mountFile, "123 456 0:1 /var/lib/kube/pods/$uid/volumes/kubernetes.io~empty-dir/html /html rw a b c d\n");
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
         $this->assertEquals($uid, $resource->getAttributes()->toArray()['k8s.pod.uid'] ?? null);
         unlink($namespaceFile);
         unlink($mountFile);
@@ -279,11 +279,11 @@ EOT);
         $mountFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('mountinfo_name_');
         $envName = 'testpodname';
         $this->setEnvironmentVariable(Variables::SW_K8S_POD_NAME, $envName);
-        $resource = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
         $this->assertEquals($envName, $resource->getAttributes()->get('k8s.pod.name') ?? null);
         // Now unset the env var and check fallback
         putenv(Variables::SW_K8S_POD_NAME);
-        $resource2 = (new K8s($namespaceFile, $mountFile))->getResource();
+        $resource2 = (new K8s(namespaceFile: $namespaceFile, mountInfoFile: $mountFile))->getResource();
         $this->assertEquals(php_uname('n'), $resource2->getAttributes()->get('k8s.pod.name') ?? null);
         unlink($namespaceFile);
     }

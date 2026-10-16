@@ -339,7 +339,7 @@ abstract class OboeSampler implements SamplerInterface
 
     public function updateSettings(Settings $settings): void
     {
-        if ($settings->timestamp > ($this->settings?->timestamp ?? 0)) {
+        if ($settings->timestamp > ($this->settings->timestamp ?? 0)) {
             $this->settings = $settings;
             // update bucket from cache
             $this->updateBucketStateFromCache((string) (getmypid()));

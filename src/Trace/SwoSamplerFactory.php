@@ -7,10 +7,10 @@ namespace Solarwinds\ApmPhp\Trace;
 use Exception;
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
-use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
@@ -20,9 +20,10 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SemConv\Attributes\ServiceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration as SolarwindsConfiguration;
+use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
-use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
-use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\SwoHttpSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\SwoJsonSampler;
 
 class SwoSamplerFactory
 {
@@ -31,7 +32,6 @@ class SwoSamplerFactory
     private const SOLARWINDS_PREFIX = 'solarwinds';
     private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
     private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
-    private const DEFAULT_APM_COLLECTOR = 'apm.collector.na-01.cloud.solarwinds.com';
     private const SERVICE_KEY_DELIMITER = ':';
     private const SERVICE_KEY_PATTERN = '/^([^:]+):([^:]+)$/';
     private ResourceInfo $resource;
@@ -51,7 +51,7 @@ class SwoSamplerFactory
         $collector = $isHttp
             ? (Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
                 ? Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR)
-                : self::DEFAULT_APM_COLLECTOR)
+                : KnownValues::VALUE_SAMPLER_SOLARWINDS_HTTP_DEFAULT_APM_COLLECTOR)
             : '';
         $token = '';
         if ($isHttp && $serviceKey) {
@@ -127,9 +127,8 @@ class SwoSamplerFactory
                                 : null;
                             if ($serviceKey && preg_match(self::SERVICE_KEY_PATTERN, $serviceKey)) {
                                 $configuration = $this->getSolarwindsConfiguration(true, $serviceKey);
-                                $http = new HttpSampler($meterProvider, $configuration);
 
-                                return new ParentBased($http, $http, $http);
+                                return new SwoHttpSampler($meterProvider, $configuration);
                             }
                             self::logWarning('SW_APM_SERVICE_KEY is not correctly formatted. Falling back to AlwaysOffSampler.');
 
@@ -142,9 +141,8 @@ class SwoSamplerFactory
                     }
                 case self::VALUE_SOLARWINDS_JSON:
                     $configuration = $this->getSolarwindsConfiguration(false);
-                    $json = new JsonSampler($meterProvider, $configuration);
 
-                    return new ParentBased($json, $json, $json);
+                    return new SwoJsonSampler($meterProvider, $configuration);
             }
         }
 
