@@ -39,6 +39,7 @@ final class SpanProcessorResponseTime implements ComponentProvider
             ->scalarNode('transaction_name')->validate()->always(Validation::ensureString())->end()->end()
             ->end()
         ;
+
         return $node;
     }
 }

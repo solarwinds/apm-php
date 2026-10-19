@@ -8,7 +8,6 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Trace\LocalRootSpan;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
-use Solarwinds\ApmPhp\Trace\SpanProcessor\TransactionNameSpanProcessor;
 
 final class TransactionName
 {

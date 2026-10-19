@@ -54,7 +54,6 @@ use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 use RuntimeException;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
-use Solarwinds\ApmPhp\Trace\SpanProcessor\TransactionNameSpanProcessor;
 use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 use Throwable;
 
