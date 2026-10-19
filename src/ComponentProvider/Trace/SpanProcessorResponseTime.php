@@ -7,6 +7,7 @@ namespace Solarwinds\ApmPhp\ComponentProvider\Trace;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -26,12 +27,18 @@ final class SpanProcessorResponseTime implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SpanProcessorInterface
     {
-        return new ResponseTimeSpanProcessor($context->meterProvider);
+        return ResponseTimeSpanProcessor::getInstance($context->meterProvider, $properties['transaction_name'] ?? null);
     }
 
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return $builder->arrayNode('response_time');
+        $node = $builder->arrayNode('response_time');
+        $node
+            ->children()
+            ->scalarNode('transaction_name')->validate()->always(Validation::ensureString())->end()->end()
+            ->end()
+        ;
+        return $node;
     }
 }

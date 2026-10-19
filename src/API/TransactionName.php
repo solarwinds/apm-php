@@ -7,6 +7,7 @@ namespace Solarwinds\ApmPhp\API;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Trace\LocalRootSpan;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
+use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\TransactionNameSpanProcessor;
 
 final class TransactionName
@@ -25,10 +26,10 @@ final class TransactionName
         }
         $span = LocalRootSpan::current();
         if ($span instanceof ReadableSpanInterface) {
-            $spanProcessor = TransactionNameSpanProcessor::getInstance();
-            if ($spanProcessor instanceof TransactionNameSpanProcessor) {
+            $spanProcessor = ResponseTimeSpanProcessor::getInstance();
+            if ($spanProcessor instanceof ResponseTimeSpanProcessor) {
                 $name = $spanProcessor->getTransactionNamePool()->register($name);
-                $span->setAttribute(TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE, $name);
+                $span->setAttribute(ResponseTimeSpanProcessor::TRANSACTION_NAME_ATTRIBUTE, $name);
 
                 return true;
             }
