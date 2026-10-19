@@ -10,7 +10,7 @@ putenv('OTEL_TRACES_EXPORTER=console');
 putenv('OTEL_METRICS_EXPORTER=console');
 putenv('OTEL_LOGS_EXPORTER=console');
 putenv('OTEL_LOG_LEVEL=info');
-putenv('OTEL_TRACES_SAMPLER=solarwinds_http');
+putenv('OTEL_TRACES_SAMPLER=swo_http');
 putenv('OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta');
 putenv('OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram');
 putenv('SW_APM_COLLECTOR=apm.collector.na-01.cloud.solarwinds.com');
@@ -19,7 +19,7 @@ putenv('SW_APM_TRACING_MODE=enabled');
 putenv('SW_APM_TRIGGER_TRACE=enabled');
 putenv('SW_APM_TRANSACTION_NAME=txn');
 putenv('SW_APM_TRANSACTION_SETTINGS=[{"tracing":"disabled", "regex":"/^.*\\.css$/"}]');
-putenv('OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions');
+putenv('OTEL_PROPAGATORS=baggage,tracecontext,swo_tracestate,swo_xtraceoptions');
 
 echo 'autoloading SDK example starting...' . PHP_EOL;
 
