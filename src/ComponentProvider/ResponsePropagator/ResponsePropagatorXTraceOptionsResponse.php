@@ -32,6 +32,6 @@ final class ResponsePropagatorXTraceOptionsResponse implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return $builder->arrayNode('xtraceoptionsresponse');
+        return $builder->arrayNode('swo_xtraceoptionsresponse');
     }
 }

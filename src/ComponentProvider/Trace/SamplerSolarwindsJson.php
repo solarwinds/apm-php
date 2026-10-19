@@ -38,7 +38,7 @@ final class SamplerSolarwindsJson implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('solarwinds_json');
+        $node = $builder->arrayNode('swo_json');
         $node
             ->children()
                 ->scalarNode('path')->defaultValue(KnownValues::VALUE_SAMPLER_SOLARWINDS_JSON_DEFAULT_PATH)->validate()->always(Validation::ensureString())->end()->end()

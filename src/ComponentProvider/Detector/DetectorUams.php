@@ -32,6 +32,6 @@ final class DetectorUams implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return $builder->arrayNode('uams');
+        return $builder->arrayNode('swo_uams');
     }
 }

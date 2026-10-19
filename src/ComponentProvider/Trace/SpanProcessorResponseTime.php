@@ -33,7 +33,7 @@ final class SpanProcessorResponseTime implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('response_time');
+        $node = $builder->arrayNode('swo_response_time');
         $node
             ->children()
             ->scalarNode('transaction_name')->validate()->always(Validation::ensureString())->end()->end()

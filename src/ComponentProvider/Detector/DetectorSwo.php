@@ -32,6 +32,6 @@ final class DetectorSwo implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return $builder->arrayNode('swo');
+        return $builder->arrayNode('swo_apm');
     }
 }

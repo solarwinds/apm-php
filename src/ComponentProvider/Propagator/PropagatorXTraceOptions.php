@@ -33,6 +33,6 @@ final class PropagatorXTraceOptions implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return $builder->arrayNode('xtraceoptions');
+        return $builder->arrayNode('swo_xtraceoptions');
     }
 }

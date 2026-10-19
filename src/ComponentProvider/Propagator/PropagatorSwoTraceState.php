@@ -33,6 +33,6 @@ final class PropagatorSwoTraceState implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return $builder->arrayNode('swotracestate');
+        return $builder->arrayNode('swo_tracestate');
     }
 }

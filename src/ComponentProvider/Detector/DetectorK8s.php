@@ -33,7 +33,7 @@ final class DetectorK8s implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('k8s');
+        $node = $builder->arrayNode('swo_k8s');
         $node
             ->children()
                 ->scalarNode('namespace')->validate()->always(Validation::ensureString())->end()->end()

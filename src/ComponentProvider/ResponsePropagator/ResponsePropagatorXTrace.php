@@ -32,6 +32,6 @@ final class ResponsePropagatorXTrace implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return $builder->arrayNode('xtrace');
+        return $builder->arrayNode('swo_xtrace');
     }
 }
