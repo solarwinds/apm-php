@@ -13,7 +13,7 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 use Solarwinds\ApmPhp\ComponentProvider\Validation\Validation as SwoValidation;
-use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\SwoHttpSampler;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -46,7 +46,7 @@ final class SamplerSwoHttp implements ComponentProvider
         }
         $config = new Configuration(service:$service_name_from_resource??$service_name??'unknown_service:php', collector:'https://' . ($properties['collector'] ?? KnownValues::VALUE_SAMPLER_SWO_HTTP_DEFAULT_APM_COLLECTOR), token:$token, tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
 
-        return new HttpSampler($context->meterProvider, $config);
+        return new SwoHttpSampler($context->meterProvider, $config);
     }
 
     #[\Override]
