@@ -8,19 +8,18 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
-use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 use Solarwinds\ApmPhp\ComponentProvider\Validation\Validation as SwoValidation;
-use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
+use Solarwinds\ApmPhp\Trace\Sampler\JsonSampler;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<SamplerInterface>
  */
-final class SamplerSolarwindsHttp implements ComponentProvider
+final class SamplerSwoJson implements ComponentProvider
 {
     /**
      * @phan-suppress PhanParamSignatureMismatch
@@ -31,32 +30,18 @@ final class SamplerSolarwindsHttp implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        $service_key = $properties['service_key'] ?? null;
-        $token = '';
-        $service_name = null;
-        if (is_string($service_key)) {
-            $arr = explode(':', $service_key, 2);
-            $token = $arr[0];
-            $service_name = $arr[1];
-        }
-        $list = $context->getExtension(ResourceInfo::class);
-        $service_name_from_resource = null;
-        if ($list instanceof ResourceInfo) {
-            $service_name_from_resource = $list->getAttributes()->get('service.name');
-        }
-        $config = new Configuration(service:$service_name_from_resource??$service_name??'unknown_service:php', collector:'https://' . ($properties['collector'] ?? KnownValues::VALUE_SAMPLER_SWO_HTTP_DEFAULT_APM_COLLECTOR), token:$token, tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
+        $config = new Configuration(service:'', collector:'', token:'', tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
 
-        return new HttpSampler($context->meterProvider, $config);
+        return new JsonSampler($context->meterProvider, $config, $properties['path'] ?? KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH);
     }
 
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('swo_http');
+        $node = $builder->arrayNode('swo_json');
         $node
             ->children()
-                ->scalarNode('service_key')->isRequired()->cannotBeEmpty()->validate()->always(SwoValidation::ensureServiceKey())->end()->end()
-                ->scalarNode('collector')->defaultValue(KnownValues::VALUE_SAMPLER_SWO_HTTP_DEFAULT_APM_COLLECTOR)->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('path')->defaultValue(KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH)->validate()->always(Validation::ensureString())->end()->end()
                 ->booleanNode('tracing_mode')->defaultTrue()->end()
                 ->booleanNode('trigger_tracing_enabled')->defaultTrue()->end()
                 ->arrayNode('transaction_settings')
