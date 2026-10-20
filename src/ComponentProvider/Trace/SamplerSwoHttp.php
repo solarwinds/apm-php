@@ -46,7 +46,7 @@ final class SamplerSwoHttp implements ComponentProvider
         }
         $config = new Configuration(service:$service_name_from_resource??$service_name??'unknown_service:php', collector:'https://' . ($properties['collector'] ?? KnownValues::VALUE_SAMPLER_SWO_HTTP_DEFAULT_APM_COLLECTOR), token:$token, tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
 
-        return new SwoHttpSampler($context->meterProvider, $config);
+        return SwoHttpSampler::getInstance($context->meterProvider, $config);
     }
 
     #[\Override]

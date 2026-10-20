@@ -20,10 +20,20 @@ use Solarwinds\ApmPhp\Common\Configuration\Configuration;
 class SwoHttpSampler implements SamplerInterface
 {
     private readonly ParentBased $parentBased;
+    private static ?self $instance = null;
     public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, CacheExtensionInterface $cacheExtension = new CacheExtension())
     {
         $http = new HttpSampler($meterProvider, $config, $initial, $client, $requestFactory, $cacheExtension);
         $this->parentBased = new ParentBased($http, $http, $http);
+    }
+
+    public static function getInstance(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, CacheExtensionInterface $cacheExtension = new CacheExtension()): self
+    {
+        if (null === self::$instance) {
+            self::$instance = new self($meterProvider, $config, $initial, $client, $requestFactory, $cacheExtension);
+        }
+
+        return self::$instance;
     }
 
     #[\Override]

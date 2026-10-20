@@ -19,10 +19,20 @@ use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 class SwoJsonSampler implements SamplerInterface
 {
     private readonly ParentBased $parentBased;
+    private static ?self $instance = null;
     public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, string $path = KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH)
     {
         $json = new JsonSampler($meterProvider, $config, $path);
         $this->parentBased = new ParentBased($json, $json, $json);
+    }
+
+    public static function getInstance(?MeterProviderInterface $meterProvider, Configuration $config, string $path = KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH): self
+    {
+        if (null === self::$instance) {
+            self::$instance = new self($meterProvider, $config, $path);
+        }
+
+        return self::$instance;
     }
 
     #[\Override]

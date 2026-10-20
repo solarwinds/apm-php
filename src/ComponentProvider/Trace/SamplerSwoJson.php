@@ -32,7 +32,7 @@ final class SamplerSwoJson implements ComponentProvider
     {
         $config = new Configuration(service:'', collector:'', token:'', tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
 
-        return new SwoJsonSampler($context->meterProvider, $config, $properties['path'] ?? KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH);
+        return SwoJsonSampler::getInstance($context->meterProvider, $config, $properties['path'] ?? KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH);
     }
 
     #[\Override]
