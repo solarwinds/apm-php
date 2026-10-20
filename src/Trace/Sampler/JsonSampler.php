@@ -26,7 +26,7 @@ class JsonSampler extends Sampler
     private string $path;
     private ContextInterface $requestContext;
 
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, string $path = KnownValues::VALUE_SAMPLER_SOLARWINDS_JSON_DEFAULT_PATH)
+    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, string $path = KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH)
     {
         parent::__construct($meterProvider, $config);
         $this->path = $path;

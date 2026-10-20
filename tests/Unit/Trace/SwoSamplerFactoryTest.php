@@ -103,7 +103,7 @@ class SwoSamplerFactoryTest extends TestCase
 
     public function test_default_values_are_used(): void
     {
-        \putenv(Env::OTEL_TRACES_SAMPLER . '=solarwinds_http');
+        \putenv(Env::OTEL_TRACES_SAMPLER . '=swo_http');
         if (!empty(getenv('SW_APM_SERVICE_KEY'))) {
             $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is set.');
         }

@@ -29,9 +29,9 @@ class SwoSamplerFactory
 {
     use LogsMessagesTrait;
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
-    private const SOLARWINDS_PREFIX = 'solarwinds';
-    private const VALUE_SOLARWINDS_HTTP = 'solarwinds_http';
-    private const VALUE_SOLARWINDS_JSON = 'solarwinds_json';
+    private const SWO_PREFIX = 'swo';
+    private const VALUE_SWO_HTTP = 'swo_http';
+    private const VALUE_SWO_JSON = 'swo_json';
     private const SERVICE_KEY_DELIMITER = ':';
     private const SERVICE_KEY_PATTERN = '/^([^:]+):([^:]+)$/';
     private ResourceInfo $resource;
@@ -51,7 +51,7 @@ class SwoSamplerFactory
         $collector = $isHttp
             ? (Configuration::has(SolarwindsEnv::SW_APM_COLLECTOR)
                 ? Configuration::getString(SolarwindsEnv::SW_APM_COLLECTOR)
-                : KnownValues::VALUE_SAMPLER_SOLARWINDS_HTTP_DEFAULT_APM_COLLECTOR)
+                : KnownValues::VALUE_SAMPLER_SWO_HTTP_DEFAULT_APM_COLLECTOR)
             : '';
         $token = '';
         if ($isHttp && $serviceKey) {
@@ -109,7 +109,7 @@ class SwoSamplerFactory
     {
         $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
 
-        if (str_contains($name, self::TRACEIDRATIO_PREFIX) || str_contains($name, self::SOLARWINDS_PREFIX)) {
+        if (str_contains($name, self::TRACEIDRATIO_PREFIX) || str_contains($name, self::SWO_PREFIX)) {
             switch ($name) {
                 case Values::VALUE_TRACE_ID_RATIO:
                     $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
@@ -119,7 +119,7 @@ class SwoSamplerFactory
                     $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
 
                     return new ParentBased(new TraceIdRatioBasedSampler($arg));
-                case self::VALUE_SOLARWINDS_HTTP:
+                case self::VALUE_SWO_HTTP:
                     {
                         try {
                             $serviceKey = Configuration::has(SolarwindsEnv::SW_APM_SERVICE_KEY)
@@ -139,7 +139,7 @@ class SwoSamplerFactory
                             return new AlwaysOffSampler();
                         }
                     }
-                case self::VALUE_SOLARWINDS_JSON:
+                case self::VALUE_SWO_JSON:
                     $configuration = $this->getSolarwindsConfiguration(false);
 
                     return new SwoJsonSampler($meterProvider, $configuration);

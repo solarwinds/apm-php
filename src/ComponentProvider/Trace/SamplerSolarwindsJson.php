@@ -32,7 +32,7 @@ final class SamplerSolarwindsJson implements ComponentProvider
     {
         $config = new Configuration(service:'', collector:'', token:'', tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
 
-        return new JsonSampler($context->meterProvider, $config, $properties['path'] ?? KnownValues::VALUE_SAMPLER_SOLARWINDS_JSON_DEFAULT_PATH);
+        return new JsonSampler($context->meterProvider, $config, $properties['path'] ?? KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH);
     }
 
     #[\Override]
@@ -41,7 +41,7 @@ final class SamplerSolarwindsJson implements ComponentProvider
         $node = $builder->arrayNode('swo_json');
         $node
             ->children()
-                ->scalarNode('path')->defaultValue(KnownValues::VALUE_SAMPLER_SOLARWINDS_JSON_DEFAULT_PATH)->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('path')->defaultValue(KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH)->validate()->always(Validation::ensureString())->end()->end()
                 ->booleanNode('tracing_mode')->defaultTrue()->end()
                 ->booleanNode('trigger_tracing_enabled')->defaultTrue()->end()
                 ->arrayNode('transaction_settings')
