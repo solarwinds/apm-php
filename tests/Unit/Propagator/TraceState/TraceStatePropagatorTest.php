@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp\Tests\Unit\Propagator\SwoTraceState;
+namespace Solarwinds\ApmPhp\Tests\Unit\Propagator\TraceState;
 
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -13,16 +13,16 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Solarwinds\ApmPhp\Propagator\SwoTraceState\SwoTraceStatePropagator;
+use Solarwinds\ApmPhp\Propagator\TraceState\TraceStatePropagator;
 
-#[CoversClass(SwoTraceStatePropagator::class)]
-class SwoTraceStatePropagatorTest extends TestCase
+#[CoversClass(TraceStatePropagator::class)]
+class TraceStatePropagatorTest extends TestCase
 {
     private TextMapPropagatorInterface $propagator;
 
     public function test_fields(): void
     {
-        $this->assertSame(SwoTraceStatePropagator::FIELDS, $this->propagator->fields());
+        $this->assertSame(TraceStatePropagator::FIELDS, $this->propagator->fields());
     }
 
     public function test_inject_empty_baggage(): void
@@ -94,6 +94,6 @@ class SwoTraceStatePropagatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->propagator = SwoTraceStatePropagator::getInstance();
+        $this->propagator = TraceStatePropagator::getInstance();
     }
 }

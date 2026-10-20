@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Solarwinds\ApmPhp\Propagator\SwoTraceState;
+namespace Solarwinds\ApmPhp\Propagator\TraceState;
 
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\TraceState;
@@ -14,7 +14,7 @@ use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Solarwinds\ApmPhp\Common\Configuration\KnownValues;
 
-class SwoTraceStatePropagator implements TextMapPropagatorInterface
+class TraceStatePropagator implements TextMapPropagatorInterface
 {
     public const TRACESTATE = 'tracestate';
     const SW = 'sw';

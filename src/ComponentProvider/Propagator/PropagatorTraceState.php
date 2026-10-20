@@ -8,7 +8,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
-use Solarwinds\ApmPhp\Propagator\SwoTraceState\SwoTraceStatePropagator;
+use Solarwinds\ApmPhp\Propagator\TraceState\TraceStatePropagator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  * @implements ComponentProvider<TextMapPropagatorInterface>
  */
 
-final class PropagatorSwoTraceState implements ComponentProvider
+final class PropagatorTraceState implements ComponentProvider
 {
     /**
      * @phan-suppress PhanParamSignatureMismatch
@@ -27,7 +27,7 @@ final class PropagatorSwoTraceState implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
     {
-        return SwoTraceStatePropagator::getInstance();
+        return TraceStatePropagator::getInstance();
     }
 
     #[\Override]

@@ -6,7 +6,7 @@ namespace Solarwinds\ApmPhp\Common\Configuration;
 
 interface KnownValues
 {
-    public const VALUE_SWOTRACESTATE = 'swo_tracestate';
+    public const VALUE_TRACESTATE = 'swo_tracestate';
     public const VALUE_XTRACEOPTIONS = 'swo_xtraceoptions';
     public const VALUE_APM = 'swo_apm';
     public const VALUE_K8S = 'swo_k8s';

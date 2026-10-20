@@ -11,7 +11,7 @@
     },
     "files": [
       "src/_autoload.php",
-      "src/Propagator/SwoTraceState/_register.php",
+      "src/Propagator/TraceState/_register.php",
       "src/Propagator/XTraceOptions/_register.php",
       "src/Resource/_register.php",
       "src/ResponsePropagator/XTrace/_register.php",
@@ -82,7 +82,7 @@
         "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorApm",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorUams",
 
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Propagator\\PropagatorSwoTraceState",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Propagator\\PropagatorTraceState",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Propagator\\PropagatorXTraceOptions",
 
         "Solarwinds\\ApmPhp\\ComponentProvider\\ResponsePropagator\\ResponsePropagatorXTrace",
