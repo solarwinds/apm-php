@@ -87,8 +87,7 @@
         "Solarwinds\\ApmPhp\\ComponentProvider\\ResponsePropagator\\ResponsePropagatorXTraceOptionsResponse",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSwoHttp",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSwoJson",
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorResponseTime",
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorTransactionName"
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorResponseTime"
       ]
     }
   }
