@@ -5,7 +5,7 @@ disabled: ${OTEL_SDK_DISABLED:-false}
 resource:
   attributes:
     - name: service.name
-      value: <your-service-name>
+      value: php-basic-file
   attributes_list: ${OTEL_RESOURCE_ATTRIBUTES}
   detection/development: # /development properties may not be supported in all SDKs
     detectors:
@@ -34,46 +34,18 @@ response_propagator/development:
 
 tracer_provider:
   sampler:
-    parent_based:
-      root:
-        swo_http:
-          service_key: "<token>:php-basic-file"
-          collector: "apm.collector.na-01.cloud.solarwinds.com"
-          tracing_mode: true
-          trigger_tracing_enabled: true
-          transaction_settings:
-            - tracing: "enabled"
-              regex: "/^.*$/"
-            - tracing: "disabled"
-              regex: "/.*health.*/"
-            - tracing: "disabled"
-              regex: "/.*metrics.*/"
-      remote_parent_sampled:
-        swo_http:
-          service_key: "<token>:php-basic-file"
-          collector: "apm.collector.na-01.cloud.solarwinds.com"
-          tracing_mode: true
-          trigger_tracing_enabled: true
-          transaction_settings:
-            - tracing: "enabled"
-              regex: "/^.*$/"
-            - tracing: "disabled"
-              regex: "/.*health.*/"
-            - tracing: "disabled"
-              regex: "/.*metrics.*/"
-      remote_parent_not_sampled:
-        swo_http:
-          service_key: "<token>:php-basic-file"
-          collector: "apm.collector.na-01.cloud.solarwinds.com"
-          tracing_mode: true
-          trigger_tracing_enabled: true
-          transaction_settings:
-            - tracing: "enabled"
-              regex: "/^.*$/"
-            - tracing: "disabled"
-              regex: "/.*health.*/"
-            - tracing: "disabled"
-              regex: "/.*metrics.*/"
+    swo_http:
+      service_key: "<token>:php-basic-file"
+      collector: "apm.collector.na-01.cloud.solarwinds.com"
+      tracing_mode: true
+      trigger_tracing_enabled: true
+      transaction_settings:
+        - tracing: "enabled"
+          regex: "/^.*$/"
+        - tracing: "disabled"
+          regex: "/.*health.*/"
+        - tracing: "disabled"
+          regex: "/.*metrics.*/"
 
   processors:
     - swo_response_time:           # swo response time span processor
