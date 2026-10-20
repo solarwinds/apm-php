@@ -79,7 +79,7 @@
     "spi": {
       "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
         "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorK8s",
-        "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorSwo",
+        "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorApm",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Detector\\DetectorUams",
 
         "Solarwinds\\ApmPhp\\ComponentProvider\\Propagator\\PropagatorSwoTraceState",

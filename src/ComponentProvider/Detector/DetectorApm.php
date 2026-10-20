@@ -8,14 +8,14 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
-use Solarwinds\ApmPhp\Resource\Detectors\Swo;
+use Solarwinds\ApmPhp\Resource\Detectors\Apm;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<ResourceDetectorInterface>
  */
-final class DetectorSwo implements ComponentProvider
+final class DetectorApm implements ComponentProvider
 {
     /**
      * @phan-suppress PhanParamSignatureMismatch
@@ -26,7 +26,7 @@ final class DetectorSwo implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): ResourceDetectorInterface
     {
-        return new Swo();
+        return new Apm();
     }
 
     #[\Override]

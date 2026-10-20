@@ -13,7 +13,7 @@ use OpenTelemetry\SemConv\Attributes\ServiceAttributes;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 
-final class Swo implements ResourceDetectorInterface
+final class Apm implements ResourceDetectorInterface
 {
     private const PACKAGIST_COMPOSER_NAME = 'solarwinds/apm';
     private const SERVICE_KEY_DELIMITER = ':';
