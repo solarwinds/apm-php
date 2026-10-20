@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Tests\Unit\Trace\Sampler;
 
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -191,10 +191,8 @@ class SamplerTest extends TestCase
             'flags' => 'OVERRIDE',
         ]);
         $this->AssertNotNull($result);
-        if ($result !== null) {
-            $this->assertArrayHasKey('settings', $result);
-            $this->assertInstanceOf(Settings::class, $result['settings']);
-        }
+        $this->assertArrayHasKey('settings', $result);
+        $this->assertInstanceOf(Settings::class, $result['settings']);
     }
 
     public function test_respects_enabled_settings_when_no_config_or_transaction_settings(): void

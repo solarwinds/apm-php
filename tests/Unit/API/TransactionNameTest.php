@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Solarwinds\ApmPhp\API\TransactionName;
-use Solarwinds\ApmPhp\Trace\SpanProcessor\TransactionNameSpanProcessor;
+use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
 
 #[CoversClass(TransactionName::class)]
 class TransactionNameTest extends TestCase
@@ -20,7 +20,7 @@ class TransactionNameTest extends TestCase
     {
         $spanExporter = new InMemoryExporter();
         $tracerProvider = TracerProvider::builder()
-            ->addSpanProcessor(new TransactionNameSpanProcessor())
+            ->addSpanProcessor(new ResponseTimeSpanProcessor())
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler(new AlwaysOnSampler())
             ->build();
@@ -30,14 +30,14 @@ class TransactionNameTest extends TestCase
         $span->end();
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
-        $this->assertEquals([TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'testSpan'], $spans[0]->getAttributes()->toArray());
+        $this->assertEquals([ResponseTimeSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'testSpan'], $spans[0]->getAttributes()->toArray());
     }
 
     public function test_api_call_with_valid_local_root_span(): void
     {
         $spanExporter = new InMemoryExporter();
         $tracerProvider = TracerProvider::builder()
-            ->addSpanProcessor(new TransactionNameSpanProcessor())
+            ->addSpanProcessor(new ResponseTimeSpanProcessor())
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler(new AlwaysOnSampler())
             ->build();
@@ -48,14 +48,14 @@ class TransactionNameTest extends TestCase
         $span->end();
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
-        $this->assertEquals([TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'custom-name'], $spans[0]->getAttributes()->toArray());
+        $this->assertEquals([ResponseTimeSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'custom-name'], $spans[0]->getAttributes()->toArray());
     }
 
     public function test_api_call_with_valid_local_root_span_empty(): void
     {
         $spanExporter = new InMemoryExporter();
         $tracerProvider = TracerProvider::builder()
-            ->addSpanProcessor(new TransactionNameSpanProcessor())
+            ->addSpanProcessor(new ResponseTimeSpanProcessor())
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler(new AlwaysOnSampler())
             ->build();
@@ -66,14 +66,14 @@ class TransactionNameTest extends TestCase
         $span->end();
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
-        $this->assertEquals([TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'testSpan'], $spans[0]->getAttributes()->toArray());
+        $this->assertEquals([ResponseTimeSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'testSpan'], $spans[0]->getAttributes()->toArray());
     }
 
     public function test_api_call_out_of_activated_span(): void
     {
         $spanExporter = new InMemoryExporter();
         $tracerProvider = TracerProvider::builder()
-            ->addSpanProcessor(new TransactionNameSpanProcessor())
+            ->addSpanProcessor(new ResponseTimeSpanProcessor())
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler(new AlwaysOnSampler())
             ->build();
@@ -89,14 +89,14 @@ class TransactionNameTest extends TestCase
         $this->assertFalse(TransactionName::set('custom-name'));
         $spans = $spanExporter->getSpans();
         $this->assertCount(1, $spans);
-        $this->assertEquals([TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'testSpan'], $spans[0]->getAttributes()->toArray());
+        $this->assertEquals([ResponseTimeSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'testSpan'], $spans[0]->getAttributes()->toArray());
     }
 
     public function test_set_transaction_name_to_local_root_span(): void
     {
         $spanExporter = new InMemoryExporter();
         $tracerProvider = TracerProvider::builder()
-            ->addSpanProcessor(new TransactionNameSpanProcessor())
+            ->addSpanProcessor(new ResponseTimeSpanProcessor())
             ->addSpanProcessor(new SimpleSpanProcessor($spanExporter))
             ->setSampler(new AlwaysOnSampler())
             ->build();
@@ -112,6 +112,6 @@ class TransactionNameTest extends TestCase
         $spans = $spanExporter->getSpans();
         $this->assertCount(2, $spans);
         $this->assertEquals(['child' => 'child'], $spans[0]->getAttributes()->toArray());
-        $this->assertEquals([TransactionNameSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'custom-name'], $spans[1]->getAttributes()->toArray());
+        $this->assertEquals([ResponseTimeSpanProcessor::TRANSACTION_NAME_ATTRIBUTE => 'custom-name'], $spans[1]->getAttributes()->toArray());
     }
 }

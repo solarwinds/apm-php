@@ -78,15 +78,15 @@ The extensions will be enabled by the `PHP_INI_SCAN_DIR` app setting described i
 
 Environment variables supported by APM PHP can be set as app settings, in the Azure portal this is under Settings > Environment variables > App settings. These are the required settings:
 
-| Name | Value |
-| ---- | ----- |
-| SW_APM_SERVICE_KEY | The service name portion, i.e. string after `:`, is ignored and the App Service app name (`WEBSITE_SITE_NAME`) is used as the SWO service name. To override with an explicit service name, set the `OTEL_SERVICE_NAME` variable. |
-| SOLARWINDS_TOKEN | Set this to the same API Token portion used in `SW_APM_SERVICE_KEY`. |
-| OTEL_TRACES_SAMPLER | `solarwinds_http` |
-| OTEL_PROPAGATORS | `baggage,tracecontext,swotracestate,xtraceoptions` |
-| OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS | `xtrace,xtraceoptionsresponse` |
-| OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE | `delta` |
-| OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION | `base2_exponential_bucket_histogram` |
+| Name                                                     | Value                                                                                                                                                                                                                            |
+|----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| SW_APM_SERVICE_KEY                                       | The service name portion, i.e. string after `:`, is ignored and the App Service app name (`WEBSITE_SITE_NAME`) is used as the SWO service name. To override with an explicit service name, set the `OTEL_SERVICE_NAME` variable. |
+| SOLARWINDS_TOKEN                                         | Set this to the same API Token portion used in `SW_APM_SERVICE_KEY`.                                                                                                                                                             |
+| OTEL_TRACES_SAMPLER                                      | `swo_http`                                                                                                                                                                                                                       |
+| OTEL_PROPAGATORS                                         | `baggage,tracecontext,swo_tracestate,swo_xtraceoptions`                                                                                                                                                                          |
+| OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS                   | `swo_xtrace,swo_xtraceoptionsresponse`                                                                                                                                                                                           |
+| OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE        | `delta`                                                                                                                                                                                                                          |
+| OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION | `base2_exponential_bucket_histogram`                                                                                                                                                                                             |
 
 ## Add the SolarWinds OpenTelemetry Collector as a sidecar
 
@@ -123,10 +123,10 @@ Now create the sidecar. This can be done in the Azure portal under Deployment Ce
 
 Set these app setting environment variables to enable the extensions and auto-instrumentation:
 
-| Name | Value |
-| ---- | ----- |
-| PHP_INI_SCAN_DIR  | `/usr/local/etc/php/conf.d:/home/site/ini`. This adds the path used in the [example](#install-the-opentelemetry-and-solarwinds-apm-extensions). |
-| OTEL_PHP_AUTOLOAD_ENABLED | `true` |
+| Name                      | Value                                                                                                                                           |
+|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| PHP_INI_SCAN_DIR          | `/usr/local/etc/php/conf.d:/home/site/ini`. This adds the path used in the [example](#install-the-opentelemetry-and-solarwinds-apm-extensions). |
+| OTEL_PHP_AUTOLOAD_ENABLED | `true`                                                                                                                                          |
 
 # WordPress App Service
 

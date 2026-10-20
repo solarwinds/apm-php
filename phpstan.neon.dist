@@ -8,3 +8,19 @@ parameters:
     paths:
         - ./src
         - ./tests
+    reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        -
+            message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertInstanceOf\\(\\) with .* and .* will always evaluate to true.#"
+            paths:
+                - tests
+        -
+            message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertTrue\\(\\) with .* will always evaluate to true.#"
+            paths:
+                - tests
+        -
+            message: "#Call to an undefined method Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\NodeParentInterface::.*#"
+            paths:
+                - src/ComponentProvider
+                - tests

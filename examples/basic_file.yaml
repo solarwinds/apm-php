@@ -1,0 +1,84 @@
+file_format: "1.0-rc.2"
+
+disabled: ${OTEL_SDK_DISABLED:-false}
+
+resource:
+  attributes:
+    - name: service.name
+      value: php-basic-file
+  attributes_list: ${OTEL_RESOURCE_ATTRIBUTES}
+  detection/development: # /development properties may not be supported in all SDKs
+    detectors:
+      - composer:        # from otel
+      - host:            # from otel
+      - process:         # from otel
+      - swo_k8s:             # swo k8s detector
+          namespace: "k8s-namespace"
+          pod_uid: "k8s-uid"
+          pod_name: "k8s-name"
+      - swo_apm:             # swo SW_APM_SERVICE_KEY detector
+      - swo_uams:            # uams client detector
+      - service:         # from otel
+
+propagator:
+  composite:
+    - baggage:           # from otel
+    - tracecontext:      # from otel
+    - swo_tracestate:     # swo trace state propagator
+    - swo_xtraceoptions:     # swo xtrace options propagator
+
+response_propagator/development:
+  composite:
+    - swo_xtrace:                # swo xtrace response
+    - swo_xtraceoptionsresponse: # swo xtrace options response
+
+tracer_provider:
+  sampler:
+    swo_http:
+      service_key: "<token>:php-basic-file"
+      collector: "apm.collector.na-01.cloud.solarwinds.com"
+      tracing_mode: true
+      trigger_tracing_enabled: true
+      transaction_settings:
+        - tracing: "enabled"
+          regex: "/^.*$/"
+        - tracing: "disabled"
+          regex: "/.*health.*/"
+        - tracing: "disabled"
+          regex: "/.*metrics.*/"
+
+  processors:
+    - swo_response_time:           # swo response time span processor
+        transaction_name: "I-am-transaction"
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: "https://otel.collector.na-01.cloud.solarwinds.com:443/v1/traces" # Currently PHP is working only with the /v1/traces, it might not be the case for other languages
+            headers:
+              - name: "Authorization"
+                value: "Bearer <token>"
+          # console:
+
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          otlp_http:
+            endpoint: "https://otel.collector.na-01.cloud.solarwinds.com:443/v1/metrics"
+            headers:
+              - name: "Authorization"
+                value: "Bearer <token>"
+            default_histogram_aggregation: "base2_exponential_bucket_histogram"
+            temporality_preference: "delta"
+          # console:
+
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: "https://otel.collector.na-01.cloud.solarwinds.com:443/v1/logs"
+            headers:
+              - name: "Authorization"
+                value: "Bearer <token>"
+          # console:

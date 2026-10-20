@@ -119,9 +119,9 @@ Start the app with tracing, make sure to replace `<solarwinds-otlp-endpoint>` an
 ```bash
 env OTEL_PHP_AUTOLOAD_ENABLED=true \
     OTEL_SERVICE_NAME=php-example \
-    OTEL_TRACES_SAMPLER=solarwinds_http \
-    OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions \
-    OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=xtrace,xtraceoptionsresponse \
+    OTEL_TRACES_SAMPLER=swo_http \
+    OTEL_PROPAGATORS=baggage,tracecontext,swo_tracestate,swo_xtraceoptions \
+    OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=swo_xtrace,swo_xtraceoptionsresponse \
     OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta \
     OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram \
     OTEL_EXPORTER_OTLP_ENDPOINT=<solarwinds-otlp-endpoint> \
@@ -167,9 +167,9 @@ Restart the app with tracing using the following to send data to the local colle
 ```bash
 env OTEL_PHP_AUTOLOAD_ENABLED=true \
     OTEL_SERVICE_NAME=php-example \
-    OTEL_TRACES_SAMPLER=solarwinds_http \
-    OTEL_PROPAGATORS=baggage,tracecontext,swotracestate,xtraceoptions \
-    OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=xtrace,xtraceoptionsresponse \
+    OTEL_TRACES_SAMPLER=swo_http \
+    OTEL_PROPAGATORS=baggage,tracecontext,swo_tracestate,swo_xtraceoptions \
+    OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=swo_xtrace,swo_xtraceoptionsresponse \
     OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta \
     OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram \
     SW_APM_SERVICE_KEY=<solarwinds-token>:php-example \

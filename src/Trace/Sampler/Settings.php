@@ -19,7 +19,7 @@ class Settings
 
     public static function merge(Settings $remote, LocalSettings $local): Settings
     {
-        $flags = $local->getTracingMode()?->value ?? $remote->flags;
+        $flags = $local->getTracingMode()->value ?? $remote->flags;
 
         if ($local->getTriggerMode()) {
             $flags |= Flags::TRIGGERED_TRACE->value;
