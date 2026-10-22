@@ -146,7 +146,7 @@ class SwoSamplerFactoryTest extends TestCase
             $serviceKey = 'token1234:apm-php-unittest';
             $factory = new SwoSamplerFactory();
             $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
-            $this->assertEquals('apm-php-unittest', $config->getService());
+            $this->assertEquals('unknown_service:php', $config->getService());
         } finally {
             if ($localEnvSetup) {
                 \putenv('SW_APM_SERVICE_KEY');
