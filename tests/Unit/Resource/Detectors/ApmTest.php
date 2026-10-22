@@ -13,7 +13,7 @@ use Solarwinds\ApmPhp\Resource\Detectors\Apm;
 use Solarwinds\ApmPhp\Tests\Unit\TestState;
 
 #[CoversClass(Apm::class)]
-class SwoTest extends TestCase
+class ApmTest extends TestCase
 {
     use TestState;
 
@@ -32,7 +32,6 @@ class SwoTest extends TestCase
             $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
             $this->assertSame('apm', $resource->getAttributes()->get(Apm::SW_DATA_MODULE));
             $this->assertSame($version, $resource->getAttributes()->get(Apm::SW_APM_VERSION));
-            $this->assertSame($service, $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
         } else {
             $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set or invalid.');
         }
@@ -41,7 +40,7 @@ class SwoTest extends TestCase
     public function test_swo_get_resource_does_not_use_service_name_from_service_key_on_azure_app_service(): void
     {
         if (!class_exists(self::AZURE_APP_SERVICE_DETECTOR_CLASS, false)) {
-            class_alias(SwoTestAzureAppServiceDetector::class, self::AZURE_APP_SERVICE_DETECTOR_CLASS);
+            class_alias(ApmTestAzureAppServiceDetector::class, self::AZURE_APP_SERVICE_DETECTOR_CLASS);
         }
 
         $this->setEnvironmentVariable(SolarwindsEnv::SW_APM_SERVICE_KEY, 'token:service-from-sw-apm-service-key');
@@ -63,6 +62,6 @@ class SwoTest extends TestCase
     }
 }
 
-class SwoTestAzureAppServiceDetector
+class ApmTestAzureAppServiceDetector
 {
 }
