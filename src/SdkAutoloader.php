@@ -27,7 +27,6 @@ use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
-use OpenTelemetry\Config\SDK\Instrumentation as SdkInstrumentation;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -115,7 +114,7 @@ class SdkAutoloader
         }
         $distributionProperties = self::loadDistributionPropertiesFromEnv();
         $distributionConfiguration = $distributionProperties->getDistributionConfiguration(SdkDistribution::class) ?? new SdkDistribution();
-        $emitMetrics = $distributionConfiguration->internalMetricsEnabled;
+        $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED); // $distributionConfiguration->internalMetricsEnabled;
 
         $resource = ResourceInfoFactory::defaultResource();
         $exporter = (new ExporterFactory())->create();
@@ -190,19 +189,20 @@ class SdkAutoloader
         if (!Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             $configuration = self::loadConfigPropertiesFromEnv();
         } else {
-            try {
-                // Catching here, rather than letting this join the parse above, is what keeps an
-                // unparseable instrumentation node from also costing us the already-registered SDK.
-                $configuration = $config?->getInstrumentationConfig() ?? new NoopConfigProperties();
-            } catch (Throwable $t) {
-                // Reported verbatim, including the Error raised when an older sdk-configuration
-                // lacks getInstrumentationConfig() — PHP's own message names the missing method, and
-                // `sdk` can only suggest that package, so its version cannot be constrained from
-                // here. Singling Error out to blame the version instead would also catch faults
-                // raised *by* the configuration, such as a TypeError from a plugin's create().
-                self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
-                $configuration = new NoopConfigProperties();
-            }
+            //            try {
+            //                // Catching here, rather than letting this join the parse above, is what keeps an
+            //                // unparseable instrumentation node from also costing us the already-registered SDK.
+            //                $configuration = $config?->getInstrumentationConfig() ?? new NoopConfigProperties();
+            //            } catch (Throwable $t) {
+            //                // Reported verbatim, including the Error raised when an older sdk-configuration
+            //                // lacks getInstrumentationConfig() — PHP's own message names the missing method, and
+            //                // `sdk` can only suggest that package, so its version cannot be constrained from
+            //                // here. Singling Error out to blame the version instead would also catch faults
+            //                // raised *by* the configuration, such as a TypeError from a plugin's create().
+            //                self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
+            //                $configuration = new NoopConfigProperties();
+            //            }
+            $configuration = new NoopConfigProperties();
         }
         $hookManager = self::getHookManager();
         $tracerProvider = self::createLateBindingTracerProvider();
