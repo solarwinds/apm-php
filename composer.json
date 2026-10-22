@@ -57,7 +57,8 @@
   "autoload-dev": {
     "psr-4": {
       "Solarwinds\\ApmPhp\\Tests\\Unit\\": "tests/Unit/",
-      "Solarwinds\\ApmPhp\\Tests\\Benchmark\\": "tests/Benchmark/"
+      "Solarwinds\\ApmPhp\\Tests\\Benchmark\\": "tests/Benchmark/",
+      "Solarwinds\\ApmPhp\\Tests\\Integration\\": "tests/Integration/"
     }
   },
   "require-dev": {
@@ -89,6 +90,11 @@
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSwoHttp",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSwoJson",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorResponseTime"
+      ]
+    },
+    "scripts": {
+      "test-psr3": [
+        "OpenTelemetry\\Tests\\Integration\\Composer\\Psr3Compatability::run"
       ]
     }
   }
