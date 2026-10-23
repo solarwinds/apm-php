@@ -16,6 +16,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
+use Solarwinds\ApmPhp\Trace\Sampler\SwoHttpSampler;
 use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 
 class SwoSamplerFactoryTest extends TestCase
@@ -134,6 +135,23 @@ class SwoSamplerFactoryTest extends TestCase
         $this->assertEquals('token1234', $config->getToken());
     }
 
+    public function test_create_http_sampler_with_token_only_service_key(): void
+    {
+        $serviceKey = \getenv('SW_APM_SERVICE_KEY');
+        $samplerName = \getenv(Env::OTEL_TRACES_SAMPLER);
+
+        try {
+            \putenv('SW_APM_SERVICE_KEY=token1234');
+            \putenv(Env::OTEL_TRACES_SAMPLER . '=swo_http');
+            $factory = new SwoSamplerFactory(ResourceInfoFactory::emptyResource());
+
+            $this->assertInstanceOf(SwoHttpSampler::class, $factory->create());
+        } finally {
+            \putenv($serviceKey === false ? 'SW_APM_SERVICE_KEY' : 'SW_APM_SERVICE_KEY=' . $serviceKey);
+            \putenv($samplerName === false ? Env::OTEL_TRACES_SAMPLER : Env::OTEL_TRACES_SAMPLER . '=' . $samplerName);
+        }
+    }
+
     public function test_get_solarwinds_configuration_http_default_resources(): void
     {
         $localEnvSetup = false;
@@ -146,7 +164,7 @@ class SwoSamplerFactoryTest extends TestCase
             $serviceKey = 'token1234:apm-php-unittest';
             $factory = new SwoSamplerFactory();
             $config = $factory->getSolarwindsConfiguration(true, $serviceKey);
-            $this->assertEquals('apm-php-unittest', $config->getService());
+            $this->assertEquals('unknown_service:php', $config->getService());
         } finally {
             if ($localEnvSetup) {
                 \putenv('SW_APM_SERVICE_KEY');

@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Solarwinds\ApmPhp\Resource\Detectors;
 
 use Composer\InstalledVersions;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SemConv\Attributes\ServiceAttributes;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 
 final class Apm implements ResourceDetectorInterface
 {
+    use LogsMessagesTrait;
     private const PACKAGIST_COMPOSER_NAME = 'solarwinds/apm';
     private const SERVICE_KEY_DELIMITER = ':';
     public const SW_DATA_MODULE = 'sw.data.module';
@@ -45,12 +46,13 @@ final class Apm implements ResourceDetectorInterface
             }
         }
 
-        // Azure app service has higher precedence than SW_APM_SERVICE_KEY
+        // Emit warning and ignore the value
         if (!$azureAppService && $serviceKey && str_contains($serviceKey, self::SERVICE_KEY_DELIMITER)) {
-            [, $swServiceName] = explode(self::SERVICE_KEY_DELIMITER, $serviceKey);
-            if (strlen($swServiceName) > 0) {
-                $attributes[ServiceAttributes::SERVICE_NAME] = $swServiceName;
-            }
+            self::logWarning(
+                'The service name component of SW_APM_SERVICE_KEY is ignored '
+                . 'and will be removed in a future release. Set the service name '
+                . 'using OTEL_SERVICE_NAME or OTEL_RESOURCE_ATTRIBUTES instead.'
+            );
         }
 
         return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
