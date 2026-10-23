@@ -20,6 +20,10 @@ html-coverage/
 coverage.clover
 tests/coverage
 
+# mago
+.mago/
+mago.lock
+
 # Package
 package.xml
 
