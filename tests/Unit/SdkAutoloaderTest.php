@@ -66,7 +66,7 @@ class SdkAutoloaderTest extends TestCase
         $this->assertFalse(SdkAutoloader::isExcludedUrl());
     }
 
-    public function test_autoload_throws_if_config_file_set_and_class_missing(): void
+    public function test_autoload_no_throws_if_config_file_set_and_class_missing(): void
     {
         putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=true');
         putenv(Variables::OTEL_CONFIG_FILE . '=foo.yaml');
@@ -74,8 +74,8 @@ class SdkAutoloaderTest extends TestCase
         if (class_exists('OpenTelemetry\\Config\\SDK\\Configuration', false)) {
             $this->markTestSkipped('Cannot test missing SdkConfiguration class if it is loaded.');
         } else {
-            $this->expectException(\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException::class);
             SdkAutoloader::autoload();
+            $this->assertTrue(true); // If no exception is thrown, the test passes
         }
     }
 

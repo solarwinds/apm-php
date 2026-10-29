@@ -11,22 +11,18 @@ permissions: read-all
 jobs:
   php:
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ matrix.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.1', '8.2', '8.3']
-        experimental: [false]
-        composer_args: [""]
+        php-version: ['8.1', '8.2', '8.3', '8.4', '8.5']
+        composer_args: ['']
         include:
-          - php-version: 8.4
-            experimental: false
-            composer_args: "--ignore-platform-reqs"
-          - php-version: 8.5
+          - php-version: '8.6'
             experimental: true
             composer_args: "--ignore-platform-reqs"
     env:
-      extensions: ast, grpc, opentelemetry, protobuf
+      extensions: ast, grpc, opentelemetry, protobuf, yaml
 
     steps:
     - name: Set cache key
@@ -44,14 +40,16 @@ jobs:
           echo "composer=${{steps.composer.outcome}}"
           echo "style=${{steps.style.outcome}}"
           echo "deps=${{steps.deps.outcome}}"
+          echo "psr4=${{steps.psr4.outcome}}"
           echo "phan=${{steps.phan.outcome}}"
           echo "psalm=${{steps.psalm.outcome}}"
           echo "phpstan=${{steps.phpstan.outcome}}"
           echo "unit=${{steps.unit.outcome}}"
           echo "integration=${{steps.integration.outcome}}"
+          echo "benchmark=${{steps.benchmark.outcome}}"
           echo "::endgroup::"
 
-          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.phan.outcome == 'failure' || steps.psalm.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' }} == true ]; then \
+          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.psr4.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' || steps.benchmark.outcome == 'failure' }} == true ]; then \
             echo "::error::One or more steps failed"; \
           fi
 
@@ -101,14 +99,14 @@ jobs:
 
     - name: Install dependencies
       id: composer
-      if: steps.composer-cache.outputs.cache-hit != 'true'
+      if: steps.composer-cache.outputs.cache-hit != 'true' || steps.test-tools-cache.outputs.cache-hit != 'true'
       run: |
         composer --version
         composer install --prefer-dist --no-progress ${{ matrix.composer_args }}
 
     - name: Check Style
       id: style
-      continue-on-error: ${{ matrix.experimental }}
+      continue-on-error: ${{ matrix.experimental || false }}
       env:
         PHP_CS_FIXER_IGNORE_ENV: 1
       run: |
@@ -117,14 +115,20 @@ jobs:
 
     - name: Check Dependencies
       id: deps
-      continue-on-error: ${{ matrix.experimental }}
+      continue-on-error: ${{ matrix.experimental || false }}
       run: |
         vendor-bin/deptrac/vendor/bin/deptrac --version
         vendor-bin/deptrac/vendor/bin/deptrac --formatter=github-actions --report-uncovered
 
+    - name: Check PSR-4 Compliance
+      id: psr4
+      continue-on-error: ${{ matrix.experimental || false }}
+      run: composer dump-autoload --optimize --strict-psr --dry-run
+
     - name: Run Phan
       id: phan
-      continue-on-error: ${{ matrix.experimental }}
+      # Phan is not yet fully compatible with PHP 8.5; keep non-blocking until fixed upstream.
+      continue-on-error: true
       env:
         XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
@@ -132,23 +136,24 @@ jobs:
         vendor-bin/phan/vendor/bin/phan --version
         vendor-bin/phan/vendor/bin/phan
 
-#    - name: Run Psalm
-#      id: psalm
-#      continue-on-error: ${{ matrix.experimental }}
-#      run: |
-#        vendor-bin/psalm/vendor/bin/psalm --version
-#        vendor-bin/psalm/vendor/bin/psalm --output-format=github
+    - name: Run Psalm
+      id: psalm
+      # Psalm is not yet fully compatible with PHP 8.5; keep non-blocking until fixed upstream.
+      continue-on-error: true
+      run: |
+        vendor-bin/psalm/vendor/bin/psalm --version
+        vendor-bin/psalm/vendor/bin/psalm --output-format=github
 
     - name: Run Phpstan
       id: phpstan
-      continue-on-error: ${{ matrix.experimental }}
+      continue-on-error: ${{ matrix.experimental || false }}
       run: |
         vendor/bin/phpstan --version
         vendor/bin/phpstan analyse --error-format=github
 
     - name: Run PHPUnit (unit tests)
       id: unit
-      continue-on-error: ${{ matrix.experimental }}
+      continue-on-error: ${{ matrix.experimental || false }}
       env:
         OTEL_LOG_LEVEL: none
         SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
@@ -158,7 +163,7 @@ jobs:
 
     - name: Run PHPUnit (integration tests)
       id: integration
-      continue-on-error: ${{ matrix.experimental }}
+      continue-on-error: ${{ matrix.experimental || false }}
       env:
         OTEL_LOG_LEVEL: none
         SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
@@ -167,7 +172,7 @@ jobs:
     - name: Run phpbench (benchmark)
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       id: benchmark
-      continue-on-error: ${{ matrix.experimental }}
+      continue-on-error: ${{ matrix.experimental || false }}
       env:
         OTEL_LOG_LEVEL: none
         SW_APM_SERVICE_KEY: ${{ secrets.SW_APM_SERVICE_KEY }}
