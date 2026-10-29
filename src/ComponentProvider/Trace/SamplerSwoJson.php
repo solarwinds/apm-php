@@ -30,9 +30,9 @@ final class SamplerSwoJson implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        $config = new Configuration(service:'', collector:'', token:'', tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
+        $config = new Configuration(service:'', collector:'', token:'', tracingMode: $properties['tracing_enabled'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
 
-        return SwoJsonSampler::getInstance($context->meterProvider, $config, $properties['path'] ?? KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH);
+        return SwoJsonSampler::getInstance($context->meterProvider, $config, $properties['file'] ?? KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH);
     }
 
     #[\Override]
@@ -41,8 +41,8 @@ final class SamplerSwoJson implements ComponentProvider
         $node = $builder->arrayNode('swo_json');
         $node
             ->children()
-                ->scalarNode('path')->defaultValue(KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH)->validate()->always(Validation::ensureString())->end()->end()
-                ->booleanNode('tracing_mode')->defaultTrue()->end()
+                ->scalarNode('file')->defaultValue(KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH)->validate()->always(Validation::ensureString())->end()->end()
+                ->booleanNode('tracing_enabled')->defaultTrue()->end()
                 ->booleanNode('trigger_tracing_enabled')->defaultTrue()->end()
                 ->arrayNode('transaction_settings')
                     ->arrayPrototype()
