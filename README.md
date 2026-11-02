@@ -185,7 +185,7 @@ use OpenTelemetry\API\Trace\SpanKind;
 // Create a tracer. Usually, tracer is a global variable.
 $tracer = Globals::tracerProvider()->getTracer('instrumentation-scope-name');
 try {
-    // Create a root span (a trace) to measure some operation.
+    // Create a root span (a trace) for the application.
     $main = $tracer->spanBuilder('span-name')->setSpanKind(SpanKind::KIND_SERVER)->startSpan();
     // Future spans will be parented to the currently active span.
     $mainScope = $main->activate();
