@@ -176,7 +176,7 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
     php -S localhost:8080
 ```
 
-## Example for starting a trace in an application that doesn't have automatic instrumentation packages
+## Example for starting an application root span
 User can use Opentelemetry API to start a trace in an application that doesn't have automatic instrumentation packages by using the following code snippet:
 ```php
 use OpenTelemetry\API\Globals;
