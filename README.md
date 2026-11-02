@@ -179,6 +179,9 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
 ## Example for starting a trace in an application that doesn't have automatic instrumentation packages
 User can use Opentelemetry API to start a trace in an application that doesn't have automatic instrumentation packages by using the following code snippet:
 ```php
+use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Trace\SpanKind;
+
 // Create a tracer. Usually, tracer is a global variable.
 $tracer = Globals::tracerProvider()->getTracer('instrumentation-scope-name');
 try {
