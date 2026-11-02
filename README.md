@@ -190,7 +190,7 @@ try {
     // Future spans will be parented to the currently active span.
     $mainScope = $main->activate();
     // PHP code
-    ....
+    // Insert application code here.
 } finally {
     // Must detach and end the span
     $mainScope->detach();
