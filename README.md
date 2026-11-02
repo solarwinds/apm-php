@@ -176,6 +176,26 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
     php -S localhost:8080
 ```
 
+## Example for starting a trace in an application that doesn't have automatic instrumentation packages
+User can use Opentelemetry API to start a trace in an application that doesn't have automatic instrumentation packages by using the following code snippet:
+```php
+// Create a tracer. Usually, tracer is a global variable.
+$tracer = Globals::tracerProvider()->getTracer('instrumentation-scope-name');
+try {
+    // Create a root span (a trace) to measure some operation.
+    $main = $tracer->spanBuilder('span-name')->setSpanKind(SpanKind::KIND_SERVER)->startSpan();
+    // Future spans will be parented to the currently active span.
+    $mainScope = $main->activate();
+    // PHP code
+    ....
+} finally {
+    // Must detach and end the span
+    $mainScope->detach();
+    $main->end();
+}
+```
+For more details, see the [OpenTelemetry PHP documentation](https://opentelemetry.io/docs/languages/php/instrumentation/#traces).
+
 ## Example for Azure App Service
 To set up SolarWinds APM in an Azure App Service deployment, see the [Azure App Service Quickstart](./docs/azure-app-service-quickstart.md).
 
