@@ -177,7 +177,7 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
 ```
 
 ## Example for starting an application root span
-User can use Opentelemetry API to start a trace in an application that doesn't have automatic instrumentation packages by using the following code snippet:
+OpenTelemetry PHP provides [instrumentations](https://opentelemetry.io/docs/languages/php/libraries/#use-instrumentation-libraries) for many popular frameworks. If a library isn't available for your application, you can use the OpenTelemetry API to start a trace so that spans from instrumented operations will become children of the application root span. Example:
 ```php
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Trace\SpanKind;
