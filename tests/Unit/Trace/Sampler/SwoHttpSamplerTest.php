@@ -42,9 +42,13 @@ class SwoHttpSamplerTest extends TestCase
             ->with('Authorization', 'Bearer test-token')
             ->willReturn($request);
 
+        $hostname = gethostname();
+        if ($hostname === false) {
+            $this->fail('Failed to get hostname');
+        }
         $requestFactory->expects($this->once())
             ->method('createRequest')
-            ->with('GET', 'https://apm.collector.na-01.cloud.solarwinds.com/v1/settings/test+service/' . urlencode(gethostname()))
+            ->with('GET', 'https://apm.collector.na-01.cloud.solarwinds.com/v1/settings/test+service/' . urlencode($hostname))
             ->willReturn($request);
 
         $response = $this->createMock(ResponseInterface::class);

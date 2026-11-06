@@ -17,11 +17,16 @@ class SwoJsonSamplerTest extends TestCase
 {
     private string $path;
 
+    #[\Override]
     protected function setUp(): void
     {
-        $this->path = tempnam(sys_get_temp_dir(), 'swo-json-sampler-test-');
+        $tempPath = tempnam(sys_get_temp_dir(), 'swo-json-sampler-test-');
+        if ($tempPath === false) {
+            $this->fail('Unable to create temporary file for SwoJsonSampler test.');
+        }
+        $this->path = $tempPath;
     }
-
+    #[\Override]
     protected function tearDown(): void
     {
         unlink($this->path);
@@ -36,7 +41,7 @@ class SwoJsonSamplerTest extends TestCase
 
     public function test_should_sample_uses_json_sampler_result(): void
     {
-        file_put_contents($this->path, json_encode([
+        $settings = json_encode([
             [
                 'flags' => 'SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE,OVERRIDE',
                 'value' => 1000000,
@@ -47,8 +52,11 @@ class SwoJsonSamplerTest extends TestCase
                 'timestamp' => time(),
                 'ttl' => 60,
             ],
-        ]));
-
+        ]);
+        if ($settings === false) {
+            $this->fail('Unable to create temporary settings for SwoJsonSampler test.');
+        }
+        file_put_contents($this->path, $settings);
         $sampler = new SwoJsonSampler(null, $this->configuration(), $this->path);
         $result = $sampler->shouldSample(
             Context::getCurrent(),

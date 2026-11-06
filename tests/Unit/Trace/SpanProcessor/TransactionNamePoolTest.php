@@ -13,6 +13,7 @@ final class TransactionNamePoolTest extends TestCase
 {
     private TransactionNamePool $pool;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->pool = new TransactionNamePool();

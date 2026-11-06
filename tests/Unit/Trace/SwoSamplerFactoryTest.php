@@ -21,12 +21,14 @@ use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 
 class SwoSamplerFactoryTest extends TestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         // Reset environment variables before each test
         \putenv(Env::OTEL_TRACES_SAMPLER);
         \putenv(Env::OTEL_TRACES_SAMPLER_ARG);
     }
+    #[\Override]
     protected function tearDown(): void
     {
         // Reset environment variables after each test
@@ -183,7 +185,14 @@ class SwoSamplerFactoryTest extends TestCase
     public function test_get_solarwinds_configuration_transaction_settings_file(): void
     {
         $file = tempnam(sys_get_temp_dir(), 'sw_transaction_settings');
-        file_put_contents($file, json_encode([(object) ['tracing' => 'enabled', 'regex' => '/^.*.html$/'], (object) ['tracing' => 'disabled', 'regex' => '/^.*.css$/']]));
+        if ($file === false) {
+            $this->fail('Unable to create temporary transaction settings file.');
+        }
+        $settings = json_encode([(object) ['tracing' => 'enabled', 'regex' => '/^.*.html$/'], (object) ['tracing' => 'disabled', 'regex' => '/^.*.css$/']]);
+        if ($settings === false) {
+            $this->fail('Unable to create temporary transaction settings.');
+        }
+        file_put_contents($file, $settings);
         \putenv('SW_APM_TRANSACTION_SETTINGS_FILE=' . $file);
         $factory = new SwoSamplerFactory();
         $config = $factory->getSolarwindsConfiguration(true, 'token:service');
@@ -194,7 +203,11 @@ class SwoSamplerFactoryTest extends TestCase
 
     public function test_get_solarwinds_configuration_transaction_settings_env(): void
     {
-        \putenv('SW_APM_TRANSACTION_SETTINGS=' . json_encode([(object) ['tracing' => 'enabled', 'regex' => '/^.*.html$/'], (object) ['tracing' => 'disabled', 'regex' => '/^.*.css$/']]));
+        $settings = json_encode([(object) ['tracing' => 'enabled', 'regex' => '/^.*.html$/'], (object) ['tracing' => 'disabled', 'regex' => '/^.*.css$/']]);
+        if ($settings === false) {
+            $this->fail('Unable to create temporary transaction settings.');
+        }
+        \putenv('SW_APM_TRANSACTION_SETTINGS=' . $settings);
         $factory = new SwoSamplerFactory();
         $config = $factory->getSolarwindsConfiguration(true, 'token:service');
         $this->assertEquals([['tracing' => 'enabled', 'regex' => '/^.*.html$/'], ['tracing' => 'disabled', 'regex' => '/^.*.css$/']], $config->getTransactionSettings());
@@ -211,6 +224,9 @@ class SwoSamplerFactoryTest extends TestCase
         // Global disable tracing mode to ensure transaction settings are applied
         \putenv('SW_APM_TRACING_MODE=disabled');
         $file = tempnam(sys_get_temp_dir(), 'sw_transaction_settings');
+        if ($file === false) {
+            $this->fail('Unable to create temporary transaction settings file.');
+        }
         file_put_contents($file, '[{"tracing":"enabled","regex":"#^INTERNAL:http://my.domain.com/foo$#"}]');
         \putenv('SW_APM_TRANSACTION_SETTINGS_FILE=' . $file);
         $factory = new SwoSamplerFactory();

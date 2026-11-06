@@ -10,6 +10,7 @@ use Solarwinds\ApmPhp\SdkAutoloader;
 
 class SdkAutoloaderTest extends TestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         // Reset environment and server variables before each test
