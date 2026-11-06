@@ -607,8 +607,7 @@ class SamplerTest extends TestCase
         $configMock->method('isTriggerTraceEnabled')->willReturn(true);
         $configMock->method('getTransactionSettings')->willReturn([]);
         $sampler = new TestSampler(null, $configMock, null);
-        $context = $this->createMock(ContextInterface::class);
-        $headers = $sampler->requestHeaders($context, 'traceid', 'span', 1, Attributes::create([]), []);
+        $headers = $sampler->requestHeaders($this->createMock(ContextInterface::class), 'traceid', 'span', 1, Attributes::create([]), []);
         $this->assertInstanceOf(\Solarwinds\ApmPhp\Trace\Sampler\RequestHeaders::class, $headers);
     }
 
@@ -619,8 +618,7 @@ class SamplerTest extends TestCase
         $configMock->method('isTriggerTraceEnabled')->willReturn(true);
         $configMock->method('getTransactionSettings')->willReturn([]);
         $sampler = new TestSampler(null, $configMock, null);
-        $headers = $this->getMockBuilder(\Solarwinds\ApmPhp\Trace\Sampler\ResponseHeaders::class)
-            ->disableOriginalConstructor()->getMock();
+        $headers = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\ResponseHeaders::class);
         $headers->XTraceOptionsResponse = '';
         $context = $this->createMock(ContextInterface::class);
         $this->assertNull($sampler->setResponseHeaders($headers, $context, 'traceid', 'span', 1, Attributes::create([]), []));

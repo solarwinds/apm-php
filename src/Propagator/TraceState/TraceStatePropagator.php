@@ -40,7 +40,7 @@ class TraceStatePropagator implements TextMapPropagatorInterface
         }
         $swTraceState = sprintf('%s-%02x', $spanContext->getSpanId(), $spanContext->getTraceFlags());
         $traceState = $spanContext->getTraceState();
-        if ($traceState === null) {
+        if (!$traceState instanceof \OpenTelemetry\API\Trace\TraceStateInterface) {
             $traceState = new TraceState();
         }
         $updatedTraceState = $traceState->without(self::SW)->with(self::SW, $swTraceState);
@@ -51,7 +51,7 @@ class TraceStatePropagator implements TextMapPropagatorInterface
 
     public static function getInstance(): self
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof \Solarwinds\ApmPhp\Propagator\TraceState\TraceStatePropagator) {
             self::$instance = new self();
         }
 

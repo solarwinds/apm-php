@@ -54,7 +54,7 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
 
     public static function getInstance(?MeterProviderInterface $meterProvider = null, ?string $name = null): SpanProcessorInterface
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof \OpenTelemetry\SDK\Trace\SpanProcessorInterface) {
             self::$instance = new self($meterProvider, $name);
         }
 

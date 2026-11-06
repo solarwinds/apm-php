@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\API\Trace\TraceState;
+use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -47,7 +48,7 @@ class TestOboeSampler extends OboeSampler
         parent::__construct($meterProvider, $cacheExtension);
         $this->localSettings = $localSettings;
         $this->requestHeaders = $requestHeaders;
-        if ($settings !== null) {
+        if ($settings instanceof Settings) {
             $this->updateSettings($settings);
         }
     }
@@ -170,7 +171,7 @@ class OboeSamplerTest extends TestCase
             $traceState = (new TraceState())->with('vendor1', 'vendor1-value')->with('vendor2', 'vendor2-value');
         }
         if ($sw) {
-            if ($traceState !== null) {
+            if ($traceState instanceof TraceStateInterface) {
                 $traceState = $traceState->with('sw', $spanId . '-' . $swFlags);
             } else {
                 $traceState = (new TraceState())->with('sw', $spanId . '-' . $swFlags);

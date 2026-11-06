@@ -87,7 +87,6 @@ final class TransactionNamePoolTest extends TestCase
     {
         $reflection = new \ReflectionClass($object);
         $property = $reflection->getProperty($property);
-        $property->setAccessible(true);
 
         return $property->getValue($object);
     }

@@ -28,7 +28,7 @@ class SwoJsonSampler implements SamplerInterface
 
     public static function getInstance(?MeterProviderInterface $meterProvider, Configuration $config, string $path = KnownValues::VALUE_SAMPLER_SWO_JSON_DEFAULT_PATH): self
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof SwoJsonSampler) {
             self::$instance = new self($meterProvider, $config, $path);
         }
 

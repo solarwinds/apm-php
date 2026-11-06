@@ -65,7 +65,7 @@ class HttpSampler extends Sampler
                     $unparsed = json_decode($cached, true);
                     if (is_array($unparsed)) {
                         if (time() <= (int) $unparsed['timestamp'] + (int) $unparsed['ttl']) {
-                            if ($this->parsedAndUpdateSettings($unparsed)) {
+                            if ($this->parsedAndUpdateSettings($unparsed) instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings) {
                                 // return if settings are valid
                                 $this->logDebug('Applied sampling settings from cache: ' . $cached);
 
@@ -104,7 +104,7 @@ class HttpSampler extends Sampler
             $this->logDebug('Received sampling settings response ' . $content);
             $unparsed = json_decode($content, true);
             $parsed = $this->parsedAndUpdateSettings($unparsed);
-            if (!$parsed) {
+            if (!$parsed instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings) {
                 $this->logWarning('Retrieved sampling settings are invalid');
 
                 return;

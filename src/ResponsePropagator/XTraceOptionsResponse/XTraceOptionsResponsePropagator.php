@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Solarwinds\ApmPhp\ResponsePropagator\XTraceOptionsResponse;
 
 use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
@@ -29,7 +30,7 @@ class XTraceOptionsResponsePropagator implements ResponsePropagatorInterface
 
     public static function getInstance(): self
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof XTraceOptionsResponsePropagator) {
             self::$instance = new self();
         }
 
@@ -51,7 +52,7 @@ class XTraceOptionsResponsePropagator implements ResponsePropagatorInterface
         }
 
         $traceState = $spanContext->getTraceState();
-        if ($traceState !== null) {
+        if ($traceState instanceof TraceStateInterface) {
             $xtrace_options_response = $traceState->get(KnownValues::VALUE_TRACESTATE_XTRACE_OPTIONS_RESPONSE);
             if ($xtrace_options_response !== null) {
                 $replaced = str_replace('....', ',', $xtrace_options_response);
