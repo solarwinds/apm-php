@@ -55,7 +55,13 @@ class SwoSamplerFactory
             : '';
         $token = '';
         if ($isHttp && $serviceKey) {
-            $token = explode(self::SERVICE_KEY_DELIMITER, $serviceKey, 2)[0];
+            if (preg_match(self::SERVICE_KEY_PATTERN, $serviceKey)) {
+                // Legacy SW_APM_SERVICE_KEY format. e.g. token:name
+                $token = explode(self::SERVICE_KEY_DELIMITER, $serviceKey, 2)[0];
+            } else {
+                // New format
+                $token = $serviceKey;
+            }
         }
         $tracingMode = !Configuration::has(SolarwindsEnv::SW_APM_TRACING_MODE) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRACING_MODE)) === 'enabled';
         $triggerTraceEnabled = !Configuration::has(SolarwindsEnv::SW_APM_TRIGGER_TRACE) || strtolower(Configuration::getString(SolarwindsEnv::SW_APM_TRIGGER_TRACE)) === 'enabled';
@@ -125,12 +131,12 @@ class SwoSamplerFactory
                             $serviceKey = Configuration::has(SolarwindsEnv::SW_APM_SERVICE_KEY)
                                 ? Configuration::getString(SolarwindsEnv::SW_APM_SERVICE_KEY)
                                 : null;
-                            if ($serviceKey && preg_match(self::SERVICE_KEY_PATTERN, $serviceKey)) {
+                            if ($serviceKey) {
                                 $configuration = $this->getSolarwindsConfiguration(true, $serviceKey);
 
                                 return new SwoHttpSampler($meterProvider, $configuration);
                             }
-                            self::logWarning('SW_APM_SERVICE_KEY is not correctly formatted. Falling back to AlwaysOffSampler.');
+                            self::logWarning('SW_APM_SERVICE_KEY is null. Falling back to AlwaysOffSampler.');
 
                             return new AlwaysOffSampler();
                         } catch (Exception $e) {

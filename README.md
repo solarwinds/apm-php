@@ -176,6 +176,29 @@ env OTEL_PHP_AUTOLOAD_ENABLED=true \
     php -S localhost:8080
 ```
 
+## Example for starting an application root span
+OpenTelemetry PHP provides [instrumentations](https://opentelemetry.io/docs/languages/php/libraries/#use-instrumentation-libraries) for many popular frameworks. If a library isn't available for your application, you can use the OpenTelemetry API to start a trace so that spans from instrumented operations will become children of the application root span. Example:
+```php
+use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Trace\SpanKind;
+
+// Create a tracer. Usually, tracer is a global variable.
+$tracer = Globals::tracerProvider()->getTracer('instrumentation-scope-name');
+try {
+    // Create a root span (a trace) for the application.
+    $main = $tracer->spanBuilder('span-name')->setSpanKind(SpanKind::KIND_SERVER)->startSpan();
+    // Future spans will be parented to the currently active span.
+    $mainScope = $main->activate();
+    // PHP code
+    // Insert application code here.
+} finally {
+    // Must detach and end the span
+    $mainScope->detach();
+    $main->end();
+}
+```
+For more details, see the [OpenTelemetry PHP documentation](https://opentelemetry.io/docs/languages/php/instrumentation/#traces).
+
 ## Example for Azure App Service
 To set up SolarWinds APM in an Azure App Service deployment, see the [Azure App Service Quickstart](./docs/azure-app-service-quickstart.md).
 

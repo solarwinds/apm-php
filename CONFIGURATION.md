@@ -7,7 +7,7 @@ Additionally the following SolarWinds-specific configurations are supported:
 
 | Configuration                    | Default                                  | Description                                                                                                                                      |
 |----------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| SW_APM_SERVICE_KEY               |                                          | **Service key**. See [Service Name](#service-name)                                                                                               |
+| SW_APM_SERVICE_KEY               |                                          | **Service key**. API token to authenticate with SolarWinds                                                                                       |
 | SW_APM_COLLECTOR                 | apm.collector.na-01.cloud.solarwinds.com | [APM collector endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm#General) |
 | SW_APM_TRACING_MODE              | enabled                                  | Enable observability for the service. Valid values: enabled, disabled                                                                            |
 | SW_APM_TRIGGER_TRACE             | enabled                                  | Enable the trigger trace feature in solarwinds sampler. Valid values: enabled, disabled                                                          |
@@ -20,7 +20,7 @@ Additionally the following SolarWinds-specific configurations are supported:
 
 ### Service Name
 
-By default, the service name portion of the service key is used, e.g. `my-service` if the service key is `SW_APM_SERVICE_KEY=api-token:my-service`. If the `OTEL_SERVICE_NAME` or `OTEL_RESOURCE_ATTRIBUTES` environment variable is used to specify a service name, it will take precedence over the default.
+A service name specified through `OTEL_SERVICE_NAME` or `OTEL_RESOURCE_ATTRIBUTES` takes precedence over names set by resource detectors. If neither the environment variables nor the detectors provide a service name, the default is `unknown_service:php`.
 
 ### Transaction Settings
 

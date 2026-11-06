@@ -44,7 +44,7 @@ final class SamplerSwoHttp implements ComponentProvider
         if ($list instanceof ResourceInfo) {
             $service_name_from_resource = $list->getAttributes()->get('service.name');
         }
-        $config = new Configuration(service:$service_name_from_resource??$service_name??'unknown_service:php', collector:'https://' . ($properties['collector'] ?? KnownValues::VALUE_SAMPLER_SWO_HTTP_DEFAULT_APM_COLLECTOR), token:$token, tracingMode: $properties['tracing_mode'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
+        $config = new Configuration(service:$service_name_from_resource??$service_name??'unknown_service:php', collector:'https://' . ($properties['collector'] ?? KnownValues::VALUE_SAMPLER_SWO_HTTP_DEFAULT_APM_COLLECTOR), token:$token, tracingMode: $properties['tracing_enabled'] ?? null, triggerTraceEnabled: $properties['trigger_tracing_enabled'] ?? true, transactionSettings: $properties['transaction_settings'] ?? []);
 
         return SwoHttpSampler::getInstance($context->meterProvider, $config);
     }
@@ -57,7 +57,7 @@ final class SamplerSwoHttp implements ComponentProvider
             ->children()
                 ->scalarNode('service_key')->isRequired()->cannotBeEmpty()->validate()->always(SwoValidation::ensureServiceKey())->end()->end()
                 ->scalarNode('collector')->defaultValue(KnownValues::VALUE_SAMPLER_SWO_HTTP_DEFAULT_APM_COLLECTOR)->validate()->always(Validation::ensureString())->end()->end()
-                ->booleanNode('tracing_mode')->defaultTrue()->end()
+                ->booleanNode('tracing_enabled')->defaultTrue()->end()
                 ->booleanNode('trigger_tracing_enabled')->defaultTrue()->end()
                 ->arrayNode('transaction_settings')
                     ->arrayPrototype()
