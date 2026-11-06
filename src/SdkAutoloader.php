@@ -49,6 +49,7 @@ use OpenTelemetry\SDK\Propagation\ResponsePropagatorFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
+use OpenTelemetry\SDK\Trace\ExcludedRequestHeaders;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
@@ -68,7 +69,7 @@ class SdkAutoloader
         // Reset the globals to avoid any previous configuration
         Globals::reset();
 
-        if (!self::isEnabled() || self::isExcludedUrl()) {
+        if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
         $config = null;
@@ -79,7 +80,7 @@ class SdkAutoloader
                 try {
                     // One parse serves both configuration roots. Registering no initializer on
                     // failure leaves Globals to fall back to its noop configurator.
-                    $config = SdkConfiguration::parseFile(Configuration::getList(Variables::OTEL_CONFIG_FILE));
+                    $config = SdkConfiguration::parseFile(Configuration::getString(Variables::OTEL_CONFIG_FILE));
                     Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator, $config));
                 } catch (Throwable $t) {
                     self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
@@ -90,13 +91,7 @@ class SdkAutoloader
         }
         self::registerInstrumentations($config);
 
-        if (AutoRootSpan::isEnabled()) {
-            $request = AutoRootSpan::createRequest();
-            if ($request) {
-                AutoRootSpan::create($request);
-                AutoRootSpan::registerShutdownHandler();
-            }
-        }
+        AutoRootSpan::start();
 
         return true;
     }
@@ -114,7 +109,7 @@ class SdkAutoloader
         }
         $distributionProperties = self::loadDistributionPropertiesFromEnv();
         $distributionConfiguration = $distributionProperties->getDistributionConfiguration(SdkDistribution::class) ?? new SdkDistribution();
-        $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED); // $distributionConfiguration->internalMetricsEnabled;
+        $emitMetrics = $distributionConfiguration->internalMetricsEnabled;
 
         $resource = ResourceInfoFactory::defaultResource();
         $exporter = (new ExporterFactory())->create();
@@ -189,20 +184,19 @@ class SdkAutoloader
         if (!Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             $configuration = self::loadConfigPropertiesFromEnv();
         } else {
-            //            try {
-            //                // Catching here, rather than letting this join the parse above, is what keeps an
-            //                // unparseable instrumentation node from also costing us the already-registered SDK.
-            //                $configuration = $config?->getInstrumentationConfig() ?? new NoopConfigProperties();
-            //            } catch (Throwable $t) {
-            //                // Reported verbatim, including the Error raised when an older sdk-configuration
-            //                // lacks getInstrumentationConfig() — PHP's own message names the missing method, and
-            //                // `sdk` can only suggest that package, so its version cannot be constrained from
-            //                // here. Singling Error out to blame the version instead would also catch faults
-            //                // raised *by* the configuration, such as a TypeError from a plugin's create().
-            //                self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
-            //                $configuration = new NoopConfigProperties();
-            //            }
-            $configuration = new NoopConfigProperties();
+            try {
+                // Catching here, rather than letting this join the parse above, is what keeps an
+                // unparseable instrumentation node from also costing us the already-registered SDK.
+                $configuration = $config?->getInstrumentationConfig() ?? new NoopConfigProperties();
+            } catch (Throwable $t) {
+                // Reported verbatim, including the Error raised when an older sdk-configuration
+                // lacks getInstrumentationConfig(). PHP's own message names the missing method, and
+                // `sdk` can only suggest that package, so its version cannot be constrained from
+                // here. Singling Error out to blame the version instead would also catch faults
+                // raised *by* the configuration, such as a TypeError from a plugin's create().
+                self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
+                $configuration = new NoopConfigProperties();
+            }
         }
         $hookManager = self::getHookManager();
         $tracerProvider = self::createLateBindingTracerProvider();
@@ -325,7 +319,10 @@ class SdkAutoloader
         });
     }
 
-    private static function getHookManager(): HookManagerInterface
+    /**
+     * @internal
+     */
+    public static function getHookManager(): HookManagerInterface
     {
         /** @var HookManagerInterface $hookManager */
         foreach (ServiceLoader::load(HookManagerInterface::class) as $hookManager) {
@@ -341,6 +338,21 @@ class SdkAutoloader
     public static function isEnabled(): bool
     {
         return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+    }
+
+    /**
+     * Test whether a request header matches the excluded request headers configuration option
+     *
+     * @internal
+     */
+    public static function isExcludedRequestHeader(): bool
+    {
+        // In the CLI $_SERVER holds the process environment, so HTTP_* variables there are not request headers
+        if (AutoRootSpan::isCliScript()) {
+            return false;
+        }
+
+        return ExcludedRequestHeaders::matchesServer($_SERVER);
     }
 
     /**
