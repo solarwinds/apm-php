@@ -306,11 +306,13 @@ class JsonSamplerTest extends TestCase
         ), $this->path);
         $this->assertStringContainsString('JSON Sampler (' . sys_get_temp_dir() . '/solarwinds-apm-settings.json', $sampler->getDescription());
     }
+
     #[\Override]
     protected function setUp(): void
     {
         $this->path = sys_get_temp_dir() . '/solarwinds-apm-settings.json';
     }
+
     #[\Override]
     protected function tearDown(): void
     {
