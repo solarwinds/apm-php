@@ -26,6 +26,7 @@ class SwoJsonSamplerTest extends TestCase
         }
         $this->path = $tempPath;
     }
+
     #[\Override]
     protected function tearDown(): void
     {
