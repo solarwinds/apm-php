@@ -53,7 +53,7 @@ class TraceStatePropagator implements TextMapPropagatorInterface
 
     public static function getInstance(): self
     {
-        if (!self::$instance instanceof \Solarwinds\ApmPhp\Propagator\TraceState\TraceStatePropagator) {
+        if (!self::$instance instanceof TraceStatePropagator) {
             self::$instance = new self();
         }
 

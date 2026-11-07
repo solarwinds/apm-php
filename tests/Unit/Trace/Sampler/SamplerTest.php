@@ -21,7 +21,10 @@ use Solarwinds\ApmPhp\Trace\Sampler\BucketSettings;
 use Solarwinds\ApmPhp\Trace\Sampler\BucketType;
 use Solarwinds\ApmPhp\Trace\Sampler\Flags;
 use function Solarwinds\ApmPhp\Trace\Sampler\httpSpanMetadata;
+use Solarwinds\ApmPhp\Trace\Sampler\LocalSettings;
 use function Solarwinds\ApmPhp\Trace\Sampler\parseSettings;
+use Solarwinds\ApmPhp\Trace\Sampler\RequestHeaders;
+use Solarwinds\ApmPhp\Trace\Sampler\ResponseHeaders;
 use Solarwinds\ApmPhp\Trace\Sampler\Sampler;
 use Solarwinds\ApmPhp\Trace\Sampler\SampleSource;
 use Solarwinds\ApmPhp\Trace\Sampler\Settings;
@@ -597,7 +600,7 @@ class SamplerTest extends TestCase
             Attributes::create([]),
             []
         );
-        $this->assertInstanceOf(\Solarwinds\ApmPhp\Trace\Sampler\LocalSettings::class, $settings);
+        $this->assertInstanceOf(LocalSettings::class, $settings);
     }
 
     public function test_request_headers_with_and_without_baggage(): void
@@ -608,7 +611,7 @@ class SamplerTest extends TestCase
         $configMock->method('getTransactionSettings')->willReturn([]);
         $sampler = new TestSampler(null, $configMock, null);
         $headers = $sampler->requestHeaders($this->createMock(ContextInterface::class), 'traceid', 'span', 1, Attributes::create([]), []);
-        $this->assertInstanceOf(\Solarwinds\ApmPhp\Trace\Sampler\RequestHeaders::class, $headers);
+        $this->assertInstanceOf(RequestHeaders::class, $headers);
     }
 
     public function test_set_response_headers_various_cases(): void
@@ -618,7 +621,7 @@ class SamplerTest extends TestCase
         $configMock->method('isTriggerTraceEnabled')->willReturn(true);
         $configMock->method('getTransactionSettings')->willReturn([]);
         $sampler = new TestSampler(null, $configMock, null);
-        $headers = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\ResponseHeaders::class);
+        $headers = $this->createMock(ResponseHeaders::class);
         $headers->XTraceOptionsResponse = '';
         $context = $this->createMock(ContextInterface::class);
         $this->assertNull($sampler->setResponseHeaders($headers, $context, 'traceid', 'span', 1, Attributes::create([]), []));

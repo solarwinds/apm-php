@@ -29,7 +29,7 @@ class SwoHttpSampler implements SamplerInterface
 
     public static function getInstance(?MeterProviderInterface $meterProvider, Configuration $config, ?Settings $initial = null, ?ClientInterface $client = null, ?RequestFactoryInterface $requestFactory = null, CacheExtensionInterface $cacheExtension = new CacheExtension()): self
     {
-        if (!self::$instance instanceof \Solarwinds\ApmPhp\Trace\Sampler\SwoHttpSampler) {
+        if (!self::$instance instanceof SwoHttpSampler) {
             self::$instance = new self($meterProvider, $config, $initial, $client, $requestFactory, $cacheExtension);
         }
 

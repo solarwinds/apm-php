@@ -113,9 +113,9 @@ abstract class OboeSampler implements SamplerInterface
                 $s->traceOptions->response->ignored = array_map(fn ($item) => is_array($item) && $item !== [] ? $item[0] : '', $s->traceOptions->ignored);
             }
         }
-        if (!$s->settings instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings) {
+        if (!$s->settings instanceof Settings) {
             $this->logDebug('settings unavailable; sampling disabled');
-            if ($s->traceOptions instanceof \Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsWithResponse && $s->traceOptions->triggerTrace) {
+            if ($s->traceOptions instanceof TraceOptionsWithResponse && $s->traceOptions->triggerTrace) {
                 $this->logDebug('trigger trace requested but unavailable');
                 $s->traceOptions->response->triggerTrace = TriggerTrace::SETTINGS_NOT_AVAILABLE;
             }
@@ -152,7 +152,7 @@ abstract class OboeSampler implements SamplerInterface
         AttributesInterface $attributes,
         array $links,
     ): ?Settings {
-        if (!$this->settings instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings) {
+        if (!$this->settings instanceof Settings) {
             return null;
         }
         if (time() > $this->settings->timestamp + $this->settings->ttl) {
@@ -193,7 +193,7 @@ abstract class OboeSampler implements SamplerInterface
         array $links,
     ): ?TraceStateInterface {
         $headers = new ResponseHeaders();
-        if ($s->traceOptions instanceof \Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsWithResponse) {
+        if ($s->traceOptions instanceof TraceOptionsWithResponse) {
             $headers->XTraceOptionsResponse = (string) $s->traceOptions->response;
         }
 
@@ -217,12 +217,12 @@ abstract class OboeSampler implements SamplerInterface
         ]);
         $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $parentIdAttributes);
 
-        if ($s->traceOptions instanceof \Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsWithResponse && $s->traceOptions->triggerTrace) {
+        if ($s->traceOptions instanceof TraceOptionsWithResponse && $s->traceOptions->triggerTrace) {
             $this->logDebug('trigger trace requested but ignored');
             $s->traceOptions->response->triggerTrace = TriggerTrace::IGNORED;
         }
 
-        if ($s->settings instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings && $s->settings->flags & Flags::SAMPLE_THROUGH_ALWAYS->value) {
+        if ($s->settings instanceof Settings && $s->settings->flags & Flags::SAMPLE_THROUGH_ALWAYS->value) {
             $this->logDebug('SAMPLE_THROUGH_ALWAYS is set; parent-based sampling');
             $flags = hexdec(substr((string) $s->traceState, -2));
             $sampled = $flags & TraceFlags::SAMPLED;
@@ -237,7 +237,7 @@ abstract class OboeSampler implements SamplerInterface
             }
         } else {
             $this->logDebug('SAMPLE_THROUGH_ALWAYS is unset; sampling disabled');
-            if ($s->settings instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings && $s->settings->flags & Flags::SAMPLE_START->value) {
+            if ($s->settings instanceof Settings && $s->settings->flags & Flags::SAMPLE_START->value) {
                 $this->logDebug('SAMPLE_START is set; record');
                 $s->decision = SamplingResult::RECORD_ONLY;
             } else {
@@ -249,9 +249,9 @@ abstract class OboeSampler implements SamplerInterface
 
     private function triggerTraceAlgo(SampleState $s, ContextInterface $parentContext): void
     {
-        if ($s->settings instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings && $s->settings->flags & Flags::TRIGGERED_TRACE->value) {
+        if ($s->settings instanceof Settings && $s->settings->flags & Flags::TRIGGERED_TRACE->value) {
             $this->logDebug('TRIGGERED_TRACE set; trigger tracing');
-            $bucket = $s->traceOptions?->response->auth instanceof \Solarwinds\ApmPhp\Trace\Sampler\Auth ? $this->buckets[BucketType::TRIGGER_RELAXED->value] : $this->buckets[BucketType::TRIGGER_STRICT->value];
+            $bucket = $s->traceOptions?->response->auth instanceof Auth ? $this->buckets[BucketType::TRIGGER_RELAXED->value] : $this->buckets[BucketType::TRIGGER_STRICT->value];
             $newAttributes = Attributes::create([
                 TRIGGERED_TRACE_ATTRIBUTE => true,
                 BUCKET_CAPACITY_ATTRIBUTE => $bucket->getCapacity(),
@@ -265,20 +265,20 @@ abstract class OboeSampler implements SamplerInterface
                 $this->counters->getTriggeredTraceCount()->add(1, [], $parentContext);
                 $this->counters->getTraceCount()->add(1, [], $parentContext);
 
-                if ($s->traceOptions instanceof \Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsWithResponse) {
+                if ($s->traceOptions instanceof TraceOptionsWithResponse) {
                     $s->traceOptions->response->triggerTrace = TriggerTrace::OK;
                 }
                 $s->decision = SamplingResult::RECORD_AND_SAMPLE;
             } else {
                 $this->logDebug('insufficient capacity; record only');
-                if ($s->traceOptions instanceof \Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsWithResponse) {
+                if ($s->traceOptions instanceof TraceOptionsWithResponse) {
                     $s->traceOptions->response->triggerTrace = TriggerTrace::RATE_EXCEEDED;
                 }
                 $s->decision = SamplingResult::RECORD_ONLY;
             }
         } else {
             $this->logDebug('TRIGGERED_TRACE unset; record only');
-            if ($s->traceOptions instanceof \Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsWithResponse) {
+            if ($s->traceOptions instanceof TraceOptionsWithResponse) {
                 $s->traceOptions->response->triggerTrace = TriggerTrace::TRIGGER_TRACING_DISABLED;
             }
             $s->decision = SamplingResult::RECORD_ONLY;
@@ -287,10 +287,10 @@ abstract class OboeSampler implements SamplerInterface
 
     private function diceRollAlgo(SampleState $s, ContextInterface $parentContext): void
     {
-        $dice = new Dice(1000000, $s->settings instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings? $s->settings->sampleRate : 0);
+        $dice = new Dice(1000000, $s->settings instanceof Settings ? $s->settings->sampleRate : 0);
         $sampleAttributes = Attributes::create([
             SAMPLE_RATE_ATTRIBUTE => $dice->getRate(),
-            SAMPLE_SOURCE_ATTRIBUTE => $s->settings instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings? $s->settings->sampleSource->value : SampleSource::LocalDefault,
+            SAMPLE_SOURCE_ATTRIBUTE => $s->settings instanceof Settings ? $s->settings->sampleSource->value : SampleSource::LocalDefault,
         ]);
         $s->attributes = Attributes::factory()->builder()->merge($s->attributes, $sampleAttributes);
         $this->counters->getSampleCount()->add(1, [], $parentContext);
@@ -320,11 +320,11 @@ abstract class OboeSampler implements SamplerInterface
 
     private function disabledAlgo(SampleState $s): void
     {
-        if ($s->traceOptions instanceof \Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsWithResponse && $s->traceOptions->triggerTrace) {
+        if ($s->traceOptions instanceof TraceOptionsWithResponse && $s->traceOptions->triggerTrace) {
             $this->logDebug('trigger trace requested but tracing disabled');
             $s->traceOptions->response->triggerTrace = TriggerTrace::TRACING_DISABLED;
         }
-        if ($s->settings instanceof \Solarwinds\ApmPhp\Trace\Sampler\Settings && $s->settings->flags & Flags::SAMPLE_THROUGH_ALWAYS->value) {
+        if ($s->settings instanceof Settings && $s->settings->flags & Flags::SAMPLE_THROUGH_ALWAYS->value) {
             $this->logDebug('SAMPLE_THROUGH_ALWAYS is set; record');
             $s->decision = SamplingResult::RECORD_ONLY;
         } else {

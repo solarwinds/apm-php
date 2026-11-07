@@ -46,7 +46,7 @@ final class XTraceOptionsBaggage implements BaggageInterface
     #[\Override]
     public static function getEmpty(): BaggageInterface
     {
-        if (!self::$emptyBaggage instanceof \Solarwinds\ApmPhp\Propagator\XTraceOptions\XTraceOptionsBaggage) {
+        if (!self::$emptyBaggage instanceof XTraceOptionsBaggage) {
             self::$emptyBaggage = new self();
         }
 
@@ -56,7 +56,7 @@ final class XTraceOptionsBaggage implements BaggageInterface
     #[\Override]
     public function getValue(string $key)
     {
-        if (($entry = $this->getEntry($key)) instanceof \OpenTelemetry\API\Baggage\Entry) {
+        if (($entry = $this->getEntry($key)) instanceof Entry) {
             return $entry->getValue();
         }
 

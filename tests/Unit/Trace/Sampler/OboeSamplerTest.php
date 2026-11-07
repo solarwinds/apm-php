@@ -1369,7 +1369,7 @@ class OboeSamplerTest extends TestCase
 
     public function test_write_bucket_state_to_cache_calls_cache_extension(): void
     {
-        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface = $this->createMock(CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->once())->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('putBucketState')->with($this->equalTo('test-key'), $this->equalTo('test-value'))->willReturn(true);
         $sampler = new TestOboeSampler(null, null, new LocalSettings(null, true), $this->makeRequestHeaders([]), $cacheExtensionInterface);
@@ -1379,7 +1379,7 @@ class OboeSamplerTest extends TestCase
 
     public function test_update_bucket_state_from_cache_calls_cache_extension(): void
     {
-        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface = $this->createMock(CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->once())->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getBucketState')->with($this->equalTo('test-key'))->willReturn('{"Default":{"capacity":2,"rate":1,"token":1,"lastUsed":1774549154.72},"TriggerRelaxed":{"capacity":20,"rate":1,"token":20,"lastUsed":1774549154.72},"TriggerStrict":{"capacity":6,"rate":0.1,"token":6,"lastUsed":1774549154.72}}');
         $sampler = new TestOboeSampler(null, null, new LocalSettings(null, true), $this->makeRequestHeaders([]), $cacheExtensionInterface);
