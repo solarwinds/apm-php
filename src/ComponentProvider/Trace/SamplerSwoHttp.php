@@ -24,7 +24,7 @@ final class SamplerSwoHttp implements ComponentProvider
 {
     /**
      * @phan-suppress PhanParamSignatureMismatch
-     * @param array{} $properties
+     * @param array<array-key, mixed> $properties
      * @param Context $context
      * @return SamplerInterface
      */
@@ -37,7 +37,7 @@ final class SamplerSwoHttp implements ComponentProvider
         if (is_string($service_key)) {
             $arr = explode(':', $service_key, 2);
             $token = $arr[0];
-            $service_name = $arr[1];
+            $service_name = $arr[1] ?? null;
         }
         $list = $context->getExtension(ResourceInfo::class);
         $service_name_from_resource = null;

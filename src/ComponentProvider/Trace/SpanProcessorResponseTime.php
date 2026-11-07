@@ -20,7 +20,7 @@ final class SpanProcessorResponseTime implements ComponentProvider
 {
     /**
      * @phan-suppress PhanParamSignatureMismatch
-     * @param array{} $properties
+     * @param array<array-key, mixed> $properties
      * @param Context $context
      * @return SpanProcessorInterface
      */
