@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Solarwinds\ApmPhp\Common\Configuration\Configuration;
+use Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface;
 use Solarwinds\ApmPhp\Trace\Sampler\HttpSampler;
 
 #[CoversClass(HttpSampler::class)]
@@ -234,7 +235,7 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->never())->method('getStatusCode')->willReturn(200);
         $response->expects($this->never())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->never())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface = $this->createMock(CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->exactly(3))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getCache')->willReturn(json_encode(['flags' => 'SAMPLE_START', 'value' => 1000000, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 2, 'BucketCapacity' => 2]]));
         $cacheExtensionInterface->expects($this->never())->method('putCache')->willReturn(true);
@@ -262,7 +263,7 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface = $this->createMock(CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->exactly(3))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->exactly(1))->method('getCache')->willReturn('');
         $cacheExtensionInterface->expects($this->exactly(1))->method('putCache')->willReturn(true);
@@ -290,7 +291,7 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface = $this->createMock(CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->exactly(3))->method('isExtensionLoaded')->willReturn(false);
         $cacheExtensionInterface->expects($this->never())->method('getCache')->willReturn('never called');
         $cacheExtensionInterface->expects($this->never())->method('putCache')->willReturn(true);
@@ -318,7 +319,7 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface = $this->createMock(CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->exactly(3))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getCache')->willReturn(false);
         $cacheExtensionInterface->expects($this->once())->method('putCache')->willReturn(true);
@@ -346,7 +347,7 @@ class HttpSamplerTest extends TestCase
         $response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $response->expects($this->once())->method('getHeaderLine')->willReturn('application/json');
         $response->expects($this->once())->method('getBody')->willReturn($this->createConfiguredMock(\Psr\Http\Message\StreamInterface::class, ['getContents' => json_encode(['flags' => 'SAMPLE_START', 'value' => 0, 'timestamp' => time(), 'ttl' => 60, 'arguments' => ['BucketRate' => 0, 'BucketCapacity' => 0]])]));
-        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface = $this->createMock(CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->exactly(3))->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getCache')->willReturn(false);
         $cacheExtensionInterface->expects($this->once())->method('putCache')->willReturn(false);

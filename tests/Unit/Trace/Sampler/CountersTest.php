@@ -26,16 +26,13 @@ class CountersTest extends TestCase
         $this->assertInstanceOf(CounterInterface::class, $this->counters->getTokenBucketExhaustionCount());
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         $meterProvider = $this->createMock(MeterProviderInterface::class);
         $meter = $this->createMock(MeterInterface::class);
-
         $meterProvider->method('getMeter')->willReturn($meter);
-
-        $counter = $this->createMock(CounterInterface::class);
-        $meter->method('createCounter')->willReturn($counter);
-
+        $meter->method('createCounter')->willReturn($this->createMock(CounterInterface::class));
         $this->counters = new Counters($meterProvider);
     }
 }

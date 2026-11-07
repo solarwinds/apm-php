@@ -27,6 +27,7 @@ class UamsTest extends TestCase
     private string $fileId;
     private string $apiId;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->clientMock = $this->createMock(ClientInterface::class);
@@ -37,7 +38,7 @@ class UamsTest extends TestCase
 
     private function createStreamMock(string $content): StreamInterface&MockObject
     {
-        $streamMock = $this->getMockBuilder(StreamInterface::class)->getMock();
+        $streamMock = $this->createMock(StreamInterface::class);
         $streamMock->method('getContents')->willReturn($content);
 
         return $streamMock;
@@ -54,13 +55,17 @@ class UamsTest extends TestCase
             ->method('createRequest')
             ->with('GET', 'http://127.0.0.1:2113/info/uamsclient')
             ->willReturn($requestMock);
+        $settings = json_encode([
+            'is_registered' => false,
+            'otel_endpoint_access' => false,
+            'uamsclient_id' => $this->apiId,
+            'usc_connectivity' => true]);
+        if ($settings === false) {
+            $this->fail('Failed to encode uamsclient_id to JSON');
+        }
         $responseMock
             ->method('getBody')
-            ->willReturn($this->createStreamMock(json_encode([
-                'is_registered' => false,
-                'otel_endpoint_access' => false,
-                'uamsclient_id' => $this->apiId,
-                'usc_connectivity' => true])));
+            ->willReturn($this->createStreamMock($settings));
         $this->clientMock
             ->method('sendRequest')
             ->with($requestMock)
@@ -130,13 +135,17 @@ class UamsTest extends TestCase
             ->method('createRequest')
             ->with('GET', 'http://127.0.0.1:2113/info/uamsclient')
             ->willReturn($requestMock);
+        $uamsId = json_encode([
+            'is_registered' => false,
+            'otel_endpoint_access' => false,
+            'uamsclient_id' => $this->apiId,
+            'usc_connectivity' => true]);
+        if ($uamsId === false) {
+            $this->fail('Failed to encode uamsclient_id to JSON');
+        }
         $responseMock
             ->method('getBody')
-            ->willReturn($this->createStreamMock(json_encode([
-                'is_registered' => false,
-                'otel_endpoint_access' => false,
-                'uamsclient_id' => $this->apiId,
-                'usc_connectivity' => true])));
+            ->willReturn($this->createStreamMock($uamsId));
         $this->clientMock
             ->method('sendRequest')
             ->with($requestMock)
@@ -183,10 +192,13 @@ class UamsTest extends TestCase
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testDetectsIdFromApiWhenFileMissing';
         @unlink($uamsClientIdFile);
-        $requestMock = $this->createMock(RequestInterface::class);
         $responseMock = $this->createMock(ResponseInterface::class);
-        $this->requestFactoryMock->method('createRequest')->willReturn($requestMock);
-        $responseMock->method('getBody')->willReturn($this->createStreamMock(json_encode(['uamsclient_id' => $this->apiId])));
+        $this->requestFactoryMock->method('createRequest')->willReturn($this->createMock(RequestInterface::class));
+        $uamsId = json_encode(['uamsclient_id' => $this->apiId]);
+        if ($uamsId === false) {
+            $this->fail('Failed to encode uamsclient_id to JSON');
+        }
+        $responseMock->method('getBody')->willReturn($this->createStreamMock($uamsId));
         $this->clientMock->method('sendRequest')->willReturn($responseMock);
         $uams = new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock);
         $resource = $uams->getResource();
@@ -200,8 +212,7 @@ class UamsTest extends TestCase
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testReturnsEmptyResourceWhenFileAndApiFail';
         @unlink($uamsClientIdFile);
-        $requestMock = $this->createMock(RequestInterface::class);
-        $this->requestFactoryMock->method('createRequest')->willReturn($requestMock);
+        $this->requestFactoryMock->method('createRequest')->willReturn($this->createMock(RequestInterface::class));
         $this->clientMock->method('sendRequest')->willThrowException($this->createMock(\Psr\Http\Client\ClientExceptionInterface::class));
         $uams = new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock);
         $resource = $uams->getResource();
@@ -213,8 +224,7 @@ class UamsTest extends TestCase
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testReturnsEmptyResourceWhenFileUnreadable';
         file_put_contents($uamsClientIdFile, 'test');
         chmod($uamsClientIdFile, 0000);
-        $requestMock = $this->createMock(RequestInterface::class);
-        $this->requestFactoryMock->method('createRequest')->willReturn($requestMock);
+        $this->requestFactoryMock->method('createRequest')->willReturn($this->createMock(RequestInterface::class));
         $this->clientMock->method('sendRequest')->willThrowException($this->createMock(\Psr\Http\Client\ClientExceptionInterface::class));
         $uams = new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock);
         $resource = $uams->getResource();
@@ -227,9 +237,8 @@ class UamsTest extends TestCase
     {
         $uamsClientIdFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testReturnsEmptyResourceWhenApiReturnsInvalidJson';
         @unlink($uamsClientIdFile);
-        $requestMock = $this->createMock(RequestInterface::class);
         $responseMock = $this->createMock(ResponseInterface::class);
-        $this->requestFactoryMock->method('createRequest')->willReturn($requestMock);
+        $this->requestFactoryMock->method('createRequest')->willReturn($this->createMock(RequestInterface::class));
         $responseMock->method('getBody')->willReturn($this->createStreamMock('not a json'));
         $this->clientMock->method('sendRequest')->willReturn($responseMock);
         $uams = new Uams($uamsClientIdFile, $this->clientMock, $this->requestFactoryMock);

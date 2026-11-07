@@ -16,6 +16,7 @@ final class XTraceOptionsBaggageBuilder implements BaggageBuilderInterface
     {
     }
 
+    #[\Override]
     public function remove(string $key): BaggageBuilderInterface
     {
         unset($this->entries[$key]);
@@ -23,6 +24,7 @@ final class XTraceOptionsBaggageBuilder implements BaggageBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function set(string $key, mixed $value, ?MetadataInterface $metadata = null): BaggageBuilderInterface
     {
         if ($key === '') {
@@ -35,6 +37,7 @@ final class XTraceOptionsBaggageBuilder implements BaggageBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function build(): BaggageInterface
     {
         return new XTraceOptionsBaggage($this->entries);

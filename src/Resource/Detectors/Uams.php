@@ -82,6 +82,7 @@ final class Uams implements ResourceDetectorInterface
      *
      * @return ResourceInfo The resource information for the current uams client id, or an empty resource if the uams client is not available.
      */
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         $id = $this->readFromFile();

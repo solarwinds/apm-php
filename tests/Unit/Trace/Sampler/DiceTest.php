@@ -65,6 +65,7 @@ class DiceTest extends TestCase
         $this->assertEquals(0, $f);
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dice = new Dice(100, 50);

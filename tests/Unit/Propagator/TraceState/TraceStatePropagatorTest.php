@@ -92,6 +92,7 @@ class TraceStatePropagatorTest extends TestCase
         $this->assertEquals($context, Context::getCurrent());
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propagator = TraceStatePropagator::getInstance();

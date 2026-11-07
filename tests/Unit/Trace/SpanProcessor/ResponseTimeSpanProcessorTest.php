@@ -37,6 +37,7 @@ class ResponseTimeSpanProcessorTest extends MockeryTestCase
     /** @var MockInterface&ReadWriteSpanInterface */
     private $readWriteSpan;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->readableSpan = Mockery::mock(ReadableSpanInterface::class);

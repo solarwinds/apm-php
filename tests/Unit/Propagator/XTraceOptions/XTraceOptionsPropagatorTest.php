@@ -68,6 +68,7 @@ class XTraceOptionsPropagatorTest extends TestCase
         $this->assertTrue($bag->isEmpty());
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propagator = XTraceOptionsPropagator::getInstance();

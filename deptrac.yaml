@@ -12,8 +12,8 @@ deptrac:
     layers:
       -   name: Composer
           collectors:
-              - type: className
-                regex: ^Composer\\*
+              - type: classNameRegex
+                value: '#^Composer\\*#'
     ruleset:
       SDK:
           - Composer

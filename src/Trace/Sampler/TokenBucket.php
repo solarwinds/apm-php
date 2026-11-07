@@ -74,7 +74,7 @@ class TokenBucket
         }
         if ($newCapacity !== null) {
             $newCapacity = max(0, $newCapacity);
-            $diff = $newCapacity - $this->capacity;
+            $diff = (float) $newCapacity - $this->capacity;
             if ($this->lastUsed === null) {
                 // Always full if a brand-new token bucket
                 $this->tokens += $diff;
@@ -86,7 +86,7 @@ class TokenBucket
                 // First, calculate token till now
                 $now = microtime(true);
                 $elapsed = $now - $this->lastUsed;
-                $this->tokens += $elapsed * $this->rate;
+                $this->tokens += ($elapsed * (float) $this->rate);
                 // Second, adjust tokens based on new capacity
                 $this->tokens += $diff;
                 // Third, cap tokens to new capacity if needed
@@ -104,11 +104,12 @@ class TokenBucket
         $this->calculateTokens();
         if ($this->tokens >= $tokens) {
             $this->tokens -= $tokens;
-            $this->logDebug('Consumed ' . $tokens . ' token (' . round($this->tokens / $this->capacity * 100, 2) . '% remaining)');
+            $this->logDebug('Consumed ' . (string) $tokens . ' token (' . (string) (round($this->tokens / $this->capacity * 100.0, 2)) . '% remaining)');
+            ;
 
             return true;
         }
-        $this->logDebug('Token consumption failed: requested=' . $tokens . ', available=' . $this->tokens . ', capacity=' . $this->capacity);
+        $this->logDebug('Token consumption failed: requested=' . (string) $tokens . ', available=' . (string) ($this->tokens) . ', capacity=' . (string) ($this->capacity));
 
         return false;
     }

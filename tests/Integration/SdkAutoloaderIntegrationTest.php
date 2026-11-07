@@ -12,6 +12,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
 {
     private string $tempConfigFile;
 
+    #[\Override]
     protected function setUp(): void
     {
         $_SERVER = [];
@@ -24,6 +25,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
         }
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         if (file_exists($this->tempConfigFile)) {

@@ -24,6 +24,7 @@ final class Apm implements ResourceDetectorInterface
     public const ENV_WEBSITE_RESOURCE_GROUP_KEY = 'WEBSITE_RESOURCE_GROUP';
     public const ENV_WEBSITE_SITE_NAME_KEY = 'WEBSITE_SITE_NAME';
 
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         $attributes = [

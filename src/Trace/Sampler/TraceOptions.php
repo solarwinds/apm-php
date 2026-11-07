@@ -43,7 +43,7 @@ class TraceOptions
 
             return count($parts) === 2 ? $parts : [$parts[0], null];
         }, explode(';', $header)), function ($kv) {
-            return strlen((string) $kv[0]) > 0;
+            return (string) $kv[0] !== '';
         });
         foreach ($kvs as [$k, $v]) {
             if ($k === TRIGGER_TRACE_KEY) {

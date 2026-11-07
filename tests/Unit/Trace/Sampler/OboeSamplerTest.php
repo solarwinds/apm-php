@@ -10,6 +10,7 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\API\Trace\TraceState;
+use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -47,7 +48,7 @@ class TestOboeSampler extends OboeSampler
         parent::__construct($meterProvider, $cacheExtension);
         $this->localSettings = $localSettings;
         $this->requestHeaders = $requestHeaders;
-        if ($settings !== null) {
+        if ($settings instanceof Settings) {
             $this->updateSettings($settings);
         }
     }
@@ -57,6 +58,7 @@ class TestOboeSampler extends OboeSampler
         return $this->responseHeaders;
     }
 
+    #[\Override]
     public function setResponseHeaders(ResponseHeaders $headers, ContextInterface $parentContext, string $traceId, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): ?TraceState
     {
         $this->responseHeaders = $headers;
@@ -64,11 +66,13 @@ class TestOboeSampler extends OboeSampler
         return null;
     }
 
+    #[\Override]
     public function localSettings(ContextInterface $parentContext, string $traceId, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): LocalSettings
     {
         return $this->localSettings;
     }
 
+    #[\Override]
     public function requestHeaders(ContextInterface $parentContext, string $traceId, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): RequestHeaders
     {
         return $this->requestHeaders;
@@ -170,7 +174,7 @@ class OboeSamplerTest extends TestCase
             $traceState = (new TraceState())->with('vendor1', 'vendor1-value')->with('vendor2', 'vendor2-value');
         }
         if ($sw) {
-            if ($traceState !== null) {
+            if ($traceState instanceof TraceStateInterface) {
                 $traceState = $traceState->with('sw', $spanId . '-' . $swFlags);
             } else {
                 $traceState = (new TraceState())->with('sw', $spanId . '-' . $swFlags);
@@ -1368,7 +1372,7 @@ class OboeSamplerTest extends TestCase
 
     public function test_write_bucket_state_to_cache_calls_cache_extension(): void
     {
-        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface = $this->createMock(CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->once())->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('putBucketState')->with($this->equalTo('test-key'), $this->equalTo('test-value'))->willReturn(true);
         $sampler = new TestOboeSampler(null, null, new LocalSettings(null, true), $this->makeRequestHeaders([]), $cacheExtensionInterface);
@@ -1378,7 +1382,7 @@ class OboeSamplerTest extends TestCase
 
     public function test_update_bucket_state_from_cache_calls_cache_extension(): void
     {
-        $cacheExtensionInterface = $this->createMock(\Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface::class);
+        $cacheExtensionInterface = $this->createMock(CacheExtensionInterface::class);
         $cacheExtensionInterface->expects($this->once())->method('isExtensionLoaded')->willReturn(true);
         $cacheExtensionInterface->expects($this->once())->method('getBucketState')->with($this->equalTo('test-key'))->willReturn('{"Default":{"capacity":2,"rate":1,"token":1,"lastUsed":1774549154.72},"TriggerRelaxed":{"capacity":20,"rate":1,"token":20,"lastUsed":1774549154.72},"TriggerStrict":{"capacity":6,"rate":0.1,"token":6,"lastUsed":1774549154.72}}');
         $sampler = new TestOboeSampler(null, null, new LocalSettings(null, true), $this->makeRequestHeaders([]), $cacheExtensionInterface);

@@ -41,7 +41,7 @@ class HttpSampler extends Sampler
         $this->url = $config->getCollector();
         $this->service = urlencode($config->getService());
         $this->token = $config->getToken();
-        $this->hostname = urlencode(gethostname());
+        $this->hostname = urlencode(gethostname() ?: 'unknown');
         $this->client = $client ?? Discovery::find([
             'timeout' => 10,
         ]);
@@ -65,7 +65,7 @@ class HttpSampler extends Sampler
                     $unparsed = json_decode($cached, true);
                     if (is_array($unparsed)) {
                         if (time() <= (int) $unparsed['timestamp'] + (int) $unparsed['ttl']) {
-                            if ($this->parsedAndUpdateSettings($unparsed)) {
+                            if ($this->parsedAndUpdateSettings($unparsed) instanceof Settings) {
                                 // return if settings are valid
                                 $this->logDebug('Applied sampling settings from cache: ' . $cached);
 
@@ -104,7 +104,7 @@ class HttpSampler extends Sampler
             $this->logDebug('Received sampling settings response ' . $content);
             $unparsed = json_decode($content, true);
             $parsed = $this->parsedAndUpdateSettings($unparsed);
-            if (!$parsed) {
+            if (!$parsed instanceof Settings) {
                 $this->logWarning('Retrieved sampling settings are invalid');
 
                 return;
@@ -124,6 +124,7 @@ class HttpSampler extends Sampler
         }
     }
 
+    #[\Override]
     public function shouldSample(
         ContextInterface $parentContext,
         string $traceId,
@@ -137,8 +138,9 @@ class HttpSampler extends Sampler
         return parent::shouldSample(...func_get_args());
     }
 
+    #[\Override]
     public function getDescription(): string
     {
-        return sprintf('HTTP Sampler (%s)', parse_url($this->url, PHP_URL_HOST));
+        return sprintf('HTTP Sampler (%s)', parse_url($this->url, PHP_URL_HOST) ?: 'unknown');
     }
 }
