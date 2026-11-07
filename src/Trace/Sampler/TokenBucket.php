@@ -104,11 +104,12 @@ class TokenBucket
         $this->calculateTokens();
         if ($this->tokens >= $tokens) {
             $this->tokens -= $tokens;
-            $this->logDebug('Consumed ' . strval($tokens) . ' token (' . strval(round($this->tokens / $this->capacity * 100.0, 2)) . '% remaining)');;
+            $this->logDebug('Consumed ' . (string) $tokens . ' token (' . (string) (round($this->tokens / $this->capacity * 100.0, 2)) . '% remaining)');
+            ;
 
             return true;
         }
-        $this->logDebug('Token consumption failed: requested=' . strval($tokens) . ', available=' . strval($this->tokens) . ', capacity=' . strval($this->capacity));
+        $this->logDebug('Token consumption failed: requested=' . (string) $tokens . ', available=' . (string) ($this->tokens) . ', capacity=' . (string) ($this->capacity));
 
         return false;
     }

@@ -23,7 +23,7 @@ final class SamplerSwoJson implements ComponentProvider
 {
     /**
      * @phan-suppress PhanParamSignatureMismatch
-     * @param array<array-key, mixed> $properties
+     * @param array $properties
      * @param Context $context
      * @return SamplerInterface
      */
