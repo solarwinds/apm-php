@@ -69,6 +69,7 @@ class JsonSampler extends Sampler
         }
     }
 
+    #[\Override]
     public function shouldSample(
         ContextInterface $parentContext,
         string $traceId,
@@ -82,6 +83,7 @@ class JsonSampler extends Sampler
         return parent::shouldSample(...func_get_args());
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return sprintf('JSON Sampler (%s)', $this->path);

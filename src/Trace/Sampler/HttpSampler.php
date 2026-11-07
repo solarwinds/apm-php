@@ -41,7 +41,7 @@ class HttpSampler extends Sampler
         $this->url = $config->getCollector();
         $this->service = urlencode($config->getService());
         $this->token = $config->getToken();
-        $this->hostname = urlencode(gethostname());
+        $this->hostname = urlencode(gethostname() ?: 'unknown');
         $this->client = $client ?? Discovery::find([
             'timeout' => 10,
         ]);
@@ -124,6 +124,7 @@ class HttpSampler extends Sampler
         }
     }
 
+    #[\Override]
     public function shouldSample(
         ContextInterface $parentContext,
         string $traceId,
@@ -137,8 +138,9 @@ class HttpSampler extends Sampler
         return parent::shouldSample(...func_get_args());
     }
 
+    #[\Override]
     public function getDescription(): string
     {
-        return sprintf('HTTP Sampler (%s)', parse_url($this->url, PHP_URL_HOST));
+        return sprintf('HTTP Sampler (%s)', parse_url($this->url, PHP_URL_HOST) ?: 'unknown');
     }
 }

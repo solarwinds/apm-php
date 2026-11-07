@@ -109,12 +109,14 @@ class SdkAutoloader
         }
         $distributionProperties = self::loadDistributionPropertiesFromEnv();
         $distributionConfiguration = $distributionProperties->getDistributionConfiguration(SdkDistribution::class) ?? new SdkDistribution();
+        /** @psalm-suppress InternalProperty */
         $emitMetrics = $distributionConfiguration->internalMetricsEnabled;
 
         $resource = ResourceInfoFactory::defaultResource();
         $exporter = (new ExporterFactory())->create();
         $meterProvider = (new MeterProviderFactory())->create($resource);
         $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
+        /** @psalm-suppress InternalProperty */
         $builder = (new TracerProviderBuilder())
             ->addSpanProcessor(ResponseTimeSpanProcessor::getInstance($meterProvider))    // Response Time Span Processor (Used singleton due to the transaction name pool)
             ->addSpanProcessor($spanProcessor)                                   // Otel Span Processors

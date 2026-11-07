@@ -53,6 +53,7 @@ abstract class OboeSampler implements SamplerInterface
      * phan's result conflicted to rector's result
      * @phan-suppress PhanTypeMismatchArgumentNullable
      */
+    #[\Override]
     public function shouldSample(
         ContextInterface $parentContext,
         string $traceId,
@@ -81,7 +82,7 @@ abstract class OboeSampler implements SamplerInterface
         if ($s->headers->XTraceOptions !== null) {
             $parsed = TraceOptions::from($s->headers->XTraceOptions);
             $s->traceOptions = new TraceOptionsWithResponse($parsed, new TraceOptionsResponse());
-            $this->logDebug('X-Trace-Options present ' . $s->traceOptions);
+            $this->logDebug('X-Trace-Options present ' . (string) $s->traceOptions);
             if ($s->headers->XTraceOptionsSignature !== null) {
                 $this->logDebug('X-Trace-Options-Signature present; validating');
                 $s->traceOptions->response->auth = TriggerTraceUtil::validateSignature(
@@ -137,7 +138,7 @@ abstract class OboeSampler implements SamplerInterface
             $this->logDebug('SAMPLE_START is unset; sampling disabled');
             $this->disabledAlgo($s);
         }
-        $this->logDebug('final sampling state ' . $s);
+        $this->logDebug('final sampling state ' . (string) $s);
         $new_trace_state = $this->setResponseHeadersFromSampleState($s, $parentContext, $traceId, $spanName, $spanKind, $attributes, $links);
 
         return new SamplingResult($s->decision, $s->attributes, $new_trace_state);
@@ -332,6 +333,7 @@ abstract class OboeSampler implements SamplerInterface
         }
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'OboeSampler';

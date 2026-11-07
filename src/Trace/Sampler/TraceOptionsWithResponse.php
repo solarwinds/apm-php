@@ -18,6 +18,6 @@ class TraceOptionsWithResponse extends TraceOptions
 
     public function __toString(): string
     {
-        return parent::__toString() . ';' . $this->response;
+        return parent::__toString() . ';' . (string)$this->response;
     }
 }
