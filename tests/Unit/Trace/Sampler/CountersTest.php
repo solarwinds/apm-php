@@ -25,6 +25,7 @@ class CountersTest extends TestCase
         $this->assertInstanceOf(CounterInterface::class, $this->counters->getTriggeredTraceCount());
         $this->assertInstanceOf(CounterInterface::class, $this->counters->getTokenBucketExhaustionCount());
     }
+
     #[\Override]
     protected function setUp(): void
     {
