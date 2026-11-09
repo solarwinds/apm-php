@@ -25,6 +25,7 @@ use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\LateBindingMeterProvider;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
 use OpenTelemetry\Context\Context;
@@ -66,13 +67,11 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
-        // Run the shutdown handler to ensure that the auto root span is ended and the Opentelemetry SDK is shutdown properly
-        AutoRootSpan::shutdownHandler();
-        // Reset the globals to avoid any previous configuration
-        Globals::reset();
-
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
+        }
+        if (!Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
+            Globals::reset();
         }
         $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
