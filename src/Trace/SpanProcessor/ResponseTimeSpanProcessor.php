@@ -126,7 +126,7 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
                 $attributes[$key] = $value;
             }
         }
-        $this->logDebug('Recording response time: ' . (string) $durationMs . 'ms, ' . (json_encode($attributes)?: '[]'));
+        $this->logDebug('Recording response time: ' . (string) $durationMs . 'ms, ' . (json_encode($attributes) ?: '[]'));
         $this->histogram->record($durationMs, $attributes);
     }
 }
