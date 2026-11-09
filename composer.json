@@ -95,11 +95,11 @@
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SamplerSwoJson",
         "Solarwinds\\ApmPhp\\ComponentProvider\\Trace\\SpanProcessorResponseTime"
       ]
-    },
-    "scripts": {
-      "test-psr3": [
-        "OpenTelemetry\\Tests\\Integration\\Composer\\Psr3Compatability::run"
-      ]
     }
+  },
+  "scripts": {
+    "test-psr3": [
+      "Solarwinds\\ApmPhp\\Tests\\Integration\\Composer\\Psr3Compatability::run"
+    ]
   }
 }
