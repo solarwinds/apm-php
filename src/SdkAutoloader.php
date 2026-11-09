@@ -66,6 +66,8 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
+        // Run the shutdown handler to ensure that the auto root span is ended and the Opentelemetry SDK is shutdown properly
+        AutoRootSpan::shutdownHandler();
         // Reset the globals to avoid any previous configuration
         Globals::reset();
 
