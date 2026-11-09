@@ -72,7 +72,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
         $this->assertFalse($result, 'Autoload should return false for excluded URL.');
     }
 
-    public function test_autoload_keeps_existing_auto_root_span(): void
+    public function test_autoload_not_keeps_existing_auto_root_span(): void
     {
         $exporter = new InMemoryExporter();
         $tracerProvider = TracerProvider::builder()
@@ -89,8 +89,8 @@ class SdkAutoloaderIntegrationTest extends TestCase
         try {
             $rootSpanId = Span::fromContext(Context::getCurrent())->getContext()->getSpanId();
             $this->assertTrue(SdkAutoloader::autoload());
-            $this->assertSame($rootSpanId, Span::fromContext(Context::getCurrent())->getContext()->getSpanId());
-            $this->assertCount(0, $exporter->getSpans());
+            $this->assertNotSame($rootSpanId, Span::fromContext(Context::getCurrent())->getContext()->getSpanId());
+            $this->assertCount(1, $exporter->getSpans());
         } finally {
             AutoRootSpan::shutdownHandler();
             Globals::reset();

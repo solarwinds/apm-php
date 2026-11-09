@@ -70,9 +70,13 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
-        if (!Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
-            Globals::reset();
+
+        if (Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
+            // end the root span if it is already auto-started, to avoid duplicate root spans in the same request
+            AutoRootSpan::shutdownHandler();
         }
+        Globals::reset();
+
         $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
