@@ -8,4 +8,4 @@ services:
     ports:
       - 8080:80
     volumes:
-      - ./docs/build:/usr/share/nginx/html
+      - ./.phpdoc/build:/usr/share/nginx/html
