@@ -1,6 +1,6 @@
 include .env
 
-PHP_VERSION ?= 8.2
+export PHP_VERSION ?= 8.2
 DOCKER_COMPOSE ?= docker compose
 DC_RUN_PHP = $(DOCKER_COMPOSE) run --rm php
 
