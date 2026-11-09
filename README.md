@@ -14,7 +14,7 @@ SolarWinds APM PHP is an OpenTelemetry-based library for distributed tracing and
 ## Prerequisites
 
 Before you begin, ensure you have:
-- [PHP 8.1+](https://www.php.net/)
+- [PHP 8.2+](https://www.php.net/)
 - [PECL](https://pecl.php.net/)
 - [Composer](https://getcomposer.org/)
 - [PIE](https://github.com/php/pie)
