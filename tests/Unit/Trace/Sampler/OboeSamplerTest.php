@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Tests\Unit\Trace\Sampler;
 
-use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -14,7 +13,6 @@ use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\MeterProviderBuilder;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
@@ -26,59 +24,14 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Solarwinds\ApmPhp\Trace\Sampler\BucketSettings;
 use Solarwinds\ApmPhp\Trace\Sampler\BucketType;
-use Solarwinds\ApmPhp\Trace\Sampler\CacheExtension;
 use Solarwinds\ApmPhp\Trace\Sampler\CacheExtensionInterface;
 use Solarwinds\ApmPhp\Trace\Sampler\Flags;
 use Solarwinds\ApmPhp\Trace\Sampler\LocalSettings;
 use Solarwinds\ApmPhp\Trace\Sampler\OboeSampler;
 use Solarwinds\ApmPhp\Trace\Sampler\RequestHeaders;
-use Solarwinds\ApmPhp\Trace\Sampler\ResponseHeaders;
 use Solarwinds\ApmPhp\Trace\Sampler\SampleSource;
 use Solarwinds\ApmPhp\Trace\Sampler\Settings;
 use const Solarwinds\ApmPhp\Trace\Sampler\TRACESTATE_CAPTURE_ATTRIBUTE;
-
-class TestOboeSampler extends OboeSampler
-{
-    private readonly LocalSettings $localSettings;
-    private readonly RequestHeaders $requestHeaders;
-    private ?ResponseHeaders $responseHeaders = null;
-
-    public function __construct(?MeterProviderInterface $meterProvider, ?Settings $settings, LocalSettings $localSettings, RequestHeaders $requestHeaders, CacheExtensionInterface $cacheExtension = new CacheExtension())
-    {
-        parent::__construct($meterProvider, $cacheExtension);
-        $this->localSettings = $localSettings;
-        $this->requestHeaders = $requestHeaders;
-        if ($settings instanceof Settings) {
-            $this->updateSettings($settings);
-        }
-    }
-
-    public function getResponseHeaders(): ?ResponseHeaders
-    {
-        return $this->responseHeaders;
-    }
-
-    #[\Override]
-    public function setResponseHeaders(ResponseHeaders $headers, ContextInterface $parentContext, string $traceId, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): ?TraceState
-    {
-        $this->responseHeaders = $headers;
-
-        return null;
-    }
-
-    #[\Override]
-    public function localSettings(ContextInterface $parentContext, string $traceId, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): LocalSettings
-    {
-        return $this->localSettings;
-    }
-
-    #[\Override]
-    public function requestHeaders(ContextInterface $parentContext, string $traceId, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): RequestHeaders
-    {
-        return $this->requestHeaders;
-    }
-
-}
 
 #[CoversClass(OboeSampler::class)]
 class OboeSamplerTest extends TestCase

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp\Tests\Unit\Trace\Sampler;
 
-use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
@@ -28,18 +27,6 @@ use Solarwinds\ApmPhp\Trace\Sampler\ResponseHeaders;
 use Solarwinds\ApmPhp\Trace\Sampler\Sampler;
 use Solarwinds\ApmPhp\Trace\Sampler\SampleSource;
 use Solarwinds\ApmPhp\Trace\Sampler\Settings;
-
-class TestSampler extends Sampler
-{
-    public function __construct(?MeterProviderInterface $meterProvider, Configuration $config, mixed $settings)
-    {
-        parent::__construct($meterProvider, $config, $settings);
-    }
-    public function exposeParsedAndUpdateSettings(mixed $settings): ?Settings
-    {
-        return $this->parsedAndUpdateSettings($settings);
-    }
-}
 
 #[CoversClass(Sampler::class)]
 class SamplerTest extends TestCase
