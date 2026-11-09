@@ -24,13 +24,6 @@ const BUCKET_CAPACITY_ATTRIBUTE = 'BucketCapacity';
 const BUCKET_RATE_ATTRIBUTE = 'BucketRate';
 const TRIGGERED_TRACE_ATTRIBUTE = 'TriggeredTrace';
 
-enum SpanType: int
-{
-    case ROOT = 0;
-    case ENTRY = 1;
-    case LOCAL = 2;
-}
-
 abstract class OboeSampler implements SamplerInterface
 {
     use LogsMessagesTrait;

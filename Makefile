@@ -27,7 +27,7 @@ test: test-unit test-integration ## Run unit and integration tests
 test-unit: ## Run unit tests
 	$(DC_RUN_PHP) env XDEBUG_MODE=coverage OTEL_LOG_LEVEL=none SW_APM_SERVICE_KEY=$(SW_APM_SERVICE_KEY) vendor/bin/phpunit --testsuite unit --colors=always
 test-integration: ## Run integration tests
-	$(DC_RUN_PHP) env XDEBUG_MODE=off OTEL_LOG_LEVEL=none SW_APM_SERVICE_KEY=$(SW_APM_SERVICE_KEY) vendor/bin/phpunit --testsuite integration --colors=always
+	$(DC_RUN_PHP) env XDEBUG_MODE=coverage OTEL_LOG_LEVEL=none SW_APM_SERVICE_KEY=$(SW_APM_SERVICE_KEY) vendor/bin/phpunit --testsuite integration --colors=always
 test-verbose: ## Run unit tests with verbose (testdox) output
 	$(DC_RUN_PHP) env XDEBUG_MODE=coverage OTEL_LOG_LEVEL=none SW_APM_SERVICE_KEY=$(SW_APM_SERVICE_KEY) vendor/bin/phpunit --testsuite unit  --colors=always --testdox --coverage-clover coverage.clover --coverage-html=tests/coverage/html --log-junit=junit.xml
 test-coverage: ## Run units tests and generate code coverage
