@@ -83,13 +83,18 @@ class SdkAutoloaderIntegrationTest extends TestCase
             static fn ($configurator) => $configurator->withTracerProvider($tracerProvider),
         );
         AutoRootSpan::create((new Psr17Factory())->createServerRequest('GET', 'http://localhost'));
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+        $_SERVER['HTTP_HOST'] = 'localhost';
         putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=true');
         putenv(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED . '=true');
 
         try {
             $rootSpanId = Span::fromContext(Context::getCurrent())->getContext()->getSpanId();
             $this->assertTrue(SdkAutoloader::autoload());
-            $this->assertNotSame($rootSpanId, Span::fromContext(Context::getCurrent())->getContext()->getSpanId());
+            $replacementContext = Span::fromContext(Context::getCurrent())->getContext();
+            $this->assertTrue($replacementContext->isValid());
+            $this->assertNotSame($rootSpanId, $replacementContext->getSpanId());
             $this->assertCount(1, $exporter->getSpans());
         } finally {
             AutoRootSpan::shutdownHandler();
