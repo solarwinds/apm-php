@@ -19,7 +19,7 @@ class JsonSamplerTest extends TestCase
 
     public function test_valid_file_samples_created_spans(): void
     {
-        file_put_contents($this->path, json_encode([
+        $settings = json_encode([
             [
                 'flags' => 'SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE,OVERRIDE',
                 'value' => 1000000,
@@ -30,7 +30,11 @@ class JsonSamplerTest extends TestCase
                 'timestamp' => time(),
                 'ttl' => 60,
             ],
-        ]));
+        ]);
+        if ($settings === false) {
+            $this->fail('Failed to encode settings to JSON');
+        }
+        file_put_contents($this->path, $settings);
         $spanExporter = new InMemoryExporter();
         $sampler = new JsonSampler(null, new Configuration(
             service: 'test',
@@ -52,7 +56,11 @@ class JsonSamplerTest extends TestCase
 
     public function test_invalid_file_does_not_sample_created_spans(): void
     {
-        file_put_contents($this->path, json_encode(['hello' => 'world']));
+        $settings = json_encode(['hello' => 'world']);
+        if ($settings === false) {
+            $this->fail('Failed to encode settings to JSON');
+        }
+        file_put_contents($this->path, $settings);
         $spanExporter = new InMemoryExporter();
         $sampler = new JsonSampler(null, new Configuration(
             service: 'test',
@@ -94,7 +102,7 @@ class JsonSamplerTest extends TestCase
 
     public function test_expired_file_does_not_sample_created_spans(): void
     {
-        file_put_contents($this->path, json_encode([
+        $settings = json_encode([
             [
                 'flags' => 'SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE,OVERRIDE',
                 'value' => 1000000,
@@ -105,7 +113,11 @@ class JsonSamplerTest extends TestCase
                 'timestamp' => time() - 120,
                 'ttl' => 60,
             ],
-        ]));
+        ]);
+        if ($settings === false) {
+            $this->fail('Failed to encode settings to JSON');
+        }
+        file_put_contents($this->path, $settings);
         $spanExporter = new InMemoryExporter();
         $sampler = new JsonSampler(null, new Configuration(
             service: 'test',
@@ -126,7 +138,7 @@ class JsonSamplerTest extends TestCase
 
     public function test_expired_file_samples_created_span_after_reading_new_settings(): void
     {
-        file_put_contents($this->path, json_encode([
+        $settings = json_encode([
             [
                 'flags' => 'SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE,OVERRIDE',
                 'value' => 1000000,
@@ -137,7 +149,11 @@ class JsonSamplerTest extends TestCase
                 'timestamp' => time() - 120,
                 'ttl' => 60,
             ],
-        ]));
+        ]);
+        if ($settings === false) {
+            $this->fail('Failed to encode settings to JSON');
+        }
+        file_put_contents($this->path, $settings);
         $spanExporter = new InMemoryExporter();
         $sampler = new JsonSampler(null, new Configuration(
             service: 'test',
@@ -155,7 +171,7 @@ class JsonSamplerTest extends TestCase
         $spans = $spanExporter->getSpans();
         $this->assertCount(0, $spans);
         // Update the settings file to a valid state
-        file_put_contents($this->path, json_encode([
+        $updatedSettings = json_encode([
             [
                 'flags' => 'SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE,OVERRIDE',
                 'value' => 1000000,
@@ -166,7 +182,11 @@ class JsonSamplerTest extends TestCase
                 'timestamp' => time(),
                 'ttl' => 60,
             ],
-        ]));
+        ]);
+        if ($updatedSettings === false) {
+            $this->fail('Failed to encode updated settings to JSON');
+        }
+        file_put_contents($this->path, $updatedSettings);
         $span = $tracer->spanBuilder('test')->startSpan();
         $this->assertTrue($span->isRecording());
         $span->end();
@@ -197,7 +217,11 @@ class JsonSamplerTest extends TestCase
 
     public function test_file_with_missing_fields_does_not_sample(): void
     {
-        file_put_contents($this->path, json_encode([['value' => 1000000]])); // missing flags, timestamp, ttl
+        $settings = json_encode([['value' => 1000000]]); // missing flags, timestamp, ttl
+        if ($settings === false) {
+            $this->fail('Failed to encode settings to JSON');
+        }
+        file_put_contents($this->path, $settings);
         $spanExporter = new InMemoryExporter();
         $sampler = new JsonSampler(null, new Configuration(
             service: 'test',
@@ -217,7 +241,7 @@ class JsonSamplerTest extends TestCase
 
     public function test_file_with_extra_fields_samples(): void
     {
-        file_put_contents($this->path, json_encode([
+        $settings = json_encode([
             [
                 'flags' => 'SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE,OVERRIDE',
                 'value' => 1000000,
@@ -229,7 +253,11 @@ class JsonSamplerTest extends TestCase
                 'ttl' => 60,
                 'extra' => 'should be ignored',
             ],
-        ]));
+        ]);
+        if ($settings === false) {
+            $this->fail('Failed to encode settings to JSON');
+        }
+        file_put_contents($this->path, $settings);
         $spanExporter = new InMemoryExporter();
         $sampler = new JsonSampler(null, new Configuration(
             service: 'test',
@@ -279,11 +307,13 @@ class JsonSamplerTest extends TestCase
         $this->assertStringContainsString('JSON Sampler (' . sys_get_temp_dir() . '/solarwinds-apm-settings.json', $sampler->getDescription());
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->path = sys_get_temp_dir() . '/solarwinds-apm-settings.json';
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         @unlink($this->path);

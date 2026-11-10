@@ -57,6 +57,6 @@ class Settings
             'signatureKey' => $this->signatureKey,
             'timestamp' => $this->timestamp,
             'ttl' => $this->ttl,
-        ]);
+        ]) ?: '[]';
     }
 }

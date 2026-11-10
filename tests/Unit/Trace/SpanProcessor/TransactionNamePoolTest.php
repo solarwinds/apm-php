@@ -13,6 +13,7 @@ final class TransactionNamePoolTest extends TestCase
 {
     private TransactionNamePool $pool;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->pool = new TransactionNamePool();
@@ -87,7 +88,6 @@ final class TransactionNamePoolTest extends TestCase
     {
         $reflection = new \ReflectionClass($object);
         $property = $reflection->getProperty($property);
-        $property->setAccessible(true);
 
         return $property->getValue($object);
     }

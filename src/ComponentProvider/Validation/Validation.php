@@ -42,8 +42,8 @@ final class Validation
                 throw new InvalidArgumentException('must be of type string');
             }
 
-            if (!preg_match('/^([^:]+):([^:]+)$/', $value)) {
-                throw new InvalidArgumentException('must match the service key pattern');
+            if (!preg_match('/^([^:]+):([^:]+)$/', $value) && !preg_match('/^([^:]+)$/', $value)) {
+                throw new InvalidArgumentException('must match the service key pattern. Valid examples: "token:service_name" or "token"');
             }
 
             return $value;

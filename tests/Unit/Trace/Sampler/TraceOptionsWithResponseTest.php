@@ -6,9 +6,11 @@ namespace Solarwinds\ApmPhp\Tests\Unit\Trace\Sampler;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Solarwinds\ApmPhp\Trace\Sampler\Auth;
 use Solarwinds\ApmPhp\Trace\Sampler\TraceOptions;
 use Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsResponse;
 use Solarwinds\ApmPhp\Trace\Sampler\TraceOptionsWithResponse;
+use Solarwinds\ApmPhp\Trace\Sampler\TriggerTrace;
 
 #[CoversClass(TraceOptionsWithResponse::class)]
 class TraceOptionsWithResponseTest extends TestCase
@@ -47,8 +49,8 @@ class TraceOptionsWithResponseTest extends TestCase
     {
         $options = new TraceOptions(true, 42, 'sw', ['custom-key' => 'val'], [['foo', 'bar']]);
         $response = new TraceOptionsResponse();
-        $response->auth = \Solarwinds\ApmPhp\Trace\Sampler\Auth::OK;
-        $response->triggerTrace = \Solarwinds\ApmPhp\Trace\Sampler\TriggerTrace::OK;
+        $response->auth = Auth::OK;
+        $response->triggerTrace = TriggerTrace::OK;
         $response->ignored = ['bad'];
         $obj = new TraceOptionsWithResponse($options, $response);
         $str = (string) $obj;
@@ -66,7 +68,7 @@ class TraceOptionsWithResponseTest extends TestCase
     {
         $options = new TraceOptions(null, 99, null, [], [['x', 'y']]);
         $response = new TraceOptionsResponse();
-        $response->auth = \Solarwinds\ApmPhp\Trace\Sampler\Auth::BAD_SIGNATURE;
+        $response->auth = Auth::BAD_SIGNATURE;
         $obj = new TraceOptionsWithResponse($options, $response);
         $str = (string) $obj;
         $this->assertStringContainsString('ts=99', $str);

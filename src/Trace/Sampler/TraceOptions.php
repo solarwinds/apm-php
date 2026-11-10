@@ -38,13 +38,17 @@ class TraceOptions
     public static function from(string $header): TraceOptions
     {
         $traceOptions = new TraceOptions();
-        $kvs = array_filter(array_map(function ($kv) {
-            $parts = array_map('trim', explode('=', $kv, 2));
-
-            return count($parts) === 2 ? $parts : [$parts[0], null];
-        }, explode(';', $header)), function ($kv) {
-            return strlen((string) $kv[0]) > 0;
-        });
+        $kvs = array_filter(
+            array_map(
+                static fn (string $kv) => array_pad(
+                    array_map('trim', explode('=', $kv, 2)),
+                    2,
+                    null
+                ),
+                explode(';', $header)
+            ),
+            static fn (array $kv) => $kv[0] !== ''
+        );
         foreach ($kvs as [$k, $v]) {
             if ($k === TRIGGER_TRACE_KEY) {
                 if ($v !== null || $traceOptions->triggerTrace !== null) {
@@ -77,12 +81,14 @@ class TraceOptions
                 }
                 $traceOptions->swKeys = $v;
             } elseif (preg_match(CUSTOM_KEY_REGEX, (string) $k)) {
+                /** @psalm-suppress PossiblyNullArgument */
                 if ($v === null || array_key_exists($k, $traceOptions->custom)) {
                     self::logDebug("invalid trace option for custom key $k, should have a value and only be provided once");
                     $traceOptions->ignored[] = [$k, $v];
 
                     continue;
                 }
+                /** @psalm-suppress PossiblyNullArrayOffset */
                 $traceOptions->custom[$k] = $v;
             } else {
                 $traceOptions->ignored[] = [$k, $v];

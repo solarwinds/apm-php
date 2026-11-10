@@ -23,7 +23,7 @@ class JsonSamplerSpanCreationBench
     public function __construct()
     {
         $path = sys_get_temp_dir() . '/benchmark-settings.json';
-        file_put_contents($path, json_encode([
+        $settings = json_encode([
             [
                 'flags' => 'SAMPLE_START,SAMPLE_THROUGH_ALWAYS,TRIGGER_TRACE,OVERRIDE',
                 'value' => 1000000,
@@ -34,7 +34,11 @@ class JsonSamplerSpanCreationBench
                 'timestamp' => time(),
                 'ttl' => 60,
             ],
-        ]));
+        ]);
+        if ($settings === false) {
+            throw new \RuntimeException('Failed to encode settings to JSON');
+        }
+        file_put_contents($path, $settings);
         $this->sampler = new JsonSampler(null, new Configuration(
             service: 'test',
             collector: '',

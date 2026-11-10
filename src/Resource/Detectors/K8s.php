@@ -46,6 +46,7 @@ final class K8s implements ResourceDetectorInterface
      *
      * @return ResourceInfo The resource information for the current pod, or an empty resource if the k8s namespace is not available.
      */
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         $attributes = [];
@@ -124,11 +125,11 @@ final class K8s implements ResourceDetectorInterface
                 return null;
             }
             foreach ($lines as $line) {
-                $fields = preg_split('/\s+/', $line);
+                $fields = preg_split('/\s+/', $line) ?: [];
                 if (count($fields) < 10) {
                     continue;
                 }
-
+                /** @psalm-suppress PossiblyUndefinedArrayOffset */
                 [$identity, $parentId, , $root] = array_slice($fields, 0, 4);
                 if (!ctype_digit((string) $identity) || !ctype_digit((string) $parentId)) {
                     continue;

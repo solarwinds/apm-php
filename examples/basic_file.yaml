@@ -1,4 +1,4 @@
-file_format: "1.0-rc.2"
+file_format: "1.0"
 
 disabled: ${OTEL_SDK_DISABLED:-false}
 
@@ -27,15 +27,17 @@ propagator:
     - swo_tracestate:     # swo trace state propagator
     - swo_xtraceoptions:     # swo xtrace options propagator
 
-response_propagator/development:
-  composite:
-    - swo_xtrace:                # swo xtrace response
-    - swo_xtraceoptionsresponse: # swo xtrace options response
+distribution:
+  opentelemetry_php/development:
+    response_propagator/development:
+      composite:
+        - swo_xtrace:                # swo xtrace response
+        - swo_xtraceoptionsresponse: # swo xtrace options response
 
 tracer_provider:
   sampler:
     swo_http:
-      service_key: "<token>:php-basic-file"
+      service_key: "<token>"
       collector: "apm.collector.na-01.cloud.solarwinds.com"
       tracing_enabled: true
       trigger_tracing_enabled: true

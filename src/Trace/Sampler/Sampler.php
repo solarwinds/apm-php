@@ -197,6 +197,7 @@ abstract class Sampler extends OboeSampler
 
     }
 
+    #[\Override]
     public function localSettings(
         ContextInterface $parentContext,
         string $traceId,
@@ -234,6 +235,7 @@ abstract class Sampler extends OboeSampler
         return $settings;
     }
 
+    #[\Override]
     public function requestHeaders(
         ContextInterface $parentContext,
         string $traceId,
@@ -254,6 +256,7 @@ abstract class Sampler extends OboeSampler
         return new RequestHeaders();
     }
 
+    #[\Override]
     public function setResponseHeaders(
         ResponseHeaders $headers,
         ContextInterface $parentContext,
@@ -269,7 +272,7 @@ abstract class Sampler extends OboeSampler
             $replaced = str_replace(self::INTL_SWO_EQUALS, self::INTL_SWO_EQUALS_W3C_SANITIZED, $response);
             $final = str_replace(self::INTL_SWO_COMMA, self::INTL_SWO_COMMA_W3C_SANITIZED, $replaced);
             $traceState = $parentSpanContext->getTraceState();
-            if ($traceState === null) {
+            if (!$traceState instanceof TraceStateInterface) {
                 $traceState = new TraceState();
             }
 

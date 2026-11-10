@@ -9,6 +9,7 @@ use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Configuration\ConfigEnv\EnvComponentLoader;
 use OpenTelemetry\API\Configuration\ConfigProperties;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProperties;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
@@ -24,9 +25,9 @@ use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\LateBindingMeterProvider;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
-use OpenTelemetry\Config\SDK\Instrumentation as SdkInstrumentation;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -49,10 +50,10 @@ use OpenTelemetry\SDK\Propagation\ResponsePropagatorFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
+use OpenTelemetry\SDK\Trace\ExcludedRequestHeaders;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
-use RuntimeException;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
 use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 use Throwable;
@@ -66,29 +67,36 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
-        // Reset the globals to avoid any previous configuration
-        Globals::reset();
-
-        if (!self::isEnabled() || self::isExcludedUrl()) {
+        if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
+
+        if (Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
+            // end the root span if it is already auto-started, to avoid duplicate root spans in the same request
+            AutoRootSpan::shutdownHandler();
+        }
+        Globals::reset();
+
+        $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
-                throw new RuntimeException('File-based configuration requires open-telemetry/sdk-configuration');
+                self::logWarning('Error during opentelemetry initialization: file-based configuration requires open-telemetry/sdk-configuration');
+            } else {
+                try {
+                    // One parse serves both configuration roots. Registering no initializer on
+                    // failure leaves Globals to fall back to its noop configurator.
+                    $config = SdkConfiguration::parseFile(Configuration::getString(Variables::OTEL_CONFIG_FILE));
+                    Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator, $config));
+                } catch (Throwable $t) {
+                    self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
+                }
             }
-            Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator));
         } else {
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
         }
-        self::registerInstrumentations();
+        self::registerInstrumentations($config);
 
-        if (AutoRootSpan::isEnabled()) {
-            $request = AutoRootSpan::createRequest();
-            if ($request) {
-                AutoRootSpan::create($request);
-                AutoRootSpan::registerShutdownHandler();
-            }
-        }
+        AutoRootSpan::start();
 
         return true;
     }
@@ -104,15 +112,16 @@ class SdkAutoloader
             //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
             return $configurator->withPropagator($propagator)->withResponsePropagator($responsePropagator);
         }
-        $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
-
         $distributionProperties = self::loadDistributionPropertiesFromEnv();
         $distributionConfiguration = $distributionProperties->getDistributionConfiguration(SdkDistribution::class) ?? new SdkDistribution();
+        /** @psalm-suppress InternalProperty */
+        $emitMetrics = $distributionConfiguration->internalMetricsEnabled;
 
         $resource = ResourceInfoFactory::defaultResource();
         $exporter = (new ExporterFactory())->create();
         $meterProvider = (new MeterProviderFactory())->create($resource);
         $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
+        /** @psalm-suppress InternalProperty */
         $builder = (new TracerProviderBuilder())
             ->addSpanProcessor(ResponseTimeSpanProcessor::getInstance($meterProvider))    // Response Time Span Processor (Used singleton due to the transaction name pool)
             ->addSpanProcessor($spanProcessor)                                   // Otel Span Processors
@@ -144,11 +153,8 @@ class SdkAutoloader
     /**
      * @phan-suppress PhanPossiblyUndeclaredVariable,PhanDeprecatedFunction
      */
-    private static function fileBasedInitializer(Configurator $configurator): Configurator
+    private static function fileBasedInitializer(Configurator $configurator, SdkConfiguration $config): Configurator
     {
-        $file = Configuration::getString(Variables::OTEL_CONFIG_FILE);
-        $config = SdkConfiguration::parseFile($file);
-
         //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
         $scope = HookManager::disable(Context::getCurrent())->activate();
 
@@ -173,17 +179,31 @@ class SdkAutoloader
 
     /**
      * Register all {@link Instrumentation} configured through SPI
-     * @psalm-suppress ArgumentTypeCoercion
+     *
+     * Instrumentation config is resolved here, during autoload, because hooks must be installed
+     * before the instrumented function is first called, whereas building the SDK is deferred to a
+     * Globals initializer. (With {@see AutoRootSpan} enabled the initializer runs before autoload
+     * returns, so the deferral is conditional.) Both are served by the one document `$config`
+     * already holds.
      */
-    private static function registerInstrumentations(): void
+    private static function registerInstrumentations(?SdkConfiguration $config): void
     {
-        $files = Configuration::has(Variables::OTEL_CONFIG_FILE)
-            ? Configuration::getList(Variables::OTEL_CONFIG_FILE)
-            : [];
-        if (class_exists(SdkInstrumentation::class) && $files) {
-            $configuration = SdkInstrumentation::parseFile($files)->create();
-        } else {
+        if (!Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             $configuration = self::loadConfigPropertiesFromEnv();
+        } else {
+            try {
+                // Catching here, rather than letting this join the parse above, is what keeps an
+                // unparseable instrumentation node from also costing us the already-registered SDK.
+                $configuration = $config?->getInstrumentationConfig() ?? new NoopConfigProperties();
+            } catch (Throwable $t) {
+                // Reported verbatim, including the Error raised when an older sdk-configuration
+                // lacks getInstrumentationConfig(). PHP's own message names the missing method, and
+                // `sdk` can only suggest that package, so its version cannot be constrained from
+                // here. Singling Error out to blame the version instead would also catch faults
+                // raised *by* the configuration, such as a TypeError from a plugin's create().
+                self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
+                $configuration = new NoopConfigProperties();
+            }
         }
         $hookManager = self::getHookManager();
         $tracerProvider = self::createLateBindingTracerProvider();
@@ -306,7 +326,10 @@ class SdkAutoloader
         });
     }
 
-    private static function getHookManager(): HookManagerInterface
+    /**
+     * @internal
+     */
+    public static function getHookManager(): HookManagerInterface
     {
         /** @var HookManagerInterface $hookManager */
         foreach (ServiceLoader::load(HookManagerInterface::class) as $hookManager) {
@@ -322,6 +345,21 @@ class SdkAutoloader
     public static function isEnabled(): bool
     {
         return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+    }
+
+    /**
+     * Test whether a request header matches the excluded request headers configuration option
+     *
+     * @internal
+     */
+    public static function isExcludedRequestHeader(): bool
+    {
+        // In the CLI $_SERVER holds the process environment, so HTTP_* variables there are not request headers
+        if (AutoRootSpan::isCliScript()) {
+            return false;
+        }
+
+        return ExcludedRequestHeaders::matchesServer($_SERVER);
     }
 
     /**

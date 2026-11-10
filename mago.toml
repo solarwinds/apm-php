@@ -1,0 +1,8 @@
+# mago.toml
+[source]
+paths = ["src"]
+
+[formatter]
+print-width = 120
+tab-width = 4
+use-tabs = false

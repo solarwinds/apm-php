@@ -52,9 +52,10 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
         );
     }
 
+    #[\Override]
     public static function getInstance(?MeterProviderInterface $meterProvider = null, ?string $name = null): SpanProcessorInterface
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof \OpenTelemetry\SDK\Trace\SpanProcessorInterface) {
             self::$instance = new self($meterProvider, $name);
         }
 
@@ -66,6 +67,7 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
         return $this->pool;
     }
 
+    #[\Override]
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
         $parentSpanContext = $span->getParentContext();
@@ -97,6 +99,7 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
      * Still need the deprecated class constant
      * @phan-suppress PhanDeprecatedClassConstant
      */
+    #[\Override]
     public function onEnd(ReadableSpanInterface $span): void
     {
         $parentSpanContext = $span->getParentContext();
@@ -123,7 +126,7 @@ class ResponseTimeSpanProcessor extends NoopSpanProcessor implements SpanProcess
                 $attributes[$key] = $value;
             }
         }
-        $this->logDebug('Recording response time: ' . $durationMs . 'ms, ' . json_encode($attributes));
+        $this->logDebug('Recording response time: ' . (string) $durationMs . 'ms, ' . (json_encode($attributes) ?: '[]'));
         $this->histogram->record($durationMs, $attributes);
     }
 }

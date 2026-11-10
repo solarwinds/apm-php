@@ -19,7 +19,7 @@ final class ResponsePropagatorXTrace implements ComponentProvider
 {
     /**
      * @phan-suppress PhanParamSignatureMismatch
-     * @param array{} $properties
+     * @param array $properties
      * @param Context $context
      * @return ResponsePropagatorInterface
      */

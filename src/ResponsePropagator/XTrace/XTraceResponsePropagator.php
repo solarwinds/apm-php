@@ -29,7 +29,7 @@ class XTraceResponsePropagator implements ResponsePropagatorInterface
 
     public static function getInstance(): self
     {
-        if (null === self::$instance) {
+        if (!self::$instance instanceof XTraceResponsePropagator) {
             self::$instance = new self();
         }
 

@@ -107,7 +107,7 @@ class Configuration
             $maskedToken,
             $this->tracingMode !== null ? ($this->tracingMode ? 'true' : 'false') : 'null',
             $this->triggerTraceEnabled ? 'true' : 'false',
-            json_encode($this->transactionSettings)
+            json_encode($this->transactionSettings) ?: '[]'
         );
     }
 }
