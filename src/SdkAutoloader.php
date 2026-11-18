@@ -70,6 +70,7 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
+        Globals::reset();
         $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {

@@ -46,12 +46,12 @@
       "Solarwinds\\ApmPhp\\": "src/"
     },
     "files": [
-      "src/_autoload.php",
       "src/Propagator/TraceState/_register.php",
       "src/Propagator/XTraceOptions/_register.php",
       "src/Resource/_register.php",
       "src/ResponsePropagator/XTrace/_register.php",
-      "src/ResponsePropagator/XTraceOptionsResponse/_register.php"
+      "src/ResponsePropagator/XTraceOptionsResponse/_register.php",
+      "src/_autoload.php"
     ]
   },
   "autoload-dev": {
