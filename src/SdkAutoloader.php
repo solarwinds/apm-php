@@ -67,10 +67,13 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
+        self::logWarning('apm-php SdkAutoloader::autoload() called');
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
+        self::logWarning('apm-php Before Globals::reset()');
         Globals::reset();
+        self::logWarning('apm-php After Globals::reset()');
         $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
@@ -86,12 +89,19 @@ class SdkAutoloader
                 }
             }
         } else {
+            self::logWarning('apm-php Before Globals::registerInitializer()');
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
+            self::logWarning('apm-php After Globals::registerInitializer()');
         }
+        self::logWarning('apm-php Before self::registerInstrumentations');
         self::registerInstrumentations($config);
+        self::logWarning('apm-php After self::registerInstrumentations');
 
+        self::logWarning('apm-php Before AutoRootSpan::start');
         AutoRootSpan::start();
+        self::logWarning('apm-php After AutoRootSpan::start');
 
+        self::logWarning('apm-php SdkAutoloader::autoload() completed');
         return true;
     }
 
