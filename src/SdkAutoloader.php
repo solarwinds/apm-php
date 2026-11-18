@@ -25,7 +25,6 @@ use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\LateBindingMeterProvider;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
-use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
 use OpenTelemetry\Context\Context;
@@ -54,6 +53,7 @@ use OpenTelemetry\SDK\Trace\ExcludedRequestHeaders;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
+use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
 use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 use Throwable;
@@ -70,13 +70,6 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
-
-        if (Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
-            // end the root span if it is already auto-started, to avoid duplicate root spans in the same request
-            AutoRootSpan::shutdownHandler();
-        }
-        Globals::reset();
-
         $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
@@ -344,7 +337,7 @@ class SdkAutoloader
      */
     public static function isEnabled(): bool
     {
-        return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+        return Configuration::getBoolean(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED, true);
     }
 
     /**

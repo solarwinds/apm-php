@@ -6,7 +6,7 @@ use OpenTelemetry\API\Globals;
 use Solarwinds\ApmPhp\API\TransactionName;
 
 putenv('OTEL_SERVICE_NAME=apm-php-basic-test-service');
-putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
+putenv('SW_APM_AUTOLOAD_ENABLED=true');
 putenv('OTEL_TRACES_EXPORTER=console');
 putenv('OTEL_METRICS_EXPORTER=console');
 putenv('OTEL_LOGS_EXPORTER=console');

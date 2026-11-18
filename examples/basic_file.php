@@ -5,7 +5,7 @@ declare(strict_types=1);
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Trace\SpanKind;
 
-putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
+putenv('SW_APM_AUTOLOAD_ENABLED=true');
 putenv('OTEL_CONFIG_FILE=./basic_file.yaml');
 
 require __DIR__ . '/../vendor/autoload.php';

@@ -13,6 +13,7 @@ interface Variables
     /**
      * General SDK Configuration
      */
+    public const SW_APM_AUTOLOAD_ENABLED = 'SW_APM_AUTOLOAD_ENABLED';
     public const SW_APM_SERVICE_KEY = 'SW_APM_SERVICE_KEY';
     public const SW_APM_COLLECTOR = 'SW_APM_COLLECTOR';
     public const SW_APM_TRACING_MODE = 'SW_APM_TRACING_MODE';
