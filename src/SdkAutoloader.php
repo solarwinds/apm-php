@@ -71,7 +71,9 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
-        // In case user set OTEL_PHP_AUTOLOAD_ENABLED=true, we want to make sure that the SDK is reset but there will be warning messages that swo_* components are not available. This is expected behavior and can be ignored.
+        // In case user set OTEL_PHP_AUTOLOAD_ENABLED=true (which should not),
+        // we want to make sure that the SDK is reset but there will be warning messages complains about swo_* components are not available.
+        // This is expected behavior and can be ignored.
         if (Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
             // end the root span if it is already auto-started, to avoid duplicate root spans in the same request
             AutoRootSpan::shutdownHandler();
