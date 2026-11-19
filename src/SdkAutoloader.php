@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp;
 
-use OpenTelemetry\API\Trace\Span;
 use function class_exists;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
@@ -26,6 +25,7 @@ use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\LateBindingMeterProvider;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
 use OpenTelemetry\Context\Context;
