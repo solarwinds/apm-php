@@ -68,6 +68,7 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
+        self::logDebug('apm-php SDK autoloader invoked');
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
@@ -100,6 +101,7 @@ class SdkAutoloader
 
         AutoRootSpan::start();
 
+        self::logDebug('apm-php SDK autoloader ended');
         return true;
     }
 
