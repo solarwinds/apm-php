@@ -73,13 +73,13 @@ class SdkAutoloader
             return false;
         }
         // In case user set OTEL_PHP_AUTOLOAD_ENABLED=true, we want to make sure that the SDK is reset but there will be warning messages that swo_* components are not available. This is expected behavior and can be ignored.
-        if (Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED)) {
-            if (Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
-                // end the root span if it is already auto-started, to avoid duplicate root spans in the same request
-                AutoRootSpan::shutdownHandler();
-            }
-            Globals::reset();
+        if (Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
+            // end the root span if it is already auto-started, to avoid duplicate root spans in the same request
+            AutoRootSpan::shutdownHandler();
+            self::logDebug('apm-php SDK AutoRootSpan::shutdownHandler invoked');
         }
+        Globals::reset();
+        self::logDebug('apm-php SDK Globals::reset invoked');
         $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
@@ -102,6 +102,7 @@ class SdkAutoloader
         AutoRootSpan::start();
 
         self::logDebug('apm-php SDK autoloader ended');
+
         return true;
     }
 
