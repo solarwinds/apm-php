@@ -40,6 +40,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
         if (file_exists($this->tempConfigFile)) {
             unlink($this->tempConfigFile);
         }
+        putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=');
         putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED . '=');
         putenv(Variables::OTEL_PHP_EXCLUDED_URLS . '=');
         putenv(Variables::OTEL_CONFIG_FILE . '=');
