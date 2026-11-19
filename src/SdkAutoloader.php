@@ -68,7 +68,6 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
-        self::logDebug('apm-php SDK autoloader invoked');
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
@@ -76,10 +75,9 @@ class SdkAutoloader
         if (Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
             // end the root span if it is already auto-started, to avoid duplicate root spans in the same request
             AutoRootSpan::shutdownHandler();
-            self::logDebug('apm-php SDK AutoRootSpan::shutdownHandler invoked');
+            self::logDebug('solarwinds/apm AutoRootSpan::shutdownHandler() invoked');
         }
         Globals::reset();
-        self::logDebug('apm-php SDK Globals::reset invoked');
         $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
@@ -100,8 +98,6 @@ class SdkAutoloader
         self::registerInstrumentations($config);
 
         AutoRootSpan::start();
-
-        self::logDebug('apm-php SDK autoloader ended');
 
         return true;
     }
