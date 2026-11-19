@@ -3,10 +3,11 @@
 ## Specification
 [solarwinds/apm](https://packagist.org/packages/solarwinds/apm) supports [OpenTelemetry SDK configuration](https://opentelemetry.io/docs/zero-code/php/#configuration), all available variables are listed [here](https://github.com/open-telemetry/opentelemetry-php/blob/main/src/SDK/Common/Configuration/Variables.php).
 
-Additionally the following SolarWinds-specific configurations are supported:
+Additionally, the following SolarWinds-specific configurations are supported:
 
 | Configuration                    | Default                                  | Description                                                                                                                                      |
 |----------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| SW_APM_AUTOLOAD_ENABLED          | true                                     | Enable autoloading of apm-php                                                                                                                    |
 | SW_APM_SERVICE_KEY               |                                          | **Service key**. API token to authenticate with SolarWinds                                                                                       |
 | SW_APM_COLLECTOR                 | apm.collector.na-01.cloud.solarwinds.com | [APM collector endpoint](https://documentation.solarwinds.com/en/success_center/observability/content/system_requirements/endpoints.htm#General) |
 | SW_APM_TRACING_MODE              | enabled                                  | Enable observability for the service. Valid values: enabled, disabled                                                                            |
@@ -103,7 +104,7 @@ composer require open-telemetry/opentelemetry-logger-monolog
 ```
 
 ### Automatic configuration
-`solarwinds/apm` uses OpenTelemetry SDK autoloading with `OTEL_PHP_AUTOLOAD_ENABLED=true`, you can retrieve the global logger provider. That may be a no-op implementation if there was any misconfiguration.
+`solarwinds/apm` uses OpenTelemetry SDK autoloading by default with `SW_APM_AUTOLOAD_ENABLED=true` and `OTEL_PHP_AUTOLOAD_ENABLED=false`, you can retrieve the global logger provider. That may be a no-op implementation if there was any misconfiguration.
 
 Retrieve the Globals LoggerProvider and pass it to the handler:
 ```php

@@ -20,7 +20,6 @@
 - **Timing:** Set OpenTelemetry environment variables before including the Composer autoloader (e.g., before `vendor/autoload.php`). Setting them too late can prevent proper initialization.
 - **Verification:** Use `printenv` to confirm all OpenTelemetry-related environment variables are set and accessible to your PHP application.
 - **Common Environment Variables:**
-  - `OTEL_PHP_AUTOLOAD_ENABLED`
   - `OTEL_SERVICE_NAME`
   - `OTEL_TRACES_SAMPLER`
   - `OTEL_PROPAGATORS`

@@ -117,8 +117,7 @@ Get your `<solarwinds-token>` from [SolarWinds SaaS Free Trial](https://www.sola
 
 Start the app with tracing, make sure to replace `<solarwinds-otlp-endpoint>` and `<solarwinds-token>` with your actual value:
 ```bash
-env OTEL_PHP_AUTOLOAD_ENABLED=true \
-    OTEL_SERVICE_NAME=php-example \
+env OTEL_SERVICE_NAME=php-example \
     OTEL_TRACES_SAMPLER=swo_http \
     OTEL_PROPAGATORS=baggage,tracecontext,swo_tracestate,swo_xtraceoptions \
     OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=swo_xtrace,swo_xtraceoptionsresponse \
@@ -165,8 +164,7 @@ docker run -e SOLARWINDS_TOKEN="<solarwinds-token>" -p 127.0.0.1:4317:4317 -p 12
 ### 6. Run with tracing enabled and export through a local collector to SolarWinds Observability
 Restart the app with tracing using the following to send data to the local collector:
 ```bash
-env OTEL_PHP_AUTOLOAD_ENABLED=true \
-    OTEL_SERVICE_NAME=php-example \
+env OTEL_SERVICE_NAME=php-example \
     OTEL_TRACES_SAMPLER=swo_http \
     OTEL_PROPAGATORS=baggage,tracecontext,swo_tracestate,swo_xtraceoptions \
     OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=swo_xtrace,swo_xtraceoptionsresponse \
