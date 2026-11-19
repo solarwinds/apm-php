@@ -80,6 +80,7 @@ class SdkAutoloader
             self::logDebug('solarwinds/apm AutoRootSpan::shutdownHandler() invoked');
         }
         Globals::reset();
+
         $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
