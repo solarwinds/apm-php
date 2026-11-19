@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Solarwinds\ApmPhp;
 
+use OpenTelemetry\API\Trace\Span;
 use function class_exists;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
@@ -67,13 +68,17 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
-        self::logWarning('apm-php SdkAutoloader::autoload() called');
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
-        self::logWarning('apm-php Before Globals::reset()');
-        Globals::reset();
-        self::logWarning('apm-php After Globals::reset()');
+        // In case user set OTEL_PHP_AUTOLOAD_ENABLED=true, we want to make sure that the SDK is reset but there will be warning messages that swo_* components are not available. This is expected behavior and can be ignored.
+        if (Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED)) {
+            if (Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
+                // end the root span if it is already auto-started, to avoid duplicate root spans in the same request
+                AutoRootSpan::shutdownHandler();
+            }
+            Globals::reset();
+        }
         $config = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
@@ -89,19 +94,12 @@ class SdkAutoloader
                 }
             }
         } else {
-            self::logWarning('apm-php Before Globals::registerInitializer()');
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
-            self::logWarning('apm-php After Globals::registerInitializer()');
         }
-        self::logWarning('apm-php Before self::registerInstrumentations');
         self::registerInstrumentations($config);
-        self::logWarning('apm-php After self::registerInstrumentations');
 
-        self::logWarning('apm-php Before AutoRootSpan::start');
         AutoRootSpan::start();
-        self::logWarning('apm-php After AutoRootSpan::start');
 
-        self::logWarning('apm-php SdkAutoloader::autoload() completed');
         return true;
     }
 
