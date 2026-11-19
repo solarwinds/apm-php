@@ -113,7 +113,7 @@ class SwoSamplerFactory
 
     public function create(?MeterProviderInterface $meterProvider = null): SamplerInterface
     {
-        $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
+        $name = Configuration::getEnum(Env::OTEL_TRACES_SAMPLER);
 
         if (str_contains($name, self::TRACEIDRATIO_PREFIX) || str_contains($name, self::SWO_PREFIX)) {
             switch ($name) {
