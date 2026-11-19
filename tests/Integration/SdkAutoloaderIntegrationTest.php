@@ -54,6 +54,14 @@ class SdkAutoloaderIntegrationTest extends TestCase
         // Optionally, check for side effects or global state changes here
     }
 
+    public function test_autoload_enabled_by_default_when_variable_is_unset(): void
+    {
+        // putenv without '=' removes the variable from the environment entirely
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED);
+        $this->assertFalse(getenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED), 'Precondition: variable must be genuinely unset');
+        $this->assertTrue(SdkAutoloader::autoload(), 'Autoload should default to enabled when SW_APM_AUTOLOAD_ENABLED is unset.');
+    }
+
     public function test_autoload_with_config_file_initialization(): void
     {
         // Create a minimal valid YAML config file for OpenTelemetry

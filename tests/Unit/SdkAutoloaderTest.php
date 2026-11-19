@@ -43,6 +43,33 @@ class SdkAutoloaderTest extends TestCase
         $this->assertFalse(SdkAutoloader::isEnabled());
     }
 
+    public function test_is_enabled_defaults_to_true_when_variable_is_unset(): void
+    {
+        // putenv without '=' removes the variable from the environment entirely
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED);
+        unset($_SERVER[SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED], $_ENV[SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED]);
+        $this->assertFalse(getenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED), 'Precondition: variable must be genuinely unset');
+        $this->assertTrue(SdkAutoloader::isEnabled());
+    }
+
+    public function test_is_enabled_defaults_to_true_when_variable_is_empty(): void
+    {
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED . '=');
+        $this->assertTrue(SdkAutoloader::isEnabled());
+    }
+
+    public function test_is_enabled_ignores_otel_php_autoload_enabled(): void
+    {
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED);
+        putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=false');
+
+        try {
+            $this->assertTrue(SdkAutoloader::isEnabled());
+        } finally {
+            putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+        }
+    }
+
     public function test_is_excluded_url_with_no_config(): void
     {
         $this->assertFalse(SdkAutoloader::isExcludedUrl());
