@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\TestCase;
+use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\SdkAutoloader;
 
 class SdkAutoloaderIntegrationTest extends TestCase
@@ -24,7 +25,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
     protected function setUp(): void
     {
         $_SERVER = [];
-        putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=');
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED . '=');
         putenv(Variables::OTEL_PHP_EXCLUDED_URLS . '=');
         putenv(Variables::OTEL_CONFIG_FILE . '=');
         $this->tempConfigFile = sys_get_temp_dir() . '/otel_test_config.yaml';
@@ -40,23 +41,32 @@ class SdkAutoloaderIntegrationTest extends TestCase
             unlink($this->tempConfigFile);
         }
         putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=');
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED . '=');
         putenv(Variables::OTEL_PHP_EXCLUDED_URLS . '=');
         putenv(Variables::OTEL_CONFIG_FILE . '=');
     }
 
     public function test_autoload_with_environment_initialization(): void
     {
-        putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=true');
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED . '=true');
         $result = SdkAutoloader::autoload();
         $this->assertTrue($result, 'Autoload should return true when enabled and not excluded.');
         // Optionally, check for side effects or global state changes here
+    }
+
+    public function test_autoload_enabled_by_default_when_variable_is_unset(): void
+    {
+        // putenv without '=' removes the variable from the environment entirely
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED);
+        $this->assertFalse(getenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED), 'Precondition: variable must be genuinely unset');
+        $this->assertTrue(SdkAutoloader::autoload(), 'Autoload should default to enabled when SW_APM_AUTOLOAD_ENABLED is unset.');
     }
 
     public function test_autoload_with_config_file_initialization(): void
     {
         // Create a minimal valid YAML config file for OpenTelemetry
         file_put_contents($this->tempConfigFile, 'instrumentation:');
-        putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=true');
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED . '=true');
         putenv(Variables::OTEL_CONFIG_FILE . '=' . $this->tempConfigFile);
         $result = SdkAutoloader::autoload();
         $this->assertTrue($result, 'Autoload should return true when config file is present and valid.');
@@ -65,7 +75,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
 
     public function test_autoload_with_excluded_url(): void
     {
-        putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=true');
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED . '=true');
         putenv(Variables::OTEL_PHP_EXCLUDED_URLS . '=foo');
         $_SERVER['REQUEST_URI'] = '/foo';
         $result = SdkAutoloader::autoload();
@@ -87,6 +97,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
         $_SERVER['REQUEST_URI'] = '/';
         $_SERVER['HTTP_HOST'] = 'localhost';
         putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=true');
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED . '=true');
         putenv(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED . '=true');
 
         try {
@@ -113,7 +124,7 @@ class SdkAutoloaderIntegrationTest extends TestCase
             ->build();
         $span = $tracerProvider->getTracer('test')->spanBuilder('application')->startSpan();
         $scope = $span->activate();
-        putenv(Variables::OTEL_PHP_AUTOLOAD_ENABLED . '=false');
+        putenv(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED . '=false');
 
         try {
             $this->assertFalse(SdkAutoloader::autoload());

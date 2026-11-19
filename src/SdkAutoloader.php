@@ -54,6 +54,7 @@ use OpenTelemetry\SDK\Trace\ExcludedRequestHeaders;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
+use Solarwinds\ApmPhp\Common\Configuration\Variables as SolarwindsEnv;
 use Solarwinds\ApmPhp\Trace\SpanProcessor\ResponseTimeSpanProcessor;
 use Solarwinds\ApmPhp\Trace\SwoSamplerFactory;
 use Throwable;
@@ -70,10 +71,13 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
-
+        // In case user set OTEL_PHP_AUTOLOAD_ENABLED=true (which should not),
+        // we want to make sure that the SDK is reset but there will be warning messages complains about swo_* components are not available.
+        // This is expected behavior and can be ignored.
         if (Span::fromContext(Context::getCurrent())->getContext()->isValid()) {
             // end the root span if it is already auto-started, to avoid duplicate root spans in the same request
             AutoRootSpan::shutdownHandler();
+            self::logDebug('solarwinds/apm AutoRootSpan::shutdownHandler() invoked');
         }
         Globals::reset();
 
@@ -344,7 +348,7 @@ class SdkAutoloader
      */
     public static function isEnabled(): bool
     {
-        return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+        return Configuration::getBoolean(SolarwindsEnv::SW_APM_AUTOLOAD_ENABLED, true);
     }
 
     /**

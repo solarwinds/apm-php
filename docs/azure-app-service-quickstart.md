@@ -126,7 +126,6 @@ Set these app setting environment variables to enable the extensions and auto-in
 | Name                      | Value                                                                                                                                           |
 |---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | PHP_INI_SCAN_DIR          | `/usr/local/etc/php/conf.d:/home/site/ini`. This adds the path used in the [example](#install-the-opentelemetry-and-solarwinds-apm-extensions). |
-| OTEL_PHP_AUTOLOAD_ENABLED | `true`                                                                                                                                          |
 
 # WordPress App Service
 
