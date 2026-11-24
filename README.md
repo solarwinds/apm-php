@@ -200,6 +200,12 @@ For more details, see the [OpenTelemetry PHP documentation](https://opentelemetr
 ## Example for Azure App Service
 To set up SolarWinds APM in an Azure App Service deployment, see the [Azure App Service Quickstart](./docs/azure-app-service-quickstart.md).
 
+## Opentelemetry-operator support for apm-php
+See [opentelemetry-operator support for apm-php](./docs/opentelemetry-operator-support.md) for instructions on how to install apm-php in a Kubernetes cluster using the opentelemetry-operator.
+
+## Opentelemetry-helm-chart support for apm-php
+See [opentelemetry-helm-chart support for apm-php](./docs/opentelemetry-helm-chart-support.md) for instructions on how to install apm-php in a Kubernetes cluster using the opentelemetry-helm-chart.
+
 ## Custom Transaction Name
 
 Set a custom transaction name at the beginning of your application:
