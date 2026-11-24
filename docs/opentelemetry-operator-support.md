@@ -33,6 +33,8 @@ spec:
         value: "<solarwinds-otlp-endpoint>"
       - name: OTEL_EXPORTER_OTLP_HEADERS
         value: "Authorization=Bearer <solarwinds-token>"
+      - name: SW_APM_COLLECTOR
+        value: "<solarwinds-apm-collector>"
       - name: SW_APM_SERVICE_KEY
         value: "<solarwinds-token>"
 ```
