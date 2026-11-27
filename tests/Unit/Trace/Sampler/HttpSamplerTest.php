@@ -23,12 +23,11 @@ class HttpSamplerTest extends TestCase
         if (empty($serviceKey)) {
             $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set.');
         }
-        [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
         $sampler = new HttpSampler(null, new Configuration(
-            service: $service,
+            service: 'phpunit',
             collector: 'https://apm.collector.na-01.cloud.solarwinds.com',
-            token: $token,
+            token: $serviceKey,
             tracingMode: true,
             triggerTraceEnabled: true,
             transactionSettings: []
@@ -72,12 +71,11 @@ class HttpSamplerTest extends TestCase
         if (empty($serviceKey)) {
             $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set.');
         }
-        [$token, $service] = explode(':', $serviceKey);
         $spanExporter = new InMemoryExporter();
         $sampler = new HttpSampler(null, new Configuration(
-            service: $service,
+            service: 'phpunit',
             collector: 'https://collector.invalid',
-            token: $token,
+            token: $serviceKey,
             tracingMode: true,
             triggerTraceEnabled: true,
             transactionSettings: []
