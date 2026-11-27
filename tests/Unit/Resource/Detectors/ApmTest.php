@@ -33,7 +33,7 @@ class ApmTest extends TestCase
             $this->assertSame('apm', $resource->getAttributes()->get(Apm::SW_DATA_MODULE));
             $this->assertSame($version, $resource->getAttributes()->get(Apm::SW_APM_VERSION));
         } else {
-            $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set or invalid.');
+            $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set in legacy format or invalid.');
         }
     }
 
