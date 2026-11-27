@@ -22,7 +22,7 @@ Project maintainers may request additional information to help resolve your issu
 
 1. Ensure you have PHP 8.1+ and Docker installed.
 2. Clone the repository.
-3. Copy `.env.dist` to `.env` and set a valid SolarWinds Observability API token and service name in `SW_APM_SERVICE_KEY` (get a token from the [SolarWinds SaaS Free Trial](https://www.solarwinds.com/solarwinds-observability/registration)).
+3. Copy `.env.dist` to `.env` and set a valid SolarWinds Observability API token in `SW_APM_SERVICE_KEY` (get a token from the [SolarWinds SaaS Free Trial](https://www.solarwinds.com/solarwinds-observability/registration)).
 
 ## Local Development Workflow
 

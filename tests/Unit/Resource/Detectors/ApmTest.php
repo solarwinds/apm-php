@@ -19,7 +19,7 @@ class ApmTest extends TestCase
 
     private const AZURE_APP_SERVICE_DETECTOR_CLASS = 'OpenTelemetry\\Contrib\\Resource\\Detector\\Azure\\AppService\\Detector';
 
-    public function test_swo_get_resource_service_name_from_sw_apm_service_key(): void
+    public function test_swo_get_resource_service_name_from_legacy_sw_apm_service_key_format(): void
     {
         $serviceKey = getenv(SolarwindsEnv::SW_APM_SERVICE_KEY);
         if ($serviceKey && str_contains($serviceKey, ':')) {
@@ -33,7 +33,7 @@ class ApmTest extends TestCase
             $this->assertSame('apm', $resource->getAttributes()->get(Apm::SW_DATA_MODULE));
             $this->assertSame($version, $resource->getAttributes()->get(Apm::SW_APM_VERSION));
         } else {
-            $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set or invalid.');
+            $this->markTestSkipped('SW_APM_SERVICE_KEY environment variable is not set in legacy format or invalid.');
         }
     }
 

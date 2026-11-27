@@ -125,7 +125,7 @@ env OTEL_SERVICE_NAME=php-example \
     OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram \
     OTEL_EXPORTER_OTLP_ENDPOINT=<solarwinds-otlp-endpoint> \
     OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer <solarwinds-token>" \
-    SW_APM_SERVICE_KEY=<solarwinds-token>:php-example \
+    SW_APM_SERVICE_KEY=<solarwinds-token> \
     php -S localhost:8080
 ```
 
@@ -170,7 +170,7 @@ env OTEL_SERVICE_NAME=php-example \
     OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS=swo_xtrace,swo_xtraceoptionsresponse \
     OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta \
     OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram \
-    SW_APM_SERVICE_KEY=<solarwinds-token>:php-example \
+    SW_APM_SERVICE_KEY=<solarwinds-token> \
     php -S localhost:8080
 ```
 
