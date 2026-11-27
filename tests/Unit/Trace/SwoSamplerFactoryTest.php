@@ -195,7 +195,7 @@ class SwoSamplerFactoryTest extends TestCase
         file_put_contents($file, $settings);
         \putenv('SW_APM_TRANSACTION_SETTINGS_FILE=' . $file);
         $factory = new SwoSamplerFactory();
-        $config = $factory->getSolarwindsConfiguration(true, 'token:service');
+        $config = $factory->getSolarwindsConfiguration(true, 'token');
         $this->assertEquals([['tracing' => 'enabled', 'regex' => '/^.*.html$/'], ['tracing' => 'disabled', 'regex' => '/^.*.css$/']], $config->getTransactionSettings());
         \putenv('SW_APM_TRANSACTION_SETTINGS_FILE');
         unlink($file);
@@ -209,7 +209,7 @@ class SwoSamplerFactoryTest extends TestCase
         }
         \putenv('SW_APM_TRANSACTION_SETTINGS=' . $settings);
         $factory = new SwoSamplerFactory();
-        $config = $factory->getSolarwindsConfiguration(true, 'token:service');
+        $config = $factory->getSolarwindsConfiguration(true, 'token');
         $this->assertEquals([['tracing' => 'enabled', 'regex' => '/^.*.html$/'], ['tracing' => 'disabled', 'regex' => '/^.*.css$/']], $config->getTransactionSettings());
         \putenv('SW_APM_TRANSACTION_SETTINGS');
     }

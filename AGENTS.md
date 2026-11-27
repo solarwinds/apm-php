@@ -15,7 +15,7 @@ Use this flow to get productive quickly in a local development environment.
 1. Confirm prerequisites: PHP 8.1+, Docker, Composer, PECL, and `pie`.
 2. Create local environment file and set service key:
    - copy `.env.dist` to `.env`
-   - set `SW_APM_SERVICE_KEY=<token>:<service-name>`
+   - set `SW_APM_SERVICE_KEY=<token>`
 3. Install dependencies and run unit tests.
 4. Run all quality checks before opening a PR.
 
@@ -83,7 +83,7 @@ SolarWinds-specific settings are documented in [CONFIGURATION.md](./CONFIGURATIO
 
 | Variable                           | Purpose                                              |
 |------------------------------------|------------------------------------------------------|
-| `SW_APM_SERVICE_KEY`               | Service identity/auth key (`<token>:<service-name>`) |
+| `SW_APM_SERVICE_KEY`               | Service auth key (`<token>`) |
 | `SW_APM_COLLECTOR`                 | SolarWinds APM collector endpoint                    |
 | `SW_APM_TRACING_MODE`              | Enable/disable tracing behavior                      |
 | `SW_APM_TRIGGER_TRACE`             | Enable/disable trigger trace behavior                |
